@@ -57,11 +57,24 @@ For each eligible file in `/learning`:
      - Anti-patterns (things that repeatedly fail)
    - Each entry must be concise.
    - Each entry must include a short source or promotion reason.
+- Each promoted entry must include the promotion signal used (from PROMOTION CRITERIA).
    - Avoid duplicates: merge/update existing entries instead of adding repeats.
    - Avoid clutter, but do not skip clearly important confirmed information.
 
 7. **Mark as processed**
    - Update `memory/learning-processed.json` with filename + last modified time.
+
+## PROMOTION CRITERIA
+
+Promotion to `MEMORY.md` is allowed only when at least one validation signal is true:
+
+- Repeated observation across multiple files
+- Explicit user confirmation
+- Experiment succeeds more than once
+- Decision finalized by the user
+- External source explicitly trusted
+
+Each promoted memory entry must include which signal triggered promotion.
 
 ## Quality Bar
 
