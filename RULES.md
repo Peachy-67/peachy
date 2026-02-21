@@ -37,9 +37,10 @@ For each eligible file in `/learning`:
    - Append a dated entry to `memory/YYYY-MM-DD.md`.
    - Include source filename and modified time for traceability.
 
-5. **Promote long-term memory (when warranted)**
-   - If information is durable and broadly useful, add distilled notes to `MEMORY.md`.
-   - Avoid clutter: only include items likely to matter later.
+5. **Promote long-term memory (required for important facts)**
+   - Whenever reading files in `/learning`, add all important facts to `MEMORY.md`.
+   - Distill to durable, high-value points that are likely to matter later.
+   - Avoid clutter, but do not skip clearly important information.
 
 6. **Mark as processed**
    - Update `memory/learning-processed.json` with filename + last modified time.
