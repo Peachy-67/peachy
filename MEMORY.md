@@ -2,22 +2,19 @@
 
 Curated, durable facts learned over time.
 
-## Identity & People
+## Facts (stable truths)
 - _No entries yet._
 
-## Preferences
+## Preferences (user preferences)
 - _No entries yet._
 
-## Projects & Systems
+## Decisions (important project decisions)
 - _No entries yet._
 
-## Decisions
+## Patterns (things that repeatedly work)
 - _No entries yet._
 
-## Open Loops / Follow-ups
-- _No entries yet._
-
-## Reference Notes
+## Anti-patterns (things that repeatedly fail)
 - _No entries yet._
 
 ---
