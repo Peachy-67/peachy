@@ -57,7 +57,8 @@ For each eligible file in `/learning`:
      - Anti-patterns (things that repeatedly fail)
    - Each entry must be concise.
    - Each entry must include a short source or promotion reason.
-- Each promoted entry must include the promotion signal used (from PROMOTION CRITERIA).
+   - Each promoted entry must include the promotion signal used (from PROMOTION CRITERIA).
+   - Each promoted entry must include a confidence level: `tentative`, `confirmed`, or `strong`.
    - Avoid duplicates: merge/update existing entries instead of adding repeats.
    - Avoid clutter, but do not skip clearly important confirmed information.
 
@@ -75,6 +76,7 @@ Promotion to `MEMORY.md` is allowed only when at least one validation signal is 
 - External source explicitly trusted
 
 Each promoted memory entry must include which signal triggered promotion.
+Each promoted memory entry must include a confidence field with one of: `tentative`, `confirmed`, `strong`.
 
 ## Quality Bar
 
@@ -93,7 +95,7 @@ When logging a file to `memory/YYYY-MM-DD.md`, use:
 - Key facts/decisions/todos: `<bulleted list>`
 - Long-term promotion: `yes/no` (+ short reason)
 - Promotion status: `scratch` (observation/guess/experiment) or `MEMORY.md` (confirmed/repeated insight)
-- If promoted to `MEMORY.md`: include section + concise entry text + short source/promotion reason
+- If promoted to `MEMORY.md`: include section + concise entry text + short source/promotion reason + promotion signal + confidence (`tentative`|`confirmed`|`strong`)
 
 ## Update Policy
 
