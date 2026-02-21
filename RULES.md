@@ -177,8 +177,10 @@ What to propose:
 - Propose runbook updates when existing runbooks are missing steps, unclear, or repeatedly bypassed.
 - Propose new runbooks when a repeatable procedure appears across multiple runs.
 - Proposals must include:
-  - evidence from run log sessions
+  - evidence links (run ids)
   - expected benefit
+  - risk
+  - rollback plan
   - draft checklist changes or new runbook outline
 
 Promotion/change safety:
