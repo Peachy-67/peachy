@@ -41,3 +41,10 @@
 - Created `RUNBOOKS/decision-quality.md` with pre-action, uncertainty, promotion, and execution checklists.
 - Did not update `MEMORY.md` in this step.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Create SELF_IMPROVEMENT loop.
+- Moved INBOX → ACTIVE.
+- Added `SELF_IMPROVEMENT` section to `RULES.md` with cadence, detection rules, and proposal behavior.
+- Suggested review cadence: every 5 runs.
+- Enforced no auto-promotion / no auto-apply for self-improvement changes.
+- Did not update `MEMORY.md` in this step.
+- Moved ACTIVE → DONE.

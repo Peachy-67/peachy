@@ -95,3 +95,13 @@
   - Created: 2026-02-21
   - Definition of Done: Runbook created at `RUNBOOKS/decision-quality.md` with required checklists
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-09
+  - Title: Add SELF_IMPROVEMENT loop to RULES
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: SELF_IMPROVEMENT section added with cadence, detections, proposals, and no-auto-promotion rule
+  - Updated: 2026-02-21

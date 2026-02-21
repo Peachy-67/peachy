@@ -160,6 +160,32 @@ Influence on memory behavior:
 - If the same mistake occurs 2+ times, propose promotion to `MEMORY.md` → **Anti-patterns** (include promotion signal + confidence).
 - If something becomes a repeatable procedure, create a runbook file under `tasks/` (or `RUNBOOKS/` if created later), but only after repeated use.
 
+## SELF_IMPROVEMENT
+
+Goal: improve execution quality over time using run logs.
+
+Review cadence:
+- Run self-improvement review every **5 runs** (suggested default).
+- If incidents/spikes in errors appear, run an earlier review.
+
+What to detect from recent run logs:
+- Slow tasks (tasks with unusually high step count, retries, or long elapsed cycles).
+- Repeated mistakes (same failure mode appears 2+ times).
+- Repeated successes (same tactic produces good outcomes 2+ times).
+
+What to propose:
+- Propose runbook updates when existing runbooks are missing steps, unclear, or repeatedly bypassed.
+- Propose new runbooks when a repeatable procedure appears across multiple runs.
+- Proposals must include:
+  - evidence from run log sessions
+  - expected benefit
+  - draft checklist changes or new runbook outline
+
+Promotion/change safety:
+- Never auto-promote changes from self-improvement review.
+- Never auto-apply runbook edits without explicit user approval.
+- Treat review output as proposals queued for user decision.
+
 ## Update Policy
 
 - Re-process a file if its modified time changed.
