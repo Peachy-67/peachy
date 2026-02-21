@@ -153,6 +153,13 @@ Influence on memory behavior:
 - Execution logs are operational records, not long-term memory.
 - Execution logs are **not** `MEMORY.md`.
 
+## EXECUTION_LEARNING
+
+- Do not promote execution tips to `MEMORY.md` after a single run.
+- If the same tactic succeeds 2+ times, propose promotion to `MEMORY.md` → **Patterns** (include promotion signal + confidence).
+- If the same mistake occurs 2+ times, propose promotion to `MEMORY.md` → **Anti-patterns** (include promotion signal + confidence).
+- If something becomes a repeatable procedure, create a runbook file under `tasks/` (or `RUNBOOKS/` if created later), but only after repeated use.
+
 ## Update Policy
 
 - Re-process a file if its modified time changed.
