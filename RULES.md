@@ -37,14 +37,16 @@ For each eligible file in `/learning`:
    - Append a dated entry to `memory/YYYY-MM-DD.md`.
    - Include source filename and modified time for traceability.
 
-5. **Apply promotion rule before writing long-term memory**
-   - Observations, guesses, and experiment notes go to `scratch/` first (never directly to `MEMORY.md`).
-   - Only repeated or confirmed insights are eligible for promotion into `MEMORY.md`.
-   - Never store guesses directly in `MEMORY.md`.
-   - For each promoted item, include a short promotion reason (why it is confirmed/repeated/useful).
+5. **Apply promotion gate before writing long-term memory**
+   - Never promote knowledge automatically.
+   - Promotion requires confirmation or repeated evidence.
+   - Guesses stay in `scratch/`.
+   - Experiments and experiment notes stay in `scratch/` until validated.
+   - For each promoted item, include a short promotion reason (why it is confirmed/repeated/validated).
 
-6. **Promote long-term memory (required for important confirmed facts)**
+6. **Promote long-term memory (only durable, validated knowledge)**
    - Only promoted knowledge is allowed in `MEMORY.md`.
+   - Only durable, validated knowledge is eligible for `MEMORY.md`.
    - Whenever reading files in `/learning`, add important confirmed facts to `MEMORY.md`.
    - Distill to durable, high-value points that are likely to matter later.
    - Place each item in the correct `MEMORY.md` section:
