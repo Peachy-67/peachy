@@ -44,9 +44,17 @@ For each eligible file in `/learning`:
    - For each promoted item, include a short promotion reason (why it is confirmed/repeated/useful).
 
 6. **Promote long-term memory (required for important confirmed facts)**
+   - Only promoted knowledge is allowed in `MEMORY.md`.
    - Whenever reading files in `/learning`, add important confirmed facts to `MEMORY.md`.
    - Distill to durable, high-value points that are likely to matter later.
-   - Place each item in the correct `MEMORY.md` section.
+   - Place each item in the correct `MEMORY.md` section:
+     - Facts (stable truths)
+     - Preferences (user preferences)
+     - Decisions (important project decisions)
+     - Patterns (things that repeatedly work)
+     - Anti-patterns (things that repeatedly fail)
+   - Each entry must be concise.
+   - Each entry must include a short source or promotion reason.
    - Avoid duplicates: merge/update existing entries instead of adding repeats.
    - Avoid clutter, but do not skip clearly important confirmed information.
 
@@ -70,6 +78,7 @@ When logging a file to `memory/YYYY-MM-DD.md`, use:
 - Key facts/decisions/todos: `<bulleted list>`
 - Long-term promotion: `yes/no` (+ short reason)
 - Promotion status: `scratch` (observation/guess/experiment) or `MEMORY.md` (confirmed/repeated insight)
+- If promoted to `MEMORY.md`: include section + concise entry text + short source/promotion reason
 
 ## Update Policy
 
