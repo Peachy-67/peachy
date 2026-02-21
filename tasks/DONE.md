@@ -55,3 +55,13 @@
   - Created: 2026-02-21
   - Definition of Done: Approved template applied across INBOX/ACTIVE/WAITING/DONE
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-05
+  - Title: Run first real learning ingestion
+  - Type: learning
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Ingest one learning file, log outputs, and apply promotion gate correctly
+  - Updated: 2026-02-21

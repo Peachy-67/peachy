@@ -18,3 +18,9 @@
 - User approved template fields and added `Type` field.
 - Applied template structure across `tasks/INBOX.md`, `tasks/ACTIVE.md`, `tasks/WAITING.md`, and `tasks/DONE.md`.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Run first real learning ingestion.
+- Moved INBOX → ACTIVE.
+- Ingested `learning/learning-test-001.md` through learning pipeline.
+- Logged summary + key items to daily memory and scratch.
+- Promotion gate result: not promoted to `MEMORY.md` (single-source evidence only).
+- Moved ACTIVE → DONE.
