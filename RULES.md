@@ -40,6 +40,8 @@ For each eligible file in `/learning`:
 5. **Promote long-term memory (required for important facts)**
    - Whenever reading files in `/learning`, add all important facts to `MEMORY.md`.
    - Distill to durable, high-value points that are likely to matter later.
+   - Place each item in the correct `MEMORY.md` section.
+   - Avoid duplicates: merge/update existing entries instead of adding repeats.
    - Avoid clutter, but do not skip clearly important information.
 
 6. **Mark as processed**
