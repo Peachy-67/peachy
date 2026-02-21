@@ -109,6 +109,33 @@ On a regular cadence (e.g., weekly), run a memory review loop over recent `MEMOR
 
 Review updates must preserve traceability (keep concise rationale/source notes when confidence or section changes).
 
+## USER_ALIGNMENT
+
+Purpose:
+- The user can explicitly mark behaviors as good or bad.
+- Positive feedback strengthens patterns.
+- Negative feedback creates or reinforces Anti-patterns.
+- Explicit user feedback is a strong validation signal for promotion.
+
+Recording feedback:
+1. Log explicit user feedback in daily memory (`memory/YYYY-MM-DD.md`) with:
+   - behavior/context
+   - feedback type (`positive` or `negative`)
+   - short quote or paraphrase
+   - timestamp/source
+2. If feedback is durable/repeatable, update `MEMORY.md`:
+   - Positive feedback → add/update **Patterns** entry.
+   - Negative feedback → add/update **Anti-patterns** entry.
+3. Include promotion metadata on updates:
+   - promotion signal: `Explicit user confirmation`
+   - confidence: default `confirmed` (or `strong` when repeatedly reinforced)
+   - short reason/source note.
+
+Influence on memory behavior:
+- Positive feedback increases preference for the associated behavior.
+- Negative feedback decreases preference and should be treated as a guardrail.
+- When positive and negative signals conflict, prioritize the most recent explicit user instruction and update/merge entries accordingly.
+
 ## Update Policy
 
 - Re-process a file if its modified time changed.
