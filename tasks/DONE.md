@@ -65,3 +65,13 @@
   - Created: 2026-02-21
   - Definition of Done: Ingest one learning file, log outputs, and apply promotion gate correctly
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-06
+  - Title: Execute learning ingestion on new file in learning/
+  - Type: learning
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Ingest new learning file through pipeline and apply promotion criteria correctly
+  - Updated: 2026-02-21

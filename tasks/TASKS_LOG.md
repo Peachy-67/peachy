@@ -24,3 +24,9 @@
 - Logged summary + key items to daily memory and scratch.
 - Promotion gate result: not promoted to `MEMORY.md` (single-source evidence only).
 - Moved ACTIVE → DONE.
+- Added to INBOX: Execute learning ingestion on new file in learning/.
+- Moved INBOX → ACTIVE.
+- Ingested `learning/agent-building-principles.md` through learning pipeline.
+- Logged summary + key items to daily memory and scratch.
+- Promotion gate result: not promoted to `MEMORY.md` (single-source evidence only).
+- Moved ACTIVE → DONE.
