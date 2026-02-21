@@ -97,6 +97,18 @@ When logging a file to `memory/YYYY-MM-DD.md`, use:
 - Promotion status: `scratch` (observation/guess/experiment) or `MEMORY.md` (confirmed/repeated insight)
 - If promoted to `MEMORY.md`: include section + concise entry text + short source/promotion reason + promotion signal + confidence (`tentative`|`confirmed`|`strong`)
 
+## MEMORY_REVIEW
+
+On a regular cadence (e.g., weekly), run a memory review loop over recent `MEMORY.md` entries:
+
+1. Review recently added or updated entries.
+2. Merge duplicates into a single canonical entry.
+3. Downgrade weak entries by lowering confidence (`strong` → `confirmed` → `tentative`) when evidence is thin or stale.
+4. Move disproven items to **Anti-patterns** with a short note on what failed.
+5. Strengthen entries when repeated evidence appears by increasing confidence (`tentative` → `confirmed` → `strong`) and updating source/promotion signal notes.
+
+Review updates must preserve traceability (keep concise rationale/source notes when confidence or section changes).
+
 ## Update Policy
 
 - Re-process a file if its modified time changed.
