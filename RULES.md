@@ -169,7 +169,7 @@ Review cadence:
 - If incidents/spikes in errors appear, run an earlier review.
 
 What to detect from recent run logs:
-- Slow tasks (tasks with unusually high step count, retries, or long elapsed cycles).
+- Slow tasks (defined as unusually high steps, repeated tool failures, or repeated "ask user" loops).
 - Repeated mistakes (same failure mode appears 2+ times).
 - Repeated successes (same tactic produces good outcomes 2+ times).
 
