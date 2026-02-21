@@ -8,9 +8,12 @@
   - explicit user confirmation
 
 ## Item: learning/agent-building-principles.md
-- Classification: external learning note (single source)
-- Why scratch: promotion criteria not met yet (single-file evidence, no explicit trust signal recorded)
-- Candidate for promotion later if validated by:
-  - repeated observation across additional independent files
-  - explicit user confirmation
-  - repeated successful execution evidence for tactics described
+- Classification: external learning note
+- Initial status: single source (held in scratch)
+- Updated status: reinforced by `learning/decision-principles-002.md`
+- Promotion outcome: key repeated principles promoted to `MEMORY.md` with signal `repeated observation across multiple files` and confidence `confirmed`
+
+## Item: learning/decision-principles-002.md
+- Classification: second independent source (different wording)
+- Validation effect: confirmed repeated principles already seen in `learning/agent-building-principles.md`
+- Promotion outcome: repeated principles eligible and promoted to `MEMORY.md`

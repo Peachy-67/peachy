@@ -30,3 +30,9 @@
 - Logged summary + key items to daily memory and scratch.
 - Promotion gate result: not promoted to `MEMORY.md` (single-source evidence only).
 - Moved ACTIVE → DONE.
+- Added to INBOX: Create second learning source that reinforces agent decision principles.
+- Moved INBOX → ACTIVE.
+- Created `learning/decision-principles-002.md` with different wording.
+- Ingested new file through learning pipeline and logged outputs.
+- Promotion gate result: promoted repeated principles to `MEMORY.md` (repeated observation across multiple files).
+- Moved ACTIVE → DONE.

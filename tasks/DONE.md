@@ -75,3 +75,13 @@
   - Created: 2026-02-21
   - Definition of Done: Ingest new learning file through pipeline and apply promotion criteria correctly
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-07
+  - Title: Create second learning source and ingest it
+  - Type: learning
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Add second source with different wording, ingest, and apply promotion gate
+  - Updated: 2026-02-21

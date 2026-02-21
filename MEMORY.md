@@ -3,7 +3,9 @@
 Curated, durable facts learned over time.
 
 ## Facts (stable truths)
-- _No entries yet._
+- Decision quality over speed is a core agent principle. *(source: learning/agent-building-principles.md + learning/decision-principles-002.md; signal: repeated observation across multiple files; confidence: confirmed)*
+- High-impact or irreversible actions require user approval first. *(source: learning/agent-building-principles.md + learning/decision-principles-002.md; signal: repeated observation across multiple files; confidence: confirmed)*
+- Single observations are hypotheses, not long-term truth until repeated or confirmed. *(source: learning/agent-building-principles.md + learning/decision-principles-002.md; signal: repeated observation across multiple files; confidence: confirmed)*
 
 ## Preferences (user preferences)
 - _No entries yet._
@@ -12,7 +14,8 @@ Curated, durable facts learned over time.
 - _No entries yet._
 
 ## Patterns (things that repeatedly work)
-- _No entries yet._
+- Break work into small verifiable/testable steps and verify each step before continuing. *(source: learning/agent-building-principles.md + learning/decision-principles-002.md; signal: repeated observation across multiple files; confidence: confirmed)*
+- Keep actions and outcomes traceable through logs. *(source: learning/agent-building-principles.md + learning/decision-principles-002.md; signal: repeated observation across multiple files; confidence: confirmed)*
 
 ## Anti-patterns (things that repeatedly fail)
 - _No entries yet._
