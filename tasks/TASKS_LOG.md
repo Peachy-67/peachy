@@ -13,3 +13,8 @@
 - Updated `USER.md` and `IDENTITY.md`.
 - Removed `BOOTSTRAP.md` (bootstrap completed).
 - Moved ACTIVE → DONE.
+- Added to INBOX: Harden task board templates.
+- Moved INBOX → ACTIVE.
+- User approved template fields and added `Type` field.
+- Applied template structure across `tasks/INBOX.md`, `tasks/ACTIVE.md`, `tasks/WAITING.md`, and `tasks/DONE.md`.
+- Moved ACTIVE → DONE.

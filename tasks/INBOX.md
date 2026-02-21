@@ -1,6 +1,19 @@
 # INBOX
 
-## Added
-- [x] Run first execution test — simple task creation and completion. *(moved to ACTIVE, then DONE on 2026-02-21)*
-- [x] Summarize all current project files and propose next 3 meaningful tasks. *(moved to ACTIVE, then DONE on 2026-02-21)*
-- [x] Finish bootstrap identity/profile setup. *(moved to ACTIVE, then DONE on 2026-02-21)*
+## Template
+- ID:
+- Title:
+- Type: task | research | build | decision | learning
+- Status: INBOX
+- Priority: P1 | P2 | P3
+- Owner: Peachy
+- Created:
+- Due: (optional)
+- Definition of Done:
+- Next Action:
+- Blockers: (optional)
+- Notes/Context:
+- Updated:
+
+## Queue
+- _No inbox tasks right now._
