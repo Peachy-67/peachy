@@ -85,3 +85,13 @@
   - Created: 2026-02-21
   - Definition of Done: Add second source with different wording, ingest, and apply promotion gate
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-08
+  - Title: Create runbook from validated decision principles
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Runbook created at `RUNBOOKS/decision-quality.md` with required checklists
+  - Updated: 2026-02-21

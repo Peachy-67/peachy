@@ -36,3 +36,8 @@
 - Ingested new file through learning pipeline and logged outputs.
 - Promotion gate result: promoted repeated principles to `MEMORY.md` (repeated observation across multiple files).
 - Moved ACTIVE → DONE.
+- Added to INBOX: Create runbook from validated decision principles.
+- Moved INBOX → ACTIVE.
+- Created `RUNBOOKS/decision-quality.md` with pre-action, uncertainty, promotion, and execution checklists.
+- Did not update `MEMORY.md` in this step.
+- Moved ACTIVE → DONE.
