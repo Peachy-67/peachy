@@ -9,6 +9,9 @@ When new files appear in `/learning`, convert them into useful memory:
 - actionable facts
 - durable context
 
+Execution guidance for day-to-day behavior is defined in `PREFERENCES.md`.
+Treat `PREFERENCES.md` as editable working guidance and do not promote it to `MEMORY.md` unless explicitly confirmed as stable.
+
 ## Scope
 
 - Watch: `/learning`
