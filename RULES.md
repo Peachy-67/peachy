@@ -37,14 +37,20 @@ For each eligible file in `/learning`:
    - Append a dated entry to `memory/YYYY-MM-DD.md`.
    - Include source filename and modified time for traceability.
 
-5. **Promote long-term memory (required for important facts)**
-   - Whenever reading files in `/learning`, add all important facts to `MEMORY.md`.
+5. **Apply promotion rule before writing long-term memory**
+   - Observations, guesses, and experiment notes go to `scratch/` first (never directly to `MEMORY.md`).
+   - Only repeated or confirmed insights are eligible for promotion into `MEMORY.md`.
+   - Never store guesses directly in `MEMORY.md`.
+   - For each promoted item, include a short promotion reason (why it is confirmed/repeated/useful).
+
+6. **Promote long-term memory (required for important confirmed facts)**
+   - Whenever reading files in `/learning`, add important confirmed facts to `MEMORY.md`.
    - Distill to durable, high-value points that are likely to matter later.
    - Place each item in the correct `MEMORY.md` section.
    - Avoid duplicates: merge/update existing entries instead of adding repeats.
-   - Avoid clutter, but do not skip clearly important information.
+   - Avoid clutter, but do not skip clearly important confirmed information.
 
-6. **Mark as processed**
+7. **Mark as processed**
    - Update `memory/learning-processed.json` with filename + last modified time.
 
 ## Quality Bar
@@ -62,7 +68,8 @@ When logging a file to `memory/YYYY-MM-DD.md`, use:
 - Modified: `<timestamp>`
 - Summary: `<2-6 bullets>`
 - Key facts/decisions/todos: `<bulleted list>`
-- Long-term promotion: `yes/no` (+ brief reason)
+- Long-term promotion: `yes/no` (+ short reason)
+- Promotion status: `scratch` (observation/guess/experiment) or `MEMORY.md` (confirmed/repeated insight)
 
 ## Update Policy
 
