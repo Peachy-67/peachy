@@ -139,6 +139,20 @@ Influence on memory behavior:
 - Negative feedback decreases preference and should be treated as a guardrail.
 - When positive and negative signals conflict, prioritize the most recent explicit user instruction and update/merge entries accordingly.
 
+## EXECUTION_LOOP
+
+- Task state flow: `INBOX` → `ACTIVE` → `DONE` or `WAITING`.
+- WIP limit: maximum 3 items in `ACTIVE` at any time.
+- Before major or irreversible actions, ask the user first.
+- Every execution session must write a run log: `runs/YYYY-MM-DD_run.md` including:
+  - task worked
+  - steps taken
+  - outcome
+  - errors
+  - what to try next
+- Execution logs are operational records, not long-term memory.
+- Execution logs are **not** `MEMORY.md`.
+
 ## Update Policy
 
 - Re-process a file if its modified time changed.
