@@ -7,3 +7,9 @@
 - Added to INBOX: Summarize all current project files and propose next 3 meaningful tasks.
 - Moved INBOX → ACTIVE.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Finish bootstrap identity/profile setup.
+- Moved INBOX → ACTIVE.
+- Collected required user fields (name + preferred form of address).
+- Updated `USER.md` and `IDENTITY.md`.
+- Removed `BOOTSTRAP.md` (bootstrap completed).
+- Moved ACTIVE → DONE.
