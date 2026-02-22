@@ -188,6 +188,23 @@ Promotion/change safety:
 - Never auto-apply runbook edits without explicit user approval.
 - Treat review output as proposals queued for user decision.
 
+## SNAPSHOT_POLICY
+
+`SYSTEM_SNAPSHOT.md` is a concise recovery checkpoint document (not a log).
+
+Update `SYSTEM_SNAPSHOT.md`:
+- every 5 runs
+- after architecture changes
+- after new major runbook creation
+- before risky changes
+- when the user requests a snapshot
+
+Snapshot constraints:
+- Keep snapshots concise.
+- Record current recoverable system state only.
+- Do not copy full run history into snapshots.
+- Do not update `MEMORY.md` automatically as part of snapshot updates.
+
 ## Update Policy
 
 - Re-process a file if its modified time changed.

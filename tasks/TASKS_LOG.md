@@ -53,3 +53,8 @@
 - Created `ARCHITECTURE.md` with folder map, file purposes, execution loop, learning pipeline, promotion rules, self-improvement, safety, and bootstrap steps.
 - Did not update `MEMORY.md` in this step.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Add SNAPSHOT_POLICY rules.
+- Moved INBOX → ACTIVE.
+- Added `SNAPSHOT_POLICY` section to `RULES.md` with cadence, triggers, and concise snapshot constraints.
+- Explicitly enforced: snapshot updates do not auto-update `MEMORY.md`.
+- Moved ACTIVE → DONE.

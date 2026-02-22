@@ -115,3 +115,13 @@
   - Created: 2026-02-21
   - Definition of Done: `ARCHITECTURE.md` documents recreation architecture, loops, pipeline, safety, and bootstrap steps
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-11
+  - Title: Add SNAPSHOT_POLICY rules
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: `RULES.md` includes snapshot cadence/triggers and concise recovery constraints
+  - Updated: 2026-02-21
