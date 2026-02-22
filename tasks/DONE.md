@@ -175,3 +175,13 @@
   - Created: 2026-02-21
   - Definition of Done: Runbook includes concise no-change conditions and observation-mode fallback
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-17
+  - Title: Add PROPOSAL_CONFIDENCE to execution-review runbook
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Runbook includes weak/candidate/strong proposal strength levels and actions
+  - Updated: 2026-02-21

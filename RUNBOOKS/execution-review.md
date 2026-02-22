@@ -43,6 +43,16 @@ For each proposal include:
 - Prefer observation mode when uncertainty is high.
 - When unsure, log observation instead of proposing change.
 
+## PROPOSAL_CONFIDENCE
+- **weak**: evidence in 1 run → observation only.
+- **candidate**: appears in 2 runs → may propose with caution.
+- **strong**: appears in 3+ runs → safe to recommend runbook change.
+
+Rules:
+- Weak → log only.
+- Candidate → propose with caution.
+- Strong → recommend runbook change.
+
 ## Example review output structure
 - Review window:
 - Findings:

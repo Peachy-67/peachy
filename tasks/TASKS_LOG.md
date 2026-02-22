@@ -85,3 +85,8 @@
 - Added concise `NO_CHANGE_RULES` section with evidence/debugging/one-off/uncertainty constraints.
 - Confirmed no `MEMORY.md` updates in this step.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Add `PROPOSAL_CONFIDENCE` to `RUNBOOKS/execution-review.md`.
+- Moved INBOX → ACTIVE.
+- Added concise proposal strength levels (weak/candidate/strong) with required actions.
+- Confirmed no `MEMORY.md` updates in this step.
+- Moved ACTIVE → DONE.
