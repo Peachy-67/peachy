@@ -69,3 +69,8 @@
 - Moved INBOX → ACTIVE.
 - Created `RUNBOOKS/execution-review.md` with required inputs and detection checklist sections.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Revise RUNBOOK `execution-review.md` to final spec.
+- Moved INBOX → ACTIVE.
+- Updated `RUNBOOKS/execution-review.md` with decision rules and example review output structure.
+- Confirmed no `MEMORY.md` updates in this step.
+- Moved ACTIVE → DONE.

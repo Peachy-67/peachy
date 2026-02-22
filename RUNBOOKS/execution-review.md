@@ -2,40 +2,57 @@
 
 Goal: standardize self-improvement reviews using run logs.
 
-## Inputs
-- Primary source: recent run logs in `runs/`.
-- Default review window: last 5 sessions (or last full `runs/YYYY-MM-DD_run.md` if fewer).
-- Include any session marked with errors, retries, or blockers.
+## Inputs (what to read)
+- Read recent run logs in `runs/`.
+- Default window: last 5 run sessions.
+- Always include any session with errors, retries, blockers, or repeated ask-user loops.
 
 ## Detection checklist
 
 ### Slow tasks
-- [ ] Flag sessions with unusually high step count.
-- [ ] Flag repeated tool failures in one session.
-- [ ] Flag repeated "ask user" loops without forward progress.
-- [ ] Record affected run ids + short evidence note.
+- [ ] Unusually high step count
+- [ ] Repeated tool failures
+- [ ] Repeated "ask user" loops with little progress
+- [ ] Capture evidence run ids
 
 ### Repeated mistakes
-- [ ] Identify failure modes seen in 2+ sessions.
-- [ ] Confirm same root pattern (not just similar wording).
-- [ ] Capture run ids where pattern appears.
-- [ ] Propose guardrail or checklist update.
+- [ ] Same failure mode appears in 2+ runs
+- [ ] Root cause pattern is actually the same
+- [ ] Capture evidence run ids
 
 ### Repeated successes
-- [ ] Identify tactics that produced good outcomes in 2+ sessions.
-- [ ] Confirm tactic is repeatable across contexts.
-- [ ] Capture run ids where success appears.
-- [ ] Propose runbook codification or template improvement.
+- [ ] Same tactic succeeds in 2+ runs
+- [ ] Tactic appears reusable across contexts
+- [ ] Capture evidence run ids
 
-## Proposal output format
-For each proposal, include:
+## Proposal format
+For each proposal include:
 - Evidence links (run ids)
 - Expected benefit
 - Risk
 - Rollback plan
-- Suggested change (runbook update or new runbook outline)
+
+## Decision rules
+- **Propose runbook update** when an existing runbook is missing/unclear for a repeated mistake or repeated success.
+- **Propose new runbook** when a repeatable procedure appears in 2+ runs and no runbook covers it.
+- **Do nothing** when signals are one-off, weak, conflicting, or not yet repeatable.
+
+## Example review output structure
+- Review window:
+- Findings:
+  - Slow task candidates:
+  - Repeated mistakes:
+  - Repeated successes:
+- Proposals:
+  - Proposal 1: [title]
+    - Evidence (run ids):
+    - Expected benefit:
+    - Risk:
+    - Rollback plan:
+- No-action items:
+- Approval needed: yes/no
 
 ## Safety
-- Never auto-apply proposed changes.
-- Never auto-promote proposals to `MEMORY.md`.
-- Submit proposals for explicit user approval first.
+- Never auto-apply changes.
+- Never auto-promote to `MEMORY.md`.
+- Submit proposals for explicit user approval.

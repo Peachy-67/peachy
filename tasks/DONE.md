@@ -145,3 +145,13 @@
   - Created: 2026-02-21
   - Definition of Done: Execution-review runbook created with required inputs and detection checklist
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-14
+  - Title: Revise RUNBOOKS/execution-review.md to final spec
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Runbook includes inputs, detection checklist, proposal format, decision rules, and example output
+  - Updated: 2026-02-21
