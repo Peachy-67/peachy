@@ -65,3 +65,7 @@
 - Did not update `MEMORY.md`.
 - Did not update `RULES.md`.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Create RUNBOOK `execution-review.md`.
+- Moved INBOX → ACTIVE.
+- Created `RUNBOOKS/execution-review.md` with required inputs and detection checklist sections.
+- Moved ACTIVE → DONE.

@@ -135,3 +135,13 @@
   - Created: 2026-02-21
   - Definition of Done: `EVALS/scorecard.md` and three eval learning sources created without modifying MEMORY/RULES
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-13
+  - Title: Create RUNBOOKS/execution-review.md
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Execution-review runbook created with required inputs and detection checklist
+  - Updated: 2026-02-21
