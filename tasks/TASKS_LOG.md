@@ -90,3 +90,9 @@
 - Added concise proposal strength levels (weak/candidate/strong) with required actions.
 - Confirmed no `MEMORY.md` updates in this step.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Run EXECUTION_REVIEW on latest 5 sessions.
+- Moved INBOX → ACTIVE.
+- Reviewed sessions 17→13 (newest first) from `runs/2026-02-21_run.md` using `RUNBOOKS/execution-review.md`.
+- Produced summary + proposal candidates only (no automatic changes).
+- Did not update `RULES.md` or `MEMORY.md`.
+- Moved ACTIVE → DONE.

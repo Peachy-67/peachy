@@ -185,3 +185,13 @@
   - Created: 2026-02-21
   - Definition of Done: Runbook includes weak/candidate/strong proposal strength levels and actions
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-18
+  - Title: Run EXECUTION_REVIEW on latest 5 sessions
+  - Type: research
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Review produced with summary + 0-3 proposals tagged by confidence
+  - Updated: 2026-02-21
