@@ -165,3 +165,13 @@
   - Created: 2026-02-21
   - Definition of Done: Thresholds added for slow/mistake/success detection and runbook update evidence count
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-16
+  - Title: Add NO_CHANGE_RULES to execution-review runbook
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Runbook includes concise no-change conditions and observation-mode fallback
+  - Updated: 2026-02-21

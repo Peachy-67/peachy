@@ -80,3 +80,8 @@
 - Added rule: runbook update proposals require at least 2 evidence links.
 - Confirmed no `MEMORY.md` updates in this step.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Add NO_CHANGE_RULES to `RUNBOOKS/execution-review.md`.
+- Moved INBOX → ACTIVE.
+- Added concise `NO_CHANGE_RULES` section with evidence/debugging/one-off/uncertainty constraints.
+- Confirmed no `MEMORY.md` updates in this step.
+- Moved ACTIVE → DONE.
