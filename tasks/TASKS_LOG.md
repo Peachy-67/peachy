@@ -58,3 +58,10 @@
 - Added `SNAPSHOT_POLICY` section to `RULES.md` with cadence, triggers, and concise snapshot constraints.
 - Explicitly enforced: snapshot updates do not auto-update `MEMORY.md`.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Create EVALS framework for learning quality checks.
+- Moved INBOX → ACTIVE.
+- Created `EVALS/scorecard.md` with required scoring dimensions and pass/fail guidance.
+- Created eval sources: `learning/eval-facts-001.md`, `learning/eval-decisions-001.md`, `learning/eval-ambiguity-001.md`.
+- Did not update `MEMORY.md`.
+- Did not update `RULES.md`.
+- Moved ACTIVE → DONE.

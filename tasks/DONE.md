@@ -125,3 +125,13 @@
   - Created: 2026-02-21
   - Definition of Done: `RULES.md` includes snapshot cadence/triggers and concise recovery constraints
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-12
+  - Title: Create EVALS framework and seed eval sources
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: `EVALS/scorecard.md` and three eval learning sources created without modifying MEMORY/RULES
+  - Updated: 2026-02-21
