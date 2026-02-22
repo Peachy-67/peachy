@@ -48,3 +48,8 @@
 - Enforced no auto-promotion / no auto-apply for self-improvement changes.
 - Did not update `MEMORY.md` in this step.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Create architecture snapshot recovery document.
+- Moved INBOX → ACTIVE.
+- Created `ARCHITECTURE.md` with folder map, file purposes, execution loop, learning pipeline, promotion rules, self-improvement, safety, and bootstrap steps.
+- Did not update `MEMORY.md` in this step.
+- Moved ACTIVE → DONE.

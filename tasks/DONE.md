@@ -105,3 +105,13 @@
   - Created: 2026-02-21
   - Definition of Done: SELF_IMPROVEMENT section added with cadence, detections, proposals, and no-auto-promotion rule
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-10
+  - Title: Create architecture recovery snapshot
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: `ARCHITECTURE.md` documents recreation architecture, loops, pipeline, safety, and bootstrap steps
+  - Updated: 2026-02-21
