@@ -74,3 +74,9 @@
 - Updated `RUNBOOKS/execution-review.md` with decision rules and example review output structure.
 - Confirmed no `MEMORY.md` updates in this step.
 - Moved ACTIVE → DONE.
+- Added to INBOX: Add evidence thresholds to `RUNBOOKS/execution-review.md`.
+- Moved INBOX → ACTIVE.
+- Updated runbook thresholds (2+ runs) for slow tasks, repeated mistakes, and repeated successes.
+- Added rule: runbook update proposals require at least 2 evidence links.
+- Confirmed no `MEMORY.md` updates in this step.
+- Moved ACTIVE → DONE.

@@ -155,3 +155,13 @@
   - Created: 2026-02-21
   - Definition of Done: Runbook includes inputs, detection checklist, proposal format, decision rules, and example output
   - Updated: 2026-02-21
+
+- ID: T-2026-02-21-15
+  - Title: Add evidence thresholds to execution-review runbook
+  - Type: build
+  - Status: DONE
+  - Priority: P1
+  - Owner: Peachy
+  - Created: 2026-02-21
+  - Definition of Done: Thresholds added for slow/mistake/success detection and runbook update evidence count
+  - Updated: 2026-02-21

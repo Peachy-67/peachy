@@ -5,25 +5,24 @@ Goal: standardize self-improvement reviews using run logs.
 ## Inputs (what to read)
 - Read recent run logs in `runs/`.
 - Default window: last 5 run sessions.
-- Always include any session with errors, retries, blockers, or repeated ask-user loops.
+- Include any session with errors, retries, blockers, or repeated ask-user loops.
 
-## Detection checklist
+## Detection checklist (evidence thresholds)
 
 ### Slow tasks
-- [ ] Unusually high step count
-- [ ] Repeated tool failures
-- [ ] Repeated "ask user" loops with little progress
-- [ ] Capture evidence run ids
+- [ ] Signal appears in **2+ runs**.
+- [ ] Evidence can be high steps, repeated tool failures, or repeated ask-user loops.
+- [ ] Capture run ids.
 
 ### Repeated mistakes
-- [ ] Same failure mode appears in 2+ runs
-- [ ] Root cause pattern is actually the same
-- [ ] Capture evidence run ids
+- [ ] Same failure mode appears in **2+ runs**.
+- [ ] Root cause pattern is genuinely the same.
+- [ ] Capture run ids.
 
 ### Repeated successes
-- [ ] Same tactic succeeds in 2+ runs
-- [ ] Tactic appears reusable across contexts
-- [ ] Capture evidence run ids
+- [ ] Same tactic produces positive outcomes in **2+ runs**.
+- [ ] Tactic is reusable across contexts.
+- [ ] Capture run ids.
 
 ## Proposal format
 For each proposal include:
@@ -33,18 +32,18 @@ For each proposal include:
 - Rollback plan
 
 ## Decision rules
-- **Propose runbook update** when an existing runbook is missing/unclear for a repeated mistake or repeated success.
+- **Propose runbook update** when existing runbook guidance is missing/unclear and there are **at least 2 evidence links**.
 - **Propose new runbook** when a repeatable procedure appears in 2+ runs and no runbook covers it.
-- **Do nothing** when signals are one-off, weak, conflicting, or not yet repeatable.
+- **Do nothing** when signals are one-off, weak, conflicting, or below thresholds.
 
 ## Example review output structure
 - Review window:
 - Findings:
-  - Slow task candidates:
+  - Slow tasks:
   - Repeated mistakes:
   - Repeated successes:
 - Proposals:
-  - Proposal 1: [title]
+  - Proposal: [title]
     - Evidence (run ids):
     - Expected benefit:
     - Risk:
