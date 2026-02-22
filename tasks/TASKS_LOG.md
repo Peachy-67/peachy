@@ -96,3 +96,7 @@
 - Produced summary + proposal candidates only (no automatic changes).
 - Did not update `RULES.md` or `MEMORY.md`.
 - Moved ACTIVE → DONE.
+- User approved proposals: Pre-flight Spec Lock checklist + Review Scope Header.
+- Applied approved updates to `RUNBOOKS/execution-review.md`.
+- Did not update `MEMORY.md`.
+- Moved ACTIVE → DONE.
