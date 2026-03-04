@@ -1,23 +1,42 @@
-import fs from "fs";
-import path from "path";
+import fs from "fs"
+import OpenAI from "openai"
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+})
 
 async function runAgent() {
 
-  console.log("🍑 Peachy AI agent starting...");
+  console.log("🍑 Peachy AI brain starting")
 
-  const projectFiles = fs.readdirSync("./");
+  const files = fs.readdirSync("./")
 
-  console.log("📁 Current repo files:", projectFiles);
+  console.log("📂 Repo files:", files)
 
-  // simple improvement example
-  const logFile = "peachy_log.txt";
+  const prompt = `
+You are Peachy, an autonomous AI developer.
 
-  const entry = `Peachy ran at ${new Date().toISOString()}\n`;
+Current repo files:
+${files.join(", ")}
 
-  fs.appendFileSync(logFile, entry);
+Suggest ONE improvement to this project.
+Keep it short.
+`
 
-  console.log("✅ Logged run to peachy_log.txt");
+  const response = await client.responses.create({
+    model: "gpt-4.1-mini",
+    input: prompt
+  })
+
+  const idea = response.output[0].content[0].text
+
+  console.log("🧠 Peachy idea:", idea)
+
+  fs.appendFileSync(
+    "peachy_ideas.txt",
+    idea + "\n\n"
+  )
 
 }
 
-runAgent();
+runAgent()
