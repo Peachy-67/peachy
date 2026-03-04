@@ -1,5 +1,3 @@
-const fetch = require("node-fetch");
-
 async function runAgent() {
   console.log("Peachy agent starting...");
 
