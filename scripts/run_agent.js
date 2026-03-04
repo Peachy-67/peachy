@@ -14,13 +14,20 @@ async function runAgent() {
   console.log("📂 Repo files:", files)
 
   const prompt = `
-You are Peachy, an autonomous AI developer.
+You are Peachy, an autonomous AI software developer.
 
 Current repo files:
 ${files.join(", ")}
 
-Suggest ONE improvement to this project.
-Keep it short.
+Your job is to improve this project.
+
+Respond with JSON in this format:
+
+{
+  "filename": "new_file_name.js",
+  "code": "full code for the file",
+  "description": "short explanation"
+}
 `
 
   const response = await client.responses.create({
@@ -28,14 +35,23 @@ Keep it short.
     input: prompt
   })
 
-  const idea = response.output[0].content[0].text
+  const text = response.output[0].content[0].text
 
-  console.log("🧠 Peachy idea:", idea)
+  console.log("🧠 Peachy response:", text)
 
-  fs.appendFileSync(
-    "peachy_ideas.txt",
-    idea + "\n\n"
-  )
+  try {
+
+    const result = JSON.parse(text)
+
+    fs.writeFileSync(result.filename, result.code)
+
+    console.log("✨ Peachy created file:", result.filename)
+
+  } catch (err) {
+
+    console.log("⚠️ Peachy returned non-JSON response")
+
+  }
 
 }
 
