@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FLAGGED</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>FLAGGED</h1>
+
+      <textarea id="inputText" placeholder="Paste conversation..."></textarea>
+      <button id="analyzeBtn">Analyze</button>
+
+      <p id="creditsInfo" class="credits">3 free runs • Credits: --</p>
+
+      <div id="result"></div>
+
+      <div id="resultActions" class="result-actions hidden">
+        <button id="copyVerdictBtn" type="button">Copy verdict</button>
+        <button id="downloadCardBtn" type="button">Download share card</button>
+        <button id="shareBtn" type="button">Share…</button>
+      </div>
+
+      <p class="privacy-note">Privacy note: We don’t save your thread.</p>
+      <p class="disclaimer">
+        Entertainment only — not professional advice. Don’t post private info.
+      </p>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

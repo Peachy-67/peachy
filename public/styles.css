@@ -1,0 +1,102 @@
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #fafafa;
+  color: #111;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+h1 {
+  margin: 0 0 14px;
+  letter-spacing: 0.3px;
+}
+
+textarea {
+  width: 100%;
+  height: 160px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  resize: vertical;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #f4f4f4;
+}
+
+.credits {
+  margin: 10px 0 0;
+  color: #444;
+  font-size: 14px;
+}
+
+.result-card {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.result-card.green {
+  border-color: #2ecc71;
+  background: #eafaf0;
+}
+
+.result-card.yellow {
+  border-color: #f1c40f;
+  background: #fff9e2;
+}
+
+.result-card.red {
+  border-color: #e74c3c;
+  background: #ffeded;
+}
+
+.result-card h2,
+.result-card h3 {
+  margin: 0 0 10px;
+}
+
+.result-card ul {
+  margin: 0 0 10px 18px;
+}
+
+.result-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hidden {
+  display: none;
+}
+
+.privacy-note,
+.disclaimer {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #555;
+}
+
+.error {
+  margin-top: 16px;
+  color: #b00020;
+}

@@ -50,3 +50,14 @@ build/
 # OS junk
 # -------------------------
 Thumbs.db# 
+
+# --- Peachy runtime outputs ---
+runs/
+tasks/
+
+# keep markdown run logs if you want them tracked:
+!runs/**/*.md
+
+# Memory: ignore everything except the human-readable md notes
+memory/*
+!memory/**/*.md

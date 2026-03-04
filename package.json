@@ -1,0 +1,21 @@
+{
+  "name": "peachy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "migrate": "node scripts/migrate.js",
+    "test": "echo \"No tests configured\"",
+    "test:contract": "node scripts/test_v1_contract.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "openai": "^6.25.0",
+    "pg": "^8.19.0"
+  }
+}
