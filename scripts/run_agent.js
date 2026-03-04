@@ -1,16 +1,23 @@
+import fs from "fs";
+import path from "path";
+
 async function runAgent() {
-  console.log("Peachy agent starting...");
 
-  try {
-    const res = await fetch("http://localhost:3000/heartbeat");
-    const data = await res.text();
+  console.log("🍑 Peachy AI agent starting...");
 
-    console.log("Agent heartbeat:", data);
-  } catch (err) {
-    console.error("Agent error:", err.message);
-  }
+  const projectFiles = fs.readdirSync("./");
 
-  console.log("Agent run complete.");
+  console.log("📁 Current repo files:", projectFiles);
+
+  // simple improvement example
+  const logFile = "peachy_log.txt";
+
+  const entry = `Peachy ran at ${new Date().toISOString()}\n`;
+
+  fs.appendFileSync(logFile, entry);
+
+  console.log("✅ Logged run to peachy_log.txt");
+
 }
 
 runAgent();
