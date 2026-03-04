@@ -1,0 +1,33 @@
+# Secrets
+.env
+.env.local
+.env.*
+
+# Mac system files
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# OpenClaw local state
+.openclaw/
+
+# Logs
+logs/
+*.log
+
+# Runtime memory / temp
+scratch/
+runs/
+memory/*.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# OS files
+Thumbs.db
