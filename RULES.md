@@ -40,14 +40,18 @@ For each eligible file in `/learning`:
    - Append a dated entry to `memory/YYYY-MM-DD.md`.
    - Include source filename and modified time for traceability.
 
-5. **Apply promotion gate before writing long-term memory**
+5. **Detect opportunity signals (research/learning ingestion)**
+   - Use playbooks in `research/opportunities/playbooks/` to detect opportunity signals.
+   - Log signals to `research/opportunities/signals/` with source reference and concise rationale.
+
+6. **Apply promotion gate before writing long-term memory**
    - Never promote knowledge automatically.
    - Promotion requires confirmation or repeated evidence.
    - Guesses stay in `scratch/`.
    - Experiments and experiment notes stay in `scratch/` until validated.
    - For each promoted item, include a short promotion reason (why it is confirmed/repeated/validated).
 
-6. **Promote long-term memory (only durable, validated knowledge)**
+7. **Promote long-term memory (only durable, validated knowledge)**
    - Only promoted knowledge is allowed in `MEMORY.md`.
    - Only durable, validated knowledge is eligible for `MEMORY.md`.
    - Whenever reading files in `/learning`, add important confirmed facts to `MEMORY.md`.
@@ -65,7 +69,7 @@ For each eligible file in `/learning`:
    - Avoid duplicates: merge/update existing entries instead of adding repeats.
    - Avoid clutter, but do not skip clearly important confirmed information.
 
-7. **Mark as processed**
+8. **Mark as processed**
    - Update `memory/learning-processed.json` with filename + last modified time.
 
 ## PROMOTION CRITERIA

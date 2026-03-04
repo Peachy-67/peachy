@@ -2,6 +2,12 @@
 
 Goal: standardize self-improvement reviews using run logs.
 
+## Pre-flight Spec Lock
+- Confirm requested review scope (run range + newest/oldest order).
+- Confirm output requirements (summary, proposal cap, required fields).
+- Confirm guardrails (`no auto-apply`, `no MEMORY updates` unless explicitly requested).
+- If scope is ambiguous, clarify before reviewing.
+
 ## Inputs (what to read)
 - Read recent run logs in `runs/`.
 - Default window: last 5 run sessions.
@@ -54,7 +60,10 @@ Rules:
 - Strong → recommend runbook change.
 
 ## Example review output structure
-- Review window:
+- Review Scope Header:
+  - Runs reviewed (newest→oldest):
+  - Source file(s):
+  - Review date/time:
 - Findings:
   - Slow tasks:
   - Repeated mistakes:
