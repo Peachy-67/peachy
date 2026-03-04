@@ -1,33 +1,88 @@
 import fs from "fs"
 import OpenAI from "openai"
+import path from "path"
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
 
+function extractSection(text, start, end) {
+  const s = text.indexOf(start)
+  const e = text.indexOf(end)
+
+  if (s === -1 || e === -1) return null
+
+  return text.substring(s + start.length, e).trim()
+}
+
 async function runAgent() {
 
   console.log("🍑 Peachy AI brain starting")
+
+  // -----------------------------
+  // Repo files
+  // -----------------------------
 
   const files = fs.readdirSync("./")
 
   console.log("📂 Repo files:", files)
 
-  const prompt = `
-You are Peachy, an autonomous AI software developer.
+  // -----------------------------
+  // Goal
+  // -----------------------------
 
-Current repo files:
+  let goal = ""
+
+  try {
+    goal = fs.readFileSync("./GOAL.md", "utf8")
+  } catch {
+    goal = "No goal defined yet."
+  }
+
+  // -----------------------------
+  // Memory
+  // -----------------------------
+
+  let memory = {}
+
+  try {
+    memory = JSON.parse(
+      fs.readFileSync("./peachy_memory.json", "utf8")
+    )
+  } catch {
+    memory = {
+      completed: [],
+      failed: []
+    }
+  }
+
+  // -----------------------------
+  // Prompt
+  // -----------------------------
+
+  const prompt = `
+You are Peachy, an autonomous AI software engineer.
+
+Goal:
+${goal}
+
+Memory:
+${JSON.stringify(memory, null, 2)}
+
+Repository files:
 ${files.join(", ")}
 
-Your job is to improve this project.
+Choose ONE improvement.
 
-Respond with JSON in this format:
+Respond EXACTLY like this:
 
-{
-  "filename": "new_file_name.js",
-  "code": "full code for the file",
-  "description": "short explanation"
-}
+filename: path/to/file.js
+
+---CODE---
+full code here
+---END---
+
+description: short explanation
 `
 
   const response = await client.responses.create({
@@ -37,21 +92,62 @@ Respond with JSON in this format:
 
   const text = response.output[0].content[0].text
 
-  console.log("🧠 Peachy response:", text)
+  console.log("🧠 Raw Peachy response:\n", text)
 
-  try {
+  // -----------------------------
+  // Parse response safely
+  // -----------------------------
 
-    const result = JSON.parse(text)
+  const filenameMatch = text.match(/filename:\s*(.*)/)
 
-    fs.writeFileSync(result.filename, result.code)
+  const filename = filenameMatch
+    ? filenameMatch[1].trim()
+    : null
 
-    console.log("✨ Peachy created file:", result.filename)
+  const code = extractSection(text, "---CODE---", "---END---")
 
-  } catch (err) {
+  const descMatch = text.match(/description:\s*(.*)/)
 
-    console.log("⚠️ Peachy returned non-JSON response")
+  const description = descMatch
+    ? descMatch[1].trim()
+    : "No description"
 
+  if (!filename || !code) {
+
+    console.log("❌ Failed to parse Peachy response")
+
+    memory.failed.push("Parse failure")
+
+    fs.writeFileSync(
+      "./peachy_memory.json",
+      JSON.stringify(memory, null, 2)
+    )
+
+    return
   }
+
+  // -----------------------------
+  // Write file
+  // -----------------------------
+
+  fs.mkdirSync(path.dirname(filename), { recursive: true })
+
+  fs.writeFileSync(filename, code)
+
+  console.log("✨ Peachy created:", filename)
+
+  // -----------------------------
+  // Update memory
+  // -----------------------------
+
+  memory.completed.push(description)
+
+  fs.writeFileSync(
+    "./peachy_memory.json",
+    JSON.stringify(memory, null, 2)
+  )
+
+  console.log("🧠 Memory updated")
 
 }
 
