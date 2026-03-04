@@ -4,7 +4,8 @@
     "Refined the flagged behavior output to be very short, visually clear, and easy to screenshot or share, enhancing usability and viral sharing appeal.",
     "Adds a visually distinct, accessible Share button with simple styles and enhanced error handling for native share API and clipboard fallback to improve viral sharing and usability.",
     "Implements visually distinct, color-coded badge components for each detected behavior flag to improve clarity and screenshot shareability while maintaining brevity and usability.",
-    "Rewrite the flagged behavior output component to use clear, color-coded, badge-style labels that fit in a compact container optimized for easy screenshot and sharing, improving usability and viral appeal."
+    "Rewrite the flagged behavior output component to use clear, color-coded, badge-style labels that fit in a compact container optimized for easy screenshot and sharing, improving usability and viral appeal.",
+    "Improved accessibility by adding aria-live and aria-label attributes to the flagged behavior badges, enabling screen readers to announce flags dynamically, enhancing usability and inclusivity with no visual change."
   ],
   "failed": [
     "Invalid response",
