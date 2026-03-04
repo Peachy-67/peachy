@@ -9,27 +9,25 @@ jobs:
   run-agent:
     runs-on: ubuntu-latest
 
-   steps:
-  - name: Checkout repo
-    uses: actions/checkout@v4
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-  - name: Setup Node
-    uses: actions/setup-node@v4
-    with:
-      node-version: "18"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
 
-  - name: Install dependencies
-    run: npm install
-    working-directory: ./ 
+      - name: Install dependencies
+        run: npm install
 
-  - name: Run Peachy
-    run: node src/server.js
-    working-directory: ./
+      - name: Run Peachy
+        run: node src/server.js
 
-  - name: Commit improvements
-    run: |
-      git config --global user.name "Peachy-Agent"
-      git config --global user.email "peachy@agent.ai"
-      git add .
-      git commit -m "Peachy autonomous update" || echo "No changes"
-      git push
+      - name: Commit improvements
+        run: |
+          git config --global user.name "Peachy-Agent"
+          git config --global user.email "peachy@agent.ai"
+          git add .
+          git commit -m "Peachy autonomous update" || echo "No changes"
+          git push
