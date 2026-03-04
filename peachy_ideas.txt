@@ -1,0 +1,2 @@
+Add automated testing scripts and CI pipeline to ensure code quality and streamline deployments.
+
