@@ -23,7 +23,10 @@ jobs:
 
       - name: Run Peachy
         run: node src/server.js
-
+        env:        
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}       
+  
       - name: Commit improvements
         run: |
           git config --global user.name "Peachy-Agent"
