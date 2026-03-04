@@ -1,32 +1,45 @@
-import React from 'react';
+import React from "react";
 
-const flagStyles = {
-  insult: { backgroundColor: '#FFCDD2', color: '#B71C1C' },
-  manipulation: { backgroundColor: '#FFE0B2', color: '#E65100' },
-  gaslighting: { backgroundColor: '#BBDEFB', color: '#0D47A1' },
-  discard: { backgroundColor: '#E1BEE7', color: '#4A148C' },
-  control: { backgroundColor: '#C8E6C9', color: '#1B5E20' },
+const flagColors = {
+  insult: "#E74C3C", // red
+  manipulation: "#F39C12", // orange
+  gaslighting: "#9B59B6", // purple
+  discard: "#3498DB", // blue
+  control: "#27AE60", // green
 };
 
-function FlaggedOutput({ flags }) {
-  if (!flags || flags.length === 0) {
-    return null;
-  }
+export default function FlaggedOutput({ flags }) {
+  if (!flags || flags.length === 0) return null;
 
   return (
-    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+    <div
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: 8,
+        padding: 12,
+        maxWidth: 400,
+        userSelect: "text",
+        fontFamily: "Helvetica, Arial, sans-serif",
+        fontSize: 14,
+        lineHeight: 1.4,
+        background: "#fff",
+      }}
+    >
       {flags.map((flag) => (
         <span
           key={flag}
           style={{
-            ...flagStyles[flag],
-            padding: '4px 8px',
-            borderRadius: '12px',
-            fontWeight: '600',
-            fontSize: '0.9rem',
-            userSelect: 'all',
+            display: "inline-block",
+            margin: "0 6px 6px 0",
+            padding: "4px 10px",
+            borderRadius: 15,
+            color: "#fff",
+            backgroundColor: flagColors[flag] || "#999",
+            fontWeight: "600",
+            userSelect: "text",
           }}
-          aria-label={`Behavioral red flag detected: ${flag}`}
+          aria-label={`${flag} behavior flagged`}
+          title={`${flag} behavior flagged`}
         >
           {flag.charAt(0).toUpperCase() + flag.slice(1)}
         </span>
@@ -34,5 +47,3 @@ function FlaggedOutput({ flags }) {
     </div>
   );
 }
-
-export default FlaggedOutput;
