@@ -1,45 +1,70 @@
-import React from 'react';
+import React, { useState } from "react";
 
 const ShareButton = ({ textToShare }) => {
+  const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+
   const handleShare = async () => {
+    setError(null);
+    setCopied(false);
     if (navigator.share) {
       try {
         await navigator.share({
+          title: "Flagged Conversation",
           text: textToShare,
-          title: 'Flagged Conversation',
-          url: window.location.href,
         });
-      } catch (error) {
-        alert('Sharing failed. Please try copying manually.');
+      } catch (err) {
+        setError("Sharing failed");
       }
-    } else {
+    } else if (navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(textToShare);
-        alert('Text copied to clipboard!');
-      } catch (err) {
-        alert('Clipboard copying failed.');
+        setCopied(true);
+      } catch {
+        setError("Copy to clipboard failed");
       }
+    } else {
+      setError("Sharing not supported");
     }
   };
 
   return (
-    <button
-      onClick={handleShare}
-      style={{
-        backgroundColor: '#ff6f61',
-        color: 'white',
-        border: 'none',
-        borderRadius: '4px',
-        padding: '10px 16px',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        userSelect: 'none',
-      }}
-      aria-label="Share flagged text"
-      title="Share flagged text"
-    >
-      Share
-    </button>
+    <div>
+      <button
+        onClick={handleShare}
+        aria-label="Share flagged conversation"
+        style={{
+          padding: "8px 16px",
+          backgroundColor: "#ff69b4",
+          color: "#fff",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer",
+          fontWeight: "bold",
+          boxShadow: "0 2px 5px rgba(255,105,180,0.6)",
+          userSelect: "none",
+        }}
+      >
+        Share
+      </button>
+      {copied && (
+        <span
+          role="status"
+          aria-live="polite"
+          style={{ marginLeft: 12, color: "#4BB543", fontWeight: "bold" }}
+        >
+          Copied!
+        </span>
+      )}
+      {error && (
+        <span
+          role="alert"
+          style={{ marginLeft: 12, color: "#ee4b2b", fontWeight: "bold" }}
+        >
+          {error}
+        </span>
+      )}
+    </div>
   );
 };
 

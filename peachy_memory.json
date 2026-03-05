@@ -9,7 +9,8 @@
     "Added aria-label and role=\"region\" with aria-live=\"polite\" on badge container for improved screen reader clarity and dynamic announcements, enhancing accessibility and usability with no visual changes.",
     "Refine the flagged behavior badges to have distinct, accessible, color-coded backgrounds for each behavior type, enhancing visual clarity in screenshots and shortening recognition time to improve usability and viral sharing appeal.",
     "Enhanced FlaggedOutput component with visually consistent, screen-reader friendly badges that have uniform width and subtle shadow for better screenshot quality and viral sharing clarity. The small visual polish improves usability and screenshot appeal.",
-    "Enhance Badge uniformity and screenshot appeal by adding min-width, text centering, consistent padding, and subtle shadow—improving clarity and viral sharing quality without changing visuals."
+    "Enhance Badge uniformity and screenshot appeal by adding min-width, text centering, consistent padding, and subtle shadow—improving clarity and viral sharing quality without changing visuals.",
+    "Improved the Share button with clearer user feedback including accessible status messages for successful copy and error states, boosting usability and viral sharing readiness."
   ],
   "failed": [
     "Invalid response",
