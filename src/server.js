@@ -6,6 +6,9 @@ const express = require("express");
 const { checkDbConnection } = require("./db");
 const { formatAnalyzeResponse } = require("./formatters/analyzeResponse");
 
+// CONNECT LOCAL DETECTION ENGINE
+const analyzeConversation = require("./detection/analyzeConversation").default;
+
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
@@ -13,6 +16,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const port = process.env.PORT || 3000;
+
 const MAX_INPUT_LENGTH = 12000;
 const MIN_INPUT_LENGTH = 12;
 
@@ -56,11 +60,13 @@ function detectSignals(textRaw) {
     signals.add("insult");
   }
 
-  if (hasAny([/\bif\s+you\b.*\b(i'?m\s+leaving|we'?re\s+done)\b/]))
+  if (hasAny([/\bif\s+you\b.*\b(i'?m\s+leaving|we'?re\s+done)\b/])) {
     signals.add("ultimatum");
+  }
 
-  if (hasAny([/\b(i'?ll|i\s+will)\s+(ruin|expose|hurt|destroy)\b/]))
+  if (hasAny([/\b(i'?ll|i\s+will)\s+(ruin|expose|hurt|destroy)\b/])) {
     signals.add("threat");
+  }
 
   return Array.from(signals);
 }
@@ -68,9 +74,15 @@ function detectSignals(textRaw) {
 app.get("/v1/health", async (_req, res) => {
   try {
     await checkDbConnection();
-    return res.status(200).json({ status: "ok", postgres: "connected" });
+    return res.status(200).json({
+      status: "ok",
+      postgres: "connected",
+    });
   } catch {
-    return res.status(503).json({ status: "degraded", postgres: "disconnected" });
+    return res.status(503).json({
+      status: "degraded",
+      postgres: "disconnected",
+    });
   }
 });
 
@@ -99,6 +111,11 @@ app.post("/v1/analyze", async (req, res) => {
         message: `Input is too long. Max length is ${MAX_INPUT_LENGTH} characters.`,
       });
     }
+
+    /**
+     * RUN LOCAL DETECTION ENGINE
+     */
+    const localDetection = analyzeConversation(text);
 
     const prompt = `
 You are FLAGGED, a dating red/green flag detector.
@@ -171,24 +188,40 @@ Important:
       throw new Error("No structured JSON returned by model");
     }
 
-    // Deterministic safety-net.
+    /**
+     * SAFETY NET + LOCAL DETECTION MERGE
+     */
+
     const detSignals = detectSignals(text);
+
+    const localSignals = [];
+
+    if (localDetection.insults) localSignals.push("insult");
+    if (localDetection.manipulation) localSignals.push("guilt");
+    if (localDetection.gaslighting) localSignals.push("gaslighting");
+
     const mergedSignals = Array.from(
       new Set([
         ...(Array.isArray(parsed.signals) ? parsed.signals : []),
         ...detSignals,
+        ...localSignals,
       ])
     );
 
     parsed = {
       confidence:
-        typeof parsed.confidence === "number" ? parsed.confidence : 0.5,
+        typeof parsed.confidence === "number"
+          ? parsed.confidence
+          : 0.5,
+
       why: Array.isArray(parsed.why) ? parsed.why : [],
+
       watch_next: Array.isArray(parsed.watch_next)
         ? parsed.watch_next
         : [],
+
       signals: mergedSignals,
-      // Do not persist raw user text in V1.
+
       usage: {},
       meta: {},
     };
@@ -196,6 +229,7 @@ Important:
     return res.json(formatAnalyzeResponse(parsed));
   } catch (err) {
     console.error("analyze_failed", err?.message || err);
+
     return res.status(500).json({
       error: "analyze_failed",
       message: "Analysis failed. Please try again.",
