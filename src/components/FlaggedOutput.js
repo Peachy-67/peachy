@@ -1,62 +1,54 @@
 import React from 'react';
 
-const FLAG_COLORS = {
-  insult: '#e74c3c',
-  manipulation: '#f39c12',
-  gaslighting: '#8e44ad',
-  discard: '#3498db',
-  control: '#2ecc71',
+const behaviorColors = {
+  insult: '#e74c3c',       // red
+  manipulation: '#f39c12', // orange
+  gaslighting: '#9b59b6',  // purple
+  discard: '#34495e',      // dark blue-gray
+  control: '#27ae60',      // green
 };
 
-const FLAG_LABELS = {
-  insult: 'Insult',
-  manipulation: 'Manipulation',
-  gaslighting: 'Gaslighting',
-  discard: 'Discard',
-  control: 'Control',
-};
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-const FlaggedOutput = ({ flags = [] }) => {
-  if (flags.length === 0) return null;
+export default function FlaggedOutput({ flags }) {
+  if (!flags || flags.length === 0) {
+    return null;
+  }
 
   return (
-    <section
+    <div
       role="region"
+      aria-label="Behavioral flags detected"
       aria-live="polite"
-      aria-label={`Detected behavioral flags: ${flags.map(f => FLAG_LABELS[f]).join(', ')}`}
       style={{
         display: 'flex',
-        gap: 8,
+        gap: '8px',
         flexWrap: 'wrap',
+        marginTop: '12px',
         justifyContent: 'center',
-        margin: '12px 0',
       }}
     >
       {flags.map((flag) => (
         <span
           key={flag}
-          role="status"
-          aria-label={FLAG_LABELS[flag]}
           style={{
-            backgroundColor: FLAG_COLORS[flag],
+            backgroundColor: behaviorColors[flag] || '#bdc3c7',
             color: 'white',
-            padding: '6px 10px',
-            borderRadius: 12,
             fontWeight: '600',
-            fontSize: 14,
-            minWidth: 80,
+            fontSize: '0.9rem',
+            padding: '4px 12px',
+            borderRadius: '14px',
+            minWidth: '72px',
             textAlign: 'center',
             boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
             userSelect: 'none',
-            lineHeight: 1,
-            whiteSpace: 'nowrap',
           }}
+          aria-label={`${capitalize(flag)} detected`}
+          tabIndex={0}
         >
-          {FLAG_LABELS[flag]}
+          {capitalize(flag)}
         </span>
       ))}
-    </section>
+    </div>
   );
-};
-
-export default FlaggedOutput;
+}

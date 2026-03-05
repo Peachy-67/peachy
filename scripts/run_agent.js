@@ -23,9 +23,40 @@ async function runAgent() {
   // Repo files
   // -----------------------------
 
-  const files = fs.readdirSync("./")
+const files = fs.readdirSync("./").filter(
+  f => !["node_modules", ".git", ".github"].includes(f)
+)
 
-  console.log("📂 Repo files:", files)
+let repoContext = ""
+
+for (const file of files) {
+
+  if (
+    file.endsWith(".js") ||
+    file.endsWith(".md") ||
+    file.endsWith(".json")
+  ) {
+
+    try {
+
+      const content = fs.readFileSync(file, "utf8")
+
+      repoContext += `
+FILE: ${file}
+----------------
+${content}
+
+`
+
+    } catch {}
+
+  }
+
+}
+
+console.log("📂 Repo analyzed")
+
+  
 
   // -----------------------------
   // Goal
@@ -59,6 +90,8 @@ async function runAgent() {
   // -----------------------------
   // Prompt
   // -----------------------------
+  
+  const trimmedContext = repoContext.slice(-12000)
 
   const prompt = `
 You are Peachy, an autonomous AI software engineer.
@@ -69,8 +102,9 @@ ${goal}
 Memory:
 ${JSON.stringify(memory, null, 2)}
 
-Repository files:
-${files.join(", ")}
+Repository code:
+
+${trimmedContext}
 
 Choose ONE improvement.
 
