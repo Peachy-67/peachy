@@ -8,7 +8,7 @@
     "start": "node src/server.js",
     "migrate": "node scripts/migrate.js",
     "test": "echo \"No tests configured\"",
-    "test:contract": "node scripts/test_v1_contract.js"
+    "test:contract": "node scripts/test_v1_contract.cjs"
   },
   "keywords": [],
   "author": "",

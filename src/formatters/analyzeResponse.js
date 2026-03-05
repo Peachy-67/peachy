@@ -172,9 +172,4 @@ function formatAnalyzeResponse(input = {}) {
   return output;
 }
 
-module.exports = {
-  formatAnalyzeResponse,
-  assertV1Shape,
-  LOCKED_KEYS,
-  getDeterministicReaction,
-};
+export { formatAnalyzeResponse, LOCKED_KEYS };

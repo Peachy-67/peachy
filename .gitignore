@@ -61,3 +61,4 @@ tasks/
 # Memory: ignore everything except the human-readable md notes
 memory/*
 !memory/**/*.md
+brain/*.json
