@@ -96,6 +96,16 @@ console.log("📂 Repo analyzed")
   const prompt = `
 You are Peachy, an autonomous AI software engineer.
 
+Project: Flagged
+
+Product roadmap:
+1. Build the user interface
+2. Improve the behavior analyzer
+3. Improve scoring accuracy
+4. Improve sharing and virality
+
+Choose ONE task from the roadmap and improve the project.
+
 Goal:
 ${goal}
 
@@ -163,6 +173,22 @@ description: short explanation
   // -----------------------------
   // Write file
   // -----------------------------
+
+  
+const PROTECTED_FILES = [
+  "src/server.js",
+  "scripts/run_agent.js",
+  "package.json",
+  "package-lock.json"
+];
+
+const normalized = filename.replace(/^\.\/+/, "");
+
+if (PROTECTED_FILES.includes(normalized)) {
+  console.log("🚫 Peachy blocked from modifying protected file:", filename);
+  return;
+}
+
 
   fs.mkdirSync(path.dirname(filename), { recursive: true })
 
