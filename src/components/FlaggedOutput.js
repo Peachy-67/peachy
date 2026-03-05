@@ -1,48 +1,69 @@
-import React from "react";
+import React from 'react';
 
-const flagColors = {
-  insult: "#E74C3C", // red
-  manipulation: "#F39C12", // orange
-  gaslighting: "#9B59B6", // purple
-  discard: "#3498DB", // blue
-  control: "#27AE60", // green
+// Color coding for flags
+const FLAG_COLORS = {
+  insult: '#E57373',      // red-ish
+  manipulation: '#FFB74D',// orange-ish
+  gaslighting: '#64B5F6', // blue-ish
+  discard: '#81C784',     // green-ish
+  control: '#BA68C8'      // purple-ish
 };
 
-export default function FlaggedOutput({ flags }) {
-  if (!flags || flags.length === 0) return null;
+const FLAG_LABELS = {
+  insult: 'Insult',
+  manipulation: 'Manipulation',
+  gaslighting: 'Gaslighting',
+  discard: 'Discard',
+  control: 'Control'
+};
+
+function FlagBadge({ type }) {
+  const color = FLAG_COLORS[type] || '#CCCCCC';
+  return (
+    <span
+      role="alert"
+      aria-label={FLAG_LABELS[type]}
+      style={{
+        backgroundColor: color,
+        color: '#fff',
+        padding: '4px 8px',
+        borderRadius: '12px',
+        fontSize: '0.85rem',
+        marginRight: '6px',
+        fontWeight: '600',
+        userSelect: 'none',
+        display: 'inline-block',
+        minWidth: '70px',
+        textAlign:'center',
+        boxShadow: '0 0 4px rgba(0,0,0,0.2)'
+      }}
+      data-flag-type={type}
+    >
+      {FLAG_LABELS[type]}
+    </span>
+  );
+}
+
+export default function FlaggedOutput({ detectedFlags = [] }) {
+  if (!detectedFlags.length) {
+    return <p aria-live="polite" style={{ fontStyle: 'italic', color: '#777' }}>No red flags detected</p>;
+  }
 
   return (
     <div
+      role="region"
+      aria-live="polite"
+      aria-label="Detected behavioral red flags"
       style={{
-        border: "1px solid #ddd",
-        borderRadius: 8,
-        padding: 12,
-        maxWidth: 400,
-        userSelect: "text",
-        fontFamily: "Helvetica, Arial, sans-serif",
-        fontSize: 14,
-        lineHeight: 1.4,
-        background: "#fff",
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '6px',
+        marginTop: '8px',
+        maxWidth: '350px'
       }}
     >
-      {flags.map((flag) => (
-        <span
-          key={flag}
-          style={{
-            display: "inline-block",
-            margin: "0 6px 6px 0",
-            padding: "4px 10px",
-            borderRadius: 15,
-            color: "#fff",
-            backgroundColor: flagColors[flag] || "#999",
-            fontWeight: "600",
-            userSelect: "text",
-          }}
-          aria-label={`${flag} behavior flagged`}
-          title={`${flag} behavior flagged`}
-        >
-          {flag.charAt(0).toUpperCase() + flag.slice(1)}
-        </span>
+      {detectedFlags.map(flag => (
+        <FlagBadge key={flag} type={flag} />
       ))}
     </div>
   );
