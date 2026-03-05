@@ -1,51 +1,53 @@
-import React from "react";
+import React from 'react';
 
-const BEHAVIOR_FLAGS = {
-  insult: { label: "Insult", color: "#e74c3c" },
-  manipulation: { label: "Manipulation", color: "#f39c12" },
-  gaslighting: { label: "Gaslighting", color: "#8e44ad" },
-  discard: { label: "Discard", color: "#34495e" },
-  control: { label: "Control", color: "#27ae60" },
+const flagStyles = {
+  insult: { backgroundColor: '#f44336', color: 'white' },       // red
+  manipulation: { backgroundColor: '#ff9800', color: 'white' }, // orange
+  gaslighting: { backgroundColor: '#9c27b0', color: 'white' },  // purple
+  discard: { backgroundColor: '#607d8b', color: 'white' },      // blue-grey
+  control: { backgroundColor: '#3f51b5', color: 'white' },      // indigo
+};
+
+const flagLabels = {
+  insult: 'Insult',
+  manipulation: 'Manipulation',
+  gaslighting: 'Gaslighting',
+  discard: 'Discard',
+  control: 'Control',
 };
 
 export default function FlaggedBehaviorBadges({ flags }) {
-  if (!flags || flags.length === 0) return null;
+  if (!flags || flags.length === 0) {
+    return null;
+  }
 
   return (
-    <div
+    <section
       role="region"
-      aria-label="Behavior flags detected"
       aria-live="polite"
+      aria-label="Detected behavior flags"
       style={{
-        display: "flex",
-        gap: "6px",
-        flexWrap: "wrap",
-        maxWidth: "100%",
+        display: 'flex',
+        gap: '0.5rem',
+        flexWrap: 'wrap',
+        marginTop: '0.5rem',
       }}
     >
-      {flags.map((flag) => {
-        const flagInfo = BEHAVIOR_FLAGS[flag];
-        if (!flagInfo) return null;
-
-        return (
-          <span
-            key={flag}
-            style={{
-              backgroundColor: flagInfo.color,
-              color: "#fff",
-              padding: "4px 8px",
-              borderRadius: "12px",
-              fontSize: "0.85rem",
-              fontWeight: "600",
-              userSelect: "none",
-              whiteSpace: "nowrap",
-            }}
-            aria-label={`Flagged behavior: ${flagInfo.label}`}
-          >
-            {flagInfo.label}
-          </span>
-        );
-      })}
-    </div>
+      {flags.map((flag) => (
+        <span
+          key={flag}
+          style={{
+            ...flagStyles[flag],
+            padding: '0.25rem 0.5rem',
+            borderRadius: '12px',
+            fontWeight: '600',
+            fontSize: '0.875rem',
+            userSelect: 'text',
+          }}
+        >
+          {flagLabels[flag]}
+        </span>
+      ))}
+    </section>
   );
 }
