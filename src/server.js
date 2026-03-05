@@ -8,6 +8,7 @@ const { formatAnalyzeResponse } = require("./formatters/analyzeResponse");
 
 // CONNECT LOCAL DETECTION ENGINE
 const analyzeConversation = require("./detection/analyzeConversation").default;
+const calculateRisk = require("./detection/calculateRisk").default;
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -207,6 +208,8 @@ Important:
         ...localSignals,
       ])
     );
+    
+    const risk = calculateRisk(mergedSignals);    
 
     parsed = {
       confidence:
@@ -221,6 +224,8 @@ Important:
         : [],
 
       signals: mergedSignals,
+
+      risk: risk,
 
       usage: {},
       meta: {},
