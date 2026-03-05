@@ -1,12 +1,11 @@
 import React from 'react';
 
-// Color coding for flags
 const FLAG_COLORS = {
-  insult: '#E57373',      // red-ish
-  manipulation: '#FFB74D',// orange-ish
-  gaslighting: '#64B5F6', // blue-ish
-  discard: '#81C784',     // green-ish
-  control: '#BA68C8'      // purple-ish
+  insult: '#e74c3c',
+  manipulation: '#f39c12',
+  gaslighting: '#8e44ad',
+  discard: '#3498db',
+  control: '#2ecc71',
 };
 
 const FLAG_LABELS = {
@@ -14,57 +13,50 @@ const FLAG_LABELS = {
   manipulation: 'Manipulation',
   gaslighting: 'Gaslighting',
   discard: 'Discard',
-  control: 'Control'
+  control: 'Control',
 };
 
-function FlagBadge({ type }) {
-  const color = FLAG_COLORS[type] || '#CCCCCC';
-  return (
-    <span
-      role="alert"
-      aria-label={FLAG_LABELS[type]}
-      style={{
-        backgroundColor: color,
-        color: '#fff',
-        padding: '4px 8px',
-        borderRadius: '12px',
-        fontSize: '0.85rem',
-        marginRight: '6px',
-        fontWeight: '600',
-        userSelect: 'none',
-        display: 'inline-block',
-        minWidth: '70px',
-        textAlign:'center',
-        boxShadow: '0 0 4px rgba(0,0,0,0.2)'
-      }}
-      data-flag-type={type}
-    >
-      {FLAG_LABELS[type]}
-    </span>
-  );
-}
-
-export default function FlaggedOutput({ detectedFlags = [] }) {
-  if (!detectedFlags.length) {
-    return <p aria-live="polite" style={{ fontStyle: 'italic', color: '#777' }}>No red flags detected</p>;
-  }
+const FlaggedOutput = ({ flags = [] }) => {
+  if (flags.length === 0) return null;
 
   return (
-    <div
+    <section
       role="region"
       aria-live="polite"
-      aria-label="Detected behavioral red flags"
+      aria-label={`Detected behavioral flags: ${flags.map(f => FLAG_LABELS[f]).join(', ')}`}
       style={{
         display: 'flex',
+        gap: 8,
         flexWrap: 'wrap',
-        gap: '6px',
-        marginTop: '8px',
-        maxWidth: '350px'
+        justifyContent: 'center',
+        margin: '12px 0',
       }}
     >
-      {detectedFlags.map(flag => (
-        <FlagBadge key={flag} type={flag} />
+      {flags.map((flag) => (
+        <span
+          key={flag}
+          role="status"
+          aria-label={FLAG_LABELS[flag]}
+          style={{
+            backgroundColor: FLAG_COLORS[flag],
+            color: 'white',
+            padding: '6px 10px',
+            borderRadius: 12,
+            fontWeight: '600',
+            fontSize: 14,
+            minWidth: 80,
+            textAlign: 'center',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+            userSelect: 'none',
+            lineHeight: 1,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {FLAG_LABELS[flag]}
+        </span>
       ))}
-    </div>
+    </section>
   );
-}
+};
+
+export default FlaggedOutput;
