@@ -100,6 +100,8 @@ ${content}
 
   const task = TASKS[memory.completed.length] || "Improve UI polish"
 
+  console.log("🧩 Current task:", task)
+
   // -----------------------------
   // Prompt
   // -----------------------------
@@ -119,11 +121,11 @@ Memory:
 ${JSON.stringify(memory, null, 2)}
 
 Repository code:
-
 ${trimmedContext}
 
 Rules:
 - Never modify protected files
+- Never modify backend engine
 - Prefer creating new files
 - Implement ONLY the current task
 - Prefer placing UI code in src/components/
@@ -181,7 +183,7 @@ description: short explanation
   }
 
   // -----------------------------
-  // Write file
+  // Write file safely
   // -----------------------------
 
   const PROTECTED_FILES = [
@@ -191,10 +193,20 @@ description: short explanation
     "package-lock.json"
   ]
 
+  const PROTECTED_DIRECTORIES = [
+    "src/server",
+    "src/detection",
+    "src/formatters",
+    "scripts"
+  ]
+
   const normalized = filename.replace(/^\.\/+/, "")
 
-  if (PROTECTED_FILES.includes(normalized)) {
-    console.log("🚫 Peachy blocked from modifying protected file:", filename)
+  if (
+    PROTECTED_FILES.includes(normalized) ||
+    PROTECTED_DIRECTORIES.some(dir => normalized.startsWith(dir))
+  ) {
+    console.log("🚫 Peachy blocked from modifying protected path:", filename)
     return
   }
 
@@ -219,4 +231,4 @@ description: short explanation
 
 }
 
-runAgent()git add
+runAgent()
