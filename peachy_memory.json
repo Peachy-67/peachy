@@ -21,7 +21,8 @@
     "New React component creating a visually distinct \"Share Result\" button that uses the native Web Share API or clipboard fallback to share the flagged conversation result text. This boosts usability and viral sharing while keeping UI minimal and accessible.",
     "Added and refined core CSS styles for all main UI components to improve overall styling and usability with consistent brand colors, better spacing, clearer typography, subtle shadows, responsive layout, and refined interactive states. These style improvements enhance user experience, visual clarity, and screenshot shareability without changing functionality.",
     "New backend helper module to enhance natural language processing by leveraging GPT-4 prompt engineering for more accurate and confident subtle behavioral red flag detection. This function returns structured JSON with confidence scores for improved accuracy and detail.",
-    "Implements an async function to analyze sentiment and emotional cues using GPT-4, returning structured JSON with overall sentiment, detected emotions, and confidence scores, to identify potential issue cues in conversations."
+    "Implements an async function to analyze sentiment and emotional cues using GPT-4, returning structured JSON with overall sentiment, detected emotions, and confidence scores, to identify potential issue cues in conversations.",
+    "Created a new React component `RealTimeDashboard` for a user interface dashboard that supports real-time visualization of detected red flags and conversation insights. It includes a conversation input textarea, a manual analyze button fallback, live updates via WebSocket if available, and displays verdict, flagged badges, and a share button for viral sharing. The UI is designed for clarity, accessibility, and screenshot friendliness with distinct sections and live regions for dynamic updates."
   ],
   "failed": [
     "Invalid response",
