@@ -15,7 +15,8 @@
     "Improved behavior analyzer with advanced prompt engineering and confidence scores from GPT-4 for more accurate and detailed detection, enabling better scoring accuracy per roadmap step #3.",
     "Improves UI polish of the flagged behavior output by extracting badge styles into clear CSS with subtle shadows, consistent min-width, spacing, and responsive wrapping. The badges have smooth hover brightness increase for a refined feel, all designed for screenshot clarity and viral sharing usability. The JS FlaggedOutput component now imports and uses this CSS for a neat, polished look with improved usability and visual appeal.",
     "Conversation input React component with a labeled textarea, styled for clarity and usability, enabling users to paste conversation text. It accepts controlled props (value, onChange) for integration with app state. This component focuses on simplicity, accessibility, and screen reader friendliness.",
-    "Created a styled AnalyzeButton React component with accessible label and disabled state. The button visually stands out with peachy brand colors, changes color on hover when enabled, and supports an onClick handler. This supports usability and clear call-to-action for users to trigger conversation analysis."
+    "Created a styled AnalyzeButton React component with accessible label and disabled state. The button visually stands out with peachy brand colors, changes color on hover when enabled, and supports an onClick handler. This supports usability and clear call-to-action for users to trigger conversation analysis.",
+    "New React component wrapping the conversation input and analyze button with a fetch call to /api/analyze endpoint. Displays loading state, error messages, and results using existing FlaggedOutput and ShareButton components, connecting UI interaction to backend analysis."
   ],
   "failed": [
     "Invalid response",
