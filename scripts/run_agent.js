@@ -6,15 +6,6 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
 
-function extractSection(text, start, end) {
-  const s = text.indexOf(start)
-  const e = text.indexOf(end)
-
-  if (s === -1 || e === -1) return null
-
-  return text.substring(s + start.length, e).trim()
-}
-
 async function runAgent() {
 
   console.log("🍑 Peachy AI brain starting")
@@ -151,24 +142,13 @@ description: short explanation
   console.log("🧠 Raw Peachy response:\n", text)
 
   // -----------------------------
-  // Parse response safely
+  // Extract files
   // -----------------------------
 
-  const filenameMatch = text.match(/filename:\s*(.*)/)
+  const fileMatches = [...text.matchAll(/filename:\s*(.*)/g)]
+  const codeMatches = [...text.matchAll(/---CODE---([\s\S]*?)---END---/g)]
 
-  const filename = filenameMatch
-    ? filenameMatch[1].trim()
-    : null
-
-  const code = extractSection(text, "---CODE---", "---END---")
-
-  const descMatch = text.match(/description:\s*(.*)/)
-
-  const description = descMatch
-    ? descMatch[1].trim()
-    : "No description"
-
-  if (!filename || !code) {
+  if (fileMatches.length === 0 || codeMatches.length === 0) {
 
     console.log("❌ Failed to parse Peachy response")
 
@@ -183,7 +163,7 @@ description: short explanation
   }
 
   // -----------------------------
-  // Write file safely
+  // Protected paths
   // -----------------------------
 
   const PROTECTED_FILES = [
@@ -200,25 +180,42 @@ description: short explanation
     "scripts"
   ]
 
-  const normalized = filename.replace(/^\.\/+/, "")
+  // -----------------------------
+  // Write generated files
+  // -----------------------------
 
-  if (
-    PROTECTED_FILES.includes(normalized) ||
-    PROTECTED_DIRECTORIES.some(dir => normalized.startsWith(dir))
-  ) {
-    console.log("🚫 Peachy blocked from modifying protected path:", filename)
-    return
+  for (let i = 0; i < fileMatches.length; i++) {
+
+    const filename = fileMatches[i][1].trim()
+    const code = codeMatches[i][1].trim()
+
+    const normalized = filename.replace(/^\.\/+/, "")
+
+    if (
+      PROTECTED_FILES.includes(normalized) ||
+      PROTECTED_DIRECTORIES.some(dir => normalized.startsWith(dir))
+    ) {
+      console.log("🚫 Peachy blocked from modifying protected path:", filename)
+      continue
+    }
+
+    fs.mkdirSync(path.dirname(filename), { recursive: true })
+
+    fs.writeFileSync(filename, code)
+
+    console.log("✨ Peachy created:", filename)
+
   }
-
-  fs.mkdirSync(path.dirname(filename), { recursive: true })
-
-  fs.writeFileSync(filename, code)
-
-  console.log("✨ Peachy created:", filename)
 
   // -----------------------------
   // Update memory
   // -----------------------------
+
+  const descMatch = text.match(/description:\s*([\s\S]*)/)
+
+  const description = descMatch
+    ? descMatch[1].trim()
+    : "No description"
 
   memory.completed.push(description)
 
