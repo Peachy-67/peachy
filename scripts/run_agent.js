@@ -23,40 +23,38 @@ async function runAgent() {
   // Repo files
   // -----------------------------
 
-const files = fs.readdirSync("./").filter(
-  f => !["node_modules", ".git", ".github"].includes(f)
-)
+  const files = fs.readdirSync("./").filter(
+    f => !["node_modules", ".git", ".github"].includes(f)
+  )
 
-let repoContext = ""
+  let repoContext = ""
 
-for (const file of files) {
+  for (const file of files) {
 
-  if (
-    file.endsWith(".js") ||
-    file.endsWith(".md") ||
-    file.endsWith(".json")
-  ) {
+    if (
+      file.endsWith(".js") ||
+      file.endsWith(".md") ||
+      file.endsWith(".json")
+    ) {
 
-    try {
+      try {
 
-      const content = fs.readFileSync(file, "utf8")
+        const content = fs.readFileSync(file, "utf8")
 
-      repoContext += `
+        repoContext += `
 FILE: ${file}
 ----------------
 ${content}
 
 `
 
-    } catch {}
+      } catch {}
+
+    }
 
   }
 
-}
-
-console.log("📂 Repo analyzed")
-
-  
+  console.log("📂 Repo analyzed")
 
   // -----------------------------
   // Goal
@@ -88,23 +86,31 @@ console.log("📂 Repo analyzed")
   }
 
   // -----------------------------
+  // Task system
+  // -----------------------------
+
+  const TASKS = [
+    "Create conversation input UI component",
+    "Create analyze button component",
+    "Connect UI to /api/analyze endpoint",
+    "Display verdict result UI",
+    "Add share result button",
+    "Improve UI styling and usability"
+  ]
+
+  const task = TASKS[memory.completed.length] || "Improve UI polish"
+
+  // -----------------------------
   // Prompt
   // -----------------------------
-  
+
   const trimmedContext = repoContext.slice(-12000)
 
   const prompt = `
-You are Peachy, an autonomous AI software engineer.
+You are Peachy, an autonomous AI software engineer building the product FLAGGED.
 
-Project: Flagged
-
-Product roadmap:
-1. Build the user interface
-2. Improve the behavior analyzer
-3. Improve scoring accuracy
-4. Improve sharing and virality
-
-Choose ONE task from the roadmap and improve the project.
+Current task:
+${task}
 
 Goal:
 ${goal}
@@ -116,7 +122,11 @@ Repository code:
 
 ${trimmedContext}
 
-Choose ONE improvement.
+Rules:
+- Never modify protected files
+- Prefer creating new files
+- Implement ONLY the current task
+- Prefer placing UI code in src/components/
 
 Respond EXACTLY like this:
 
@@ -174,21 +184,19 @@ description: short explanation
   // Write file
   // -----------------------------
 
-  
-const PROTECTED_FILES = [
-  "src/server.js",
-  "scripts/run_agent.js",
-  "package.json",
-  "package-lock.json"
-];
+  const PROTECTED_FILES = [
+    "src/server.js",
+    "scripts/run_agent.js",
+    "package.json",
+    "package-lock.json"
+  ]
 
-const normalized = filename.replace(/^\.\/+/, "");
+  const normalized = filename.replace(/^\.\/+/, "")
 
-if (PROTECTED_FILES.includes(normalized)) {
-  console.log("🚫 Peachy blocked from modifying protected file:", filename);
-  return;
-}
-
+  if (PROTECTED_FILES.includes(normalized)) {
+    console.log("🚫 Peachy blocked from modifying protected file:", filename)
+    return
+  }
 
   fs.mkdirSync(path.dirname(filename), { recursive: true })
 
@@ -211,4 +219,4 @@ if (PROTECTED_FILES.includes(normalized)) {
 
 }
 
-runAgent()
+runAgent()git add
