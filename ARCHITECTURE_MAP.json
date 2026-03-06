@@ -1,0 +1,18 @@
+{
+  "frontend": {
+    "components": "src/components",
+    "pages": "src/pages",
+    "styles": "src/styles"
+  },
+  "backend": {
+    "server": "src/server",
+    "detection": "src/detection",
+    "formatters": "src/formatters"
+  },
+  "protected": [
+    "src/server.js",
+    "scripts/run_agent.js",
+    "package.json",
+    "package-lock.json"
+  ]
+}

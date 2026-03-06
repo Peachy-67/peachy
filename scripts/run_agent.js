@@ -48,6 +48,18 @@ ${content}
   console.log("📂 Repo analyzed")
 
   // -----------------------------
+  // Load architecture map
+  // -----------------------------
+
+  let architecture = {}
+
+  try {
+    architecture = JSON.parse(
+      fs.readFileSync("./ARCHITECTURE_MAP.json", "utf8")
+    )
+  } catch {}
+
+  // -----------------------------
   // Goal
   // -----------------------------
 
@@ -94,7 +106,7 @@ ${content}
   }
 
   // -----------------------------
-  // Generate tasks if queue empty
+  // Generate tasks if empty
   // -----------------------------
 
   if (!taskData.queue.length) {
@@ -153,6 +165,9 @@ ${task}
 
 Goal:
 ${goal}
+
+Architecture:
+${JSON.stringify(architecture, null, 2)}
 
 Memory:
 ${JSON.stringify(memory, null, 2)}
@@ -242,18 +257,14 @@ description: short explanation
       PROTECTED_FILES.includes(normalized) ||
       PROTECTED_DIRECTORIES.some(dir => normalized.startsWith(dir))
     ) {
-
       console.log("🚫 Peachy blocked from modifying protected path:", filename)
       continue
-
     }
 
     fs.mkdirSync(path.dirname(filename), { recursive: true })
-
     fs.writeFileSync(filename, code)
 
     console.log("✨ Peachy created:", filename)
-
   }
 
   // -----------------------------
@@ -261,10 +272,7 @@ description: short explanation
   // -----------------------------
 
   const descMatch = text.match(/description:\s*([\s\S]*)/)
-
-  const description = descMatch
-    ? descMatch[1].trim()
-    : "No description"
+  const description = descMatch ? descMatch[1].trim() : "No description"
 
   memory.completed.push(description)
 
@@ -284,8 +292,16 @@ description: short explanation
     JSON.stringify(taskData, null, 2)
   )
 
-  console.log("🧠 Memory updated")
+  // -----------------------------
+  // Write nightly log
+  // -----------------------------
 
+  fs.appendFileSync(
+    "./peachy_log.txt",
+    `${new Date().toISOString()} - ${description}\n`
+  )
+
+  console.log("🧠 Memory updated")
 }
 
 runAgent()
