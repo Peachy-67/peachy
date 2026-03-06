@@ -77,19 +77,65 @@ ${content}
   }
 
   // -----------------------------
-  // Task system
+  // Load task queue
   // -----------------------------
 
-  const TASKS = [
-    "Create conversation input UI component",
-    "Create analyze button component",
-    "Connect UI to /api/analyze endpoint",
-    "Display verdict result UI",
-    "Add share result button",
-    "Improve UI styling and usability"
-  ]
+  let taskData
 
-  const task = TASKS[memory.completed.length] || "Improve UI polish"
+  try {
+    taskData = JSON.parse(
+      fs.readFileSync("./peachy_tasks.json", "utf8")
+    )
+  } catch {
+    taskData = {
+      queue: [],
+      completed: []
+    }
+  }
+
+  // -----------------------------
+  // Generate tasks if queue empty
+  // -----------------------------
+
+  if (!taskData.queue.length) {
+
+    console.log("🧠 Peachy generating new tasks")
+
+    const planningPrompt = `
+You are planning development tasks for the product FLAGGED.
+
+The product analyzes conversations and detects behavioral red flags.
+
+Generate 5 development tasks to improve the product.
+
+Return JSON:
+
+{
+"tasks": ["task1","task2","task3","task4","task5"]
+}
+`
+
+    const plan = await client.responses.create({
+      model: "gpt-4.1-mini",
+      input: planningPrompt
+    })
+
+    try {
+
+      const parsed = JSON.parse(plan.output[0].content[0].text)
+
+      taskData.queue.push(...parsed.tasks)
+
+      fs.writeFileSync(
+        "./peachy_tasks.json",
+        JSON.stringify(taskData, null, 2)
+      )
+
+    } catch {}
+
+  }
+
+  const task = taskData.queue[0] || "Improve UI polish"
 
   console.log("🧩 Current task:", task)
 
@@ -142,13 +188,13 @@ description: short explanation
   console.log("🧠 Raw Peachy response:\n", text)
 
   // -----------------------------
-  // Extract files
+  // Extract generated files
   // -----------------------------
 
   const fileMatches = [...text.matchAll(/filename:\s*(.*)/g)]
   const codeMatches = [...text.matchAll(/---CODE---([\s\S]*?)---END---/g)]
 
-  if (fileMatches.length === 0 || codeMatches.length === 0) {
+  if (!fileMatches.length) {
 
     console.log("❌ Failed to parse Peachy response")
 
@@ -160,6 +206,7 @@ description: short explanation
     )
 
     return
+
   }
 
   // -----------------------------
@@ -195,8 +242,10 @@ description: short explanation
       PROTECTED_FILES.includes(normalized) ||
       PROTECTED_DIRECTORIES.some(dir => normalized.startsWith(dir))
     ) {
+
       console.log("🚫 Peachy blocked from modifying protected path:", filename)
       continue
+
     }
 
     fs.mkdirSync(path.dirname(filename), { recursive: true })
@@ -208,7 +257,7 @@ description: short explanation
   }
 
   // -----------------------------
-  // Update memory
+  // Update memory + task queue
   // -----------------------------
 
   const descMatch = text.match(/description:\s*([\s\S]*)/)
@@ -222,6 +271,17 @@ description: short explanation
   fs.writeFileSync(
     "./peachy_memory.json",
     JSON.stringify(memory, null, 2)
+  )
+
+  const finished = taskData.queue.shift()
+
+  if (finished) {
+    taskData.completed.push(finished)
+  }
+
+  fs.writeFileSync(
+    "./peachy_tasks.json",
+    JSON.stringify(taskData, null, 2)
   )
 
   console.log("🧠 Memory updated")
