@@ -13,7 +13,8 @@
     "Refactor FlaggedOutput badges to use flex container with wrapping and consistent spacing, improving layout on narrow screens for better screenshot-friendliness and viral sharing usability.",
     "Improved the behavior analyzer API endpoint by adding input validation, sanitization, and structured error handling to increase code stability and prevent crashes on invalid input.",
     "Improved behavior analyzer with advanced prompt engineering and confidence scores from GPT-4 for more accurate and detailed detection, enabling better scoring accuracy per roadmap step #3.",
-    "Improves UI polish of the flagged behavior output by extracting badge styles into clear CSS with subtle shadows, consistent min-width, spacing, and responsive wrapping. The badges have smooth hover brightness increase for a refined feel, all designed for screenshot clarity and viral sharing usability. The JS FlaggedOutput component now imports and uses this CSS for a neat, polished look with improved usability and visual appeal."
+    "Improves UI polish of the flagged behavior output by extracting badge styles into clear CSS with subtle shadows, consistent min-width, spacing, and responsive wrapping. The badges have smooth hover brightness increase for a refined feel, all designed for screenshot clarity and viral sharing usability. The JS FlaggedOutput component now imports and uses this CSS for a neat, polished look with improved usability and visual appeal.",
+    "Conversation input React component with a labeled textarea, styled for clarity and usability, enabling users to paste conversation text. It accepts controlled props (value, onChange) for integration with app state. This component focuses on simplicity, accessibility, and screen reader friendliness."
   ],
   "failed": [
     "Invalid response",
