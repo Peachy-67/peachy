@@ -1,0 +1,66 @@
+.flagged-output {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f1f1f3;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  max-width: 100%;
+  user-select: text; /* allow easy text selection for sharing */
+}
+
+.flag-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 100px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  color: #fff;
+  user-select: none; /* avoid accidental copy of shadow details */
+  transition: background-color 0.3s ease;
+}
+
+.flag-badge.insult {
+  background: #d32f2f; /* red-ish */
+}
+
+.flag-badge.manipulation {
+  background: #f57c00; /* orange */
+}
+
+.flag-badge.gaslighting {
+  background: #1976d2; /* blue */
+}
+
+.flag-badge.discard {
+  background: #616161; /* dark grey */
+}
+
+.flag-badge.control {
+  background: #388e3c; /* green */
+}
+
+/* subtle hover effect for better UI polish */
+.flag-badge:hover {
+  filter: brightness(1.1);
+  cursor: default;
+}
+
+/* Responsive improvement for small screen, badges wrap nicely */
+@media (max-width: 400px) {
+  .flagged-output {
+    justify-content: center;
+  }
+
+  .flag-badge {
+    min-width: 80px;
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+}
