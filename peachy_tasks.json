@@ -1,12 +1,12 @@
 {
   "queue": [
-    "Display verdict result UI",
     "Add share result button",
     "Improve UI styling and usability"
   ],
   "completed": [
     "Create conversation input UI component",
     "Create analyze button component",
-    "Connect UI to /api/analyze endpoint"
+    "Connect UI to /api/analyze endpoint",
+    "Display verdict result UI"
   ]
 }
