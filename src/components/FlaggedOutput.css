@@ -1,66 +1,67 @@
-.flagged-output {
+.flagged-output-container {
+  margin-top: 18px;
+  padding: 10px 10px 14px;
+  border-radius: 12px;
+  border: 2px solid #ffad89;
+  background-color: #fff5ee;
+  box-shadow: inset 0 1px 5px rgba(255, 132, 79, 0.18);
+}
+
+.flagged-output-container[aria-live] {
+  min-height: 42px; /* avoid jumping */
+}
+
+.flagged-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 12px;
-  background-color: #f1f1f3;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  max-width: 100%;
-  user-select: text; /* allow easy text selection for sharing */
+  gap: 8px 10px;
+  justify-content: flex-start;
+  user-select: none;
 }
 
-.flag-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 13px;
-  min-width: 100px;
+.flagged-badge {
+  min-width: 88px;
+  min-height: 26px;
+  font-weight: 700;
+  font-size: 0.87rem;
   text-align: center;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-  color: #fff;
-  user-select: none; /* avoid accidental copy of shadow details */
-  transition: background-color 0.3s ease;
+  border-radius: 16px;
+  padding: 6px 10px;
+  color: white;
+  box-shadow: 0 0 6px rgb(255 130 92 / 0.4);
+  transition: filter 0.3s ease;
+  letter-spacing: 0.02em;
 }
 
-.flag-badge.insult {
-  background: #d32f2f; /* red-ish */
-}
-
-.flag-badge.manipulation {
-  background: #f57c00; /* orange */
-}
-
-.flag-badge.gaslighting {
-  background: #1976d2; /* blue */
-}
-
-.flag-badge.discard {
-  background: #616161; /* dark grey */
-}
-
-.flag-badge.control {
-  background: #388e3c; /* green */
-}
-
-/* subtle hover effect for better UI polish */
-.flag-badge:hover {
+.flagged-badge:hover,
+.flagged-badge:focus {
   filter: brightness(1.1);
+  outline: none;
   cursor: default;
 }
 
-/* Responsive improvement for small screen, badges wrap nicely */
-@media (max-width: 400px) {
-  .flagged-output {
-    justify-content: center;
-  }
+/* Color-coded badges for each behavior type */
+.badge-insult {
+  background-color: #dd3e24; /* ruby red */
+  box-shadow: 0 0 8px #dd3e24cc;
+}
 
-  .flag-badge {
-    min-width: 80px;
-    font-size: 12px;
-    padding: 4px 8px;
-  }
+.badge-manipulation {
+  background-color: #e27225; /* pumpkin */
+  box-shadow: 0 0 8px #e27225cc;
+}
+
+.badge-gaslighting {
+  background-color: #b86510; /* amber */
+  box-shadow: 0 0 8px #b86510cc;
+}
+
+.badge-discard {
+  background-color: #9e6222; /* goldenrod */
+  box-shadow: 0 0 8px #9e6222cc;
+}
+
+.badge-control {
+  background-color: #995a5f; /* dark rose */
+  box-shadow: 0 0 8px #995a5fcc;
 }

@@ -1,0 +1,52 @@
+/* General layout styling improvements */
+body {
+  margin: 0;
+  font-family: 'Helvetica', Arial, sans-serif;
+  background-color: #fff8f0;
+  color: #4a4a4a;
+  line-height: 1.5;
+}
+
+.app-container {
+  max-width: 480px;
+  margin: 24px auto;
+  padding: 0 16px 40px 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  background: white;
+  user-select: text;
+}
+
+.header {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ff825c;
+  margin-bottom: 16px;
+  user-select: none;
+  letter-spacing: 0.04em;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 32px;
+  user-select: none;
+}
+
+/* Input area improvements */
+.input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+/* Responsive tweak for smaller screens */
+@media (max-width: 360px) {
+  .app-container {
+    margin: 16px 12px;
+    padding: 0 12px 30px 12px;
+  }
+}

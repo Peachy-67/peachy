@@ -1,12 +1,11 @@
 {
-  "queue": [
-    "Improve UI styling and usability"
-  ],
+  "queue": [],
   "completed": [
     "Create conversation input UI component",
     "Create analyze button component",
     "Connect UI to /api/analyze endpoint",
     "Display verdict result UI",
-    "Add share result button"
+    "Add share result button",
+    "Improve UI styling and usability"
   ]
 }

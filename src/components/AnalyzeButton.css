@@ -1,0 +1,26 @@
+button.analyze-button {
+  cursor: pointer;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 14px;
+  border: none;
+  background-color: #ff7043;
+  color: white;
+  box-shadow: 0 3px 10px rgba(255, 112, 67, 0.5);
+  user-select: none;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+button.analyze-button:hover:not(:disabled) {
+  background-color: #ff5722;
+  box-shadow: 0 5px 18px rgba(255, 87, 34, 0.7);
+}
+
+button.analyze-button:disabled {
+  background-color: #ffb59c;
+  color: #6e3e2f;
+  box-shadow: none;
+  cursor: default;
+  user-select: none;
+}
