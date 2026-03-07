@@ -1,134 +1,140 @@
-import React, { useEffect, useState, useRef } from "react";
-import FlaggedOutput from "./FlaggedOutput.js";
-import Verdict from "./Verdict.js";
-import ShareButton from "./ShareButton.js";
-import "../styles/RealTimeDashboard.css";
+import React, { useEffect, useState, useRef } from 'react';
+import PropTypes from 'prop-types';
+import ConversationInputWithPolish from './ConversationInputWithPolish';
+import AnalyzeButton from './AnalyzeButton';
+import FlaggedResultVisualization from './FlaggedResultVisualization';
+import ShareableResult from './ShareableResult';
+import ImmediateAlert from './ImmediateAlert';
+import './RealTimeDashboard.css';
 
-function RealTimeDashboard() {
-  const [conversation, setConversation] = useState("");
-  const [analysis, setAnalysis] = useState(null);
+/**
+ * RealTimeDashboard component provides a live monitoring UI for conversation input,
+ * real-time updates of analysis results, and a live alert stream for high-risk flags.
+ * 
+ * Supports manual analysis trigger and receives live updates via WebSocket connection.
+ */
+const RealTimeDashboard = ({ wsUrl }) => {
+  const [conversationText, setConversationText] = useState('');
+  const [analysisResult, setAnalysisResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const ws = useRef(null);
+  const [error, setError] = useState(null);
+  const wsRef = useRef(null);
 
-  // Connect to a websocket backend or SSE endpoint for real-time updates
-  // For demo, we'll mock with polling simulated here.
-  // Assumes backend supports streaming or WebSocket at /api/realtime or similar
-
+  // Set up WebSocket connection for live updates if wsUrl provided
   useEffect(() => {
-    // Example websocket connection (adjust URL if real ws exists)
-    // If no backend ws yet, fallback to no real-time connection
-    if ("WebSocket" in window) {
-      ws.current = new WebSocket(`${window.location.origin.replace(/^http/, "ws")}/api/realtime`);
-      ws.current.onopen = () => {
-        setError("");
-      };
-      ws.current.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data && data.conversation && data.analysis) {
-            setConversation(data.conversation);
-            setAnalysis(data.analysis);
-          }
-        } catch {
-          // ignore malformed data
+    if (!wsUrl) return;
+
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.debug('WebSocket connected for real-time monitoring');
+    };
+
+    ws.onmessage = (message) => {
+      try {
+        const data = JSON.parse(message.data);
+        if (data && data.verdict) {
+          setAnalysisResult(data);
+          setError(null);
+          setLoading(false);
         }
-      };
-      ws.current.onerror = () => {
-        setError("Real-time connection error");
-      };
-      ws.current.onclose = () => {
-        setError("Real-time connection closed");
-      };
-      return () => ws.current.close();
-    } else {
-      setError("Real-time updates not supported by your browser");
+      } catch (e) {
+        console.error('Invalid WebSocket message data', e);
+      }
+    };
+
+    ws.onerror = (event) => {
+      console.error('WebSocket error', event);
+      setError('Real-time connection error.');
+    };
+
+    ws.onclose = () => {
+      console.debug('WebSocket connection closed');
+    };
+
+    // Cleanup on unmount
+    return () => {
+      ws.close();
+    };
+  }, [wsUrl]);
+
+  // Manual analyze function fallback if no live connection or for immediate analysis
+  const handleAnalyzeClick = async () => {
+    if (!conversationText.trim()) {
+      setError('Please enter conversation text');
+      return;
     }
-  }, []);
-
-  // Fallback UI includes:
-  // Conversation text area
-  // Button to manually analyze for first launch or fallback
-  // Displays verdict and flagged badges in real-time
-
-  // Manual analyze fallback:
-  async function analyzeText() {
     setLoading(true);
-    setError("");
-    setAnalysis(null);
+    setError(null);
     try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversation }),
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: conversationText }),
       });
       if (!response.ok) {
-        throw new Error(`Server ${response.status}`);
+        throw new Error(`HTTP error: ${response.status}`);
       }
-      const data = await response.json();
-      if (data.analysis) {
-        setAnalysis(data.analysis);
-      } else {
-        setError("No analysis returned");
-      }
+      const result = await response.json();
+      setAnalysisResult(result);
     } catch (err) {
-      setError("Analyze error: " + err.message);
+      setError(`Analyze failed: ${err.message}`);
+      setAnalysisResult(null);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <main className="dashboard-container" role="main" aria-label="Real-time Red Flags Dashboard">
-      <section className="input-section" aria-labelledby="input-heading">
-        <h2 id="input-heading" className="section-title">
-          Conversation Input
-        </h2>
-        <textarea
-          className="conversation-input"
-          aria-label="Paste or type conversation text here"
-          placeholder="Paste conversation text here for analysis..."
-          value={conversation}
-          onChange={(e) => setConversation(e.target.value)}
-          rows={6}
-          spellCheck="false"
+    <main className="dashboard-container" role="main" aria-label="Real-time conversation monitoring dashboard">
+      <h1 className="dashboard-title">FLAGGED Real-Time Monitoring</h1>
+      <section className="input-section" aria-label="Conversation input">
+        <ConversationInputWithPolish
+          value={conversationText}
+          onChange={(e) => setConversationText(e.target.value)}
+          disabled={loading}
+          aria-describedby="inputHelpText"
+          placeholder="Paste conversation text here for real-time analysis..."
         />
-        <button
-          className="analyze-button"
-          onClick={analyzeText}
-          disabled={loading || !conversation.trim()}
-          aria-disabled={loading || !conversation.trim()}
-          aria-live="polite"
+        <small id="inputHelpText" className="input-help-text">Paste conversation text and analyze instantly or wait for live updates.</small>
+        <AnalyzeButton
+          onClick={handleAnalyzeClick}
+          disabled={loading || !conversationText.trim()}
+          aria-label="Analyze conversation manually"
         >
-          {loading ? "Analyzing..." : "Analyze Conversation"}
-        </button>
-        {error && (
-          <p className="error-message" role="alert" aria-live="assertive">
-            {error}
-          </p>
-        )}
+          {loading ? 'Analyzing...' : 'Analyze Now'}
+        </AnalyzeButton>
+        {error && <p className="error-message" role="alert">{error}</p>}
       </section>
 
-      <section className="result-section" aria-live="polite" aria-label="Analysis results">
-        <h2 className="section-title">Detected Red Flags & Insights</h2>
-        {analysis ? (
+      <section className="results-section" aria-live="polite" aria-label="Analysis results and alerts">
+        {analysisResult ? (
           <>
-            <Verdict verdict={analysis.verdict} />
-            <FlaggedOutput flags={analysis.flags} />
-            <ShareButton
-              shareText={`Conversation flagged result:\nVerdict: ${analysis.verdict}\nFlags: ${analysis.flags
-                .map((f) => f.type)
-                .join(", ") || "None"}`}
-              ariaLabel="Share flagged conversation result"
-              className="share-button"
+            <ImmediateAlert flaggedBehaviors={analysisResult.flaggedBehaviors} />
+            <ShareableResult
+              verdict={analysisResult.verdict}
+              flaggedBehaviors={analysisResult.flaggedBehaviors}
+              overallConfidence={analysisResult.overallConfidence}
+              conversationText={conversationText}
             />
           </>
         ) : (
-          <p className="no-data-message">No analysis data available yet.</p>
+          <p className="no-results">No analysis results yet.</p>
         )}
       </section>
     </main>
   );
-}
+};
+
+RealTimeDashboard.propTypes = {
+  wsUrl: PropTypes.string, // WebSocket URL for live updates, optional
+};
+
+RealTimeDashboard.defaultProps = {
+  wsUrl: '', // No live update by default
+};
 
 export default RealTimeDashboard;
