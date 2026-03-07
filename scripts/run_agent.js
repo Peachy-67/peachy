@@ -48,7 +48,7 @@ ${content}
   console.log("📂 Repo analyzed")
 
   // -----------------------------
-  // Load architecture map
+  // Load architecture
   // -----------------------------
 
   let architecture = {}
@@ -60,7 +60,7 @@ ${content}
   } catch {}
 
   // -----------------------------
-  // Load roadmap (NEW)
+  // Load roadmap
   // -----------------------------
 
   let roadmap = ""
@@ -72,7 +72,7 @@ ${content}
   }
 
   // -----------------------------
-  // Goal
+  // Load goal
   // -----------------------------
 
   let goal = ""
@@ -84,7 +84,7 @@ ${content}
   }
 
   // -----------------------------
-  // Memory
+  // Load memory
   // -----------------------------
 
   let memory = {}
@@ -201,15 +201,32 @@ Rules:
 - Implement ONLY the current task
 - Prefer placing UI code in src/components/
 
-Respond EXACTLY like this:
+You may generate MULTIPLE files if needed.
 
-filename: path/to/file.js
+Respond EXACTLY like this format:
+
+filename: path/to/file1.js
 
 ---CODE---
-full code here
+code
 ---END---
 
-description: short explanation
+filename: path/to/file2.js
+
+---CODE---
+code
+---END---
+
+filename: path/to/file3.js
+
+---CODE---
+code
+---END---
+
+description: short explanation of the feature implemented
+
+You may generate up to 5 files if needed to complete the task.
+Prefer building complete working features rather than small fragments.
 `
 
   const response = await client.responses.create({
@@ -287,7 +304,7 @@ description: short explanation
   }
 
   // -----------------------------
-  // Update memory + task queue
+  // Update memory
   // -----------------------------
 
   const descMatch = text.match(/description:\s*([\s\S]*)/)
@@ -299,6 +316,10 @@ description: short explanation
     "./peachy_memory.json",
     JSON.stringify(memory, null, 2)
   )
+
+  // -----------------------------
+  // Update tasks
+  // -----------------------------
 
   const finished = taskData.queue.shift()
 
@@ -312,7 +333,7 @@ description: short explanation
   )
 
   // -----------------------------
-  // Write nightly log
+  // Log activity
   // -----------------------------
 
   fs.appendFileSync(
