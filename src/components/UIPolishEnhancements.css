@@ -1,0 +1,188 @@
+/* UI Polish Enhancements for better overall visual appeal, spacing, and smooth interactions */
+
+.ui-container {
+  max-width: 720px;
+  margin: 24px auto;
+  padding: 16px 24px;
+  background: #fff8f0;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(255, 182, 193, 0.25); /* subtle peachy glow */
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #3d3d3d;
+}
+
+.ui-container h1,
+.ui-container h2 {
+  color: #e8767b;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: 0.03em;
+}
+
+.ui-container p {
+  line-height: 1.4;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.ui-textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 16px;
+  font-size: 1.05rem;
+  border: 2px solid #f5b7b1;
+  border-radius: 10px;
+  resize: vertical;
+  box-shadow: inset 0 2px 6px rgba(255, 192, 192, 0.35);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: inherit;
+  color: #4a4a4a;
+  margin-bottom: 20px;
+}
+
+.ui-textarea:focus {
+  outline: none;
+  border-color: #ea6b6b;
+  box-shadow: 0 0 8px #ea6b6baa;
+}
+
+.ui-button {
+  background-color: #ea6b6b;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border-radius: 36px;
+  cursor: pointer;
+  box-shadow: 0 5px 12px rgba(234, 107, 107, 0.48);
+  transition: background-color 0.25s ease, box-shadow 0.3s ease;
+  user-select: none;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-button:hover:not(:disabled),
+.ui-button:focus:not(:disabled) {
+  background-color: #e85a5a;
+  box-shadow: 0 8px 20px rgba(232, 90, 90, 0.65);
+  outline: none;
+}
+
+.ui-button:disabled {
+  background-color: #f7c5c5;
+  box-shadow: none;
+  cursor: not-allowed;
+  color: #a66666;
+}
+
+.ui-verdict {
+  font-weight: 700;
+  font-size: 1.25rem;
+  padding: 12px 24px;
+  border-radius: 28px;
+  border: 2px solid transparent;
+  width: fit-content;
+  user-select: none;
+  margin-bottom: 20px;
+  display: inline-block;
+  letter-spacing: 0.025em;
+  box-shadow: 0 2px 10px rgba(255, 182, 193, 0.3);
+  transition: border-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.ui-verdict.safe {
+  color: #2a9d8f;
+  border-color: #2a9d8f88;
+  background-color: #def7f5;
+}
+
+.ui-verdict.caution {
+  color: #e9c46a;
+  border-color: #e9c46a99;
+  background-color: #fffbe6;
+}
+
+.ui-verdict.flagged {
+  color: #e63946;
+  border-color: #e6394699;
+  background-color: #ffe8e8;
+}
+
+.ui-flagged-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.ui-flagged-badge {
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: white;
+  min-width: 108px;
+  text-align: center;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.13);
+  transition: filter 0.25s ease;
+  user-select: none;
+  cursor: default;
+}
+
+.ui-flagged-badge:hover,
+.ui-flagged-badge:focus {
+  filter: brightness(1.15);
+  outline: none;
+}
+
+.ui-flagged-badge.insult {
+  background-color: #d93a3a;
+}
+
+.ui-flagged-badge.manipulation {
+  background-color: #c06c00;
+}
+
+.ui-flagged-badge.gaslighting {
+  background-color: #8f1f85;
+}
+
+.ui-flagged-badge.discard {
+  background-color: #3a6fd9;
+}
+
+.ui-flagged-badge.control {
+  background-color: #1f623e;
+}
+
+.ui-share-button {
+  margin-top: 10px;
+  display: inline-flex;
+}
+
+@media (max-width: 440px) {
+  .ui-container {
+    margin: 16px;
+    padding: 14px 18px;
+  }
+  .ui-textarea {
+    min-height: 120px;
+    font-size: 1rem;
+  }
+  .ui-button {
+    padding: 12px 22px;
+    font-size: 1rem;
+  }
+  .ui-verdict {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+  }
+  .ui-flagged-badge {
+    min-width: 90px;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+}
