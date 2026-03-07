@@ -1,0 +1,183 @@
+/* UI Polish refinements for better visual hierarchy and polish */
+
+.ui-container {
+  max-width: 720px;
+  margin: auto;
+  padding: 1.5rem;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(255, 183, 197, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.ui-container:focus-within {
+  box-shadow: 0 6px 20px rgba(255, 123, 160, 0.4);
+  outline: none;
+}
+
+/* Smooth input and button field visual polish */
+
+input[type="text"], textarea {
+  border: 2px solid #ff9bb3;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.25s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus, textarea:focus {
+  border-color: #ff749a;
+  outline: none;
+  box-shadow: 0 0 6px rgba(255, 116, 147, 0.6);
+}
+
+/* Button polish */
+
+button {
+  cursor: pointer;
+  background-color: #ff7080;
+  border: none;
+  color: #fff;
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+  box-shadow: 0 4px 12px rgba(255, 112, 128, 0.4);
+  user-select: none;
+}
+
+button:focus-visible {
+  outline: 3px solid #ff4d6d;
+  outline-offset: 3px;
+}
+
+button:hover:not(:disabled) {
+  background-color: #ff4d6d;
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(255, 77, 109, 0.7);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
+  box-shadow: 0 3px 10px rgba(255, 77, 109, 0.7);
+}
+
+button:disabled {
+  background-color: #ffa3a8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Verdict container refinement */
+
+.verdict-container {
+  margin-top: 1rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(255, 112, 128, 0.25);
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Alert banner polish */
+
+.alert-banner {
+  background-color: #ffe6eb;
+  border-left: 6px solid #ff4d6d;
+  padding: 0.9rem 1.3rem;
+  margin: 1rem 0;
+  color: #b00020;
+  font-weight: 600;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(255, 77, 109, 0.15);
+}
+
+/* Share button polish */
+
+.share-button {
+  background-color: transparent;
+  border: 2px solid #ff7080;
+  color: #ff7080;
+  padding: 0.55rem 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.15s ease;
+  user-select: none;
+}
+
+.share-button:hover:not(:disabled) {
+  background-color: #ff7080;
+  color: #fff;
+  border-color: #ff4d6d;
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(255, 77, 109, 0.5);
+}
+
+.share-button:disabled {
+  color: #ffb5bd;
+  border-color: #ffb5bd;
+  cursor: not-allowed;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* Flags badge update: subtle border and refined shadows */
+
+.flag-badge {
+  border-radius: 14px;
+  padding: 0.3rem 1rem;
+  min-width: 85px;
+  box-shadow: 0 3px 5px rgba(255, 112, 128, 0.18);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  user-select: none;
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.flag-badge:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 12px rgba(255, 77, 109, 0.35);
+}
+
+/* Flex container update for better spacing/wrapping */
+
+.flags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.25rem;
+  justify-content: center;
+  margin-top: 0.7rem;
+}
+
+/* Responsive typography */
+
+@media (max-width: 480px) {
+  .ui-container {
+    padding: 1rem;
+  }
+  button, .share-button {
+    font-size: 1rem;
+    padding: 0.55rem 1rem;
+  }
+  .flag-badge {
+    min-width: 72px;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+  }
+}

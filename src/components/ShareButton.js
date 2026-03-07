@@ -1,71 +1,46 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import '../styles/UiPolish.css';
 
-const ShareButton = ({ textToShare }) => {
-  const [error, setError] = useState(null);
+export default function ShareButton({ textToShare, disabled }) {
+  const [errorMsg, setErrorMsg] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  const handleShare = async () => {
-    setError(null);
+  async function handleShare() {
+    setErrorMsg(null);
     setCopied(false);
+    if (!textToShare) {
+      setErrorMsg('Nothing to share.');
+      return;
+    }
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: "Flagged Conversation",
-          text: textToShare,
-        });
+        await navigator.share({ text: textToShare });
       } catch (err) {
-        setError("Sharing failed");
+        setErrorMsg('Sharing failed or cancelled.');
       }
     } else if (navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(textToShare);
         setCopied(true);
       } catch {
-        setError("Copy to clipboard failed");
+        setErrorMsg('Copy to clipboard failed.');
       }
     } else {
-      setError("Sharing not supported");
+      setErrorMsg('Sharing not supported on this device.');
     }
-  };
+  }
 
   return (
-    <div>
+    <div style={{ textAlign: 'center', marginTop: '1.4rem' }}>
       <button
         onClick={handleShare}
-        aria-label="Share flagged conversation"
-        style={{
-          padding: "8px 16px",
-          backgroundColor: "#ff69b4",
-          color: "#fff",
-          border: "none",
-          borderRadius: 4,
-          cursor: "pointer",
-          fontWeight: "bold",
-          boxShadow: "0 2px 5px rgba(255,105,180,0.6)",
-          userSelect: "none",
-        }}
+        disabled={disabled}
+        aria-label="Share flagged conversation results"
+        className="share-button"
       >
-        Share
+        {copied ? 'Copied!' : 'Share Result'}
       </button>
-      {copied && (
-        <span
-          role="status"
-          aria-live="polite"
-          style={{ marginLeft: 12, color: "#4BB543", fontWeight: "bold" }}
-        >
-          Copied!
-        </span>
-      )}
-      {error && (
-        <span
-          role="alert"
-          style={{ marginLeft: 12, color: "#ee4b2b", fontWeight: "bold" }}
-        >
-          {error}
-        </span>
-      )}
+      {errorMsg && <div style={{ color: '#b00020', marginTop: '0.5rem', fontWeight: '600' }}>{errorMsg}</div>}
     </div>
   );
-};
-
-export default ShareButton;
+}

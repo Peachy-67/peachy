@@ -1,54 +1,58 @@
 import React from 'react';
+import '../styles/UiPolish.css';
 
-const behaviorColors = {
-  insult: '#e74c3c',       // red
-  manipulation: '#f39c12', // orange
-  gaslighting: '#9b59b6',  // purple
-  discard: '#34495e',      // dark blue-gray
-  control: '#27ae60',      // green
+const colorMap = {
+  insult: '#ff6b81',
+  manipulation: '#ff476f',
+  gaslighting: '#d32f3f',
+  discard: '#b72c3b',
+  control: '#ff3640',
+  default: '#ff7080'
 };
 
-const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-
-export default function FlaggedOutput({ flags }) {
-  if (!flags || flags.length === 0) {
-    return null;
+export default function FlaggedOutput({ flaggedBehaviors = [] }) {
+  if (!flaggedBehaviors.length) {
+    return (
+      <div
+        className="verdict-container"
+        style={{
+          backgroundColor: '#f4fcf9',
+          color: '#34a853',
+          border: '2px solid #34a853'
+        }}
+        role="region"
+        aria-live="polite"
+      >
+        No red flags detected.
+      </div>
+    );
   }
 
   return (
-    <div
+    <section
+      className="flags-container"
       role="region"
-      aria-label="Behavioral flags detected"
+      aria-label="Detected red flags"
       aria-live="polite"
-      style={{
-        display: 'flex',
-        gap: '8px',
-        flexWrap: 'wrap',
-        marginTop: '12px',
-        justifyContent: 'center',
-      }}
     >
-      {flags.map((flag) => (
-        <span
-          key={flag}
-          style={{
-            backgroundColor: behaviorColors[flag] || '#bdc3c7',
-            color: 'white',
-            fontWeight: '600',
-            fontSize: '0.9rem',
-            padding: '4px 12px',
-            borderRadius: '14px',
-            minWidth: '72px',
-            textAlign: 'center',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-            userSelect: 'none',
-          }}
-          aria-label={`${capitalize(flag)} detected`}
-          tabIndex={0}
-        >
-          {capitalize(flag)}
-        </span>
-      ))}
-    </div>
+      {flaggedBehaviors.map((flag) => {
+        const bgColor = colorMap[flag.type] || colorMap.default;
+        return (
+          <span
+            key={flag.type}
+            className="flag-badge"
+            style={{
+              backgroundColor: bgColor,
+              color: '#fff',
+              border: `1.5px solid ${bgColor}cc`
+            }}
+            aria-label={`${flag.type} behavior detected with confidence ${Math.round(flag.confidence * 100)} percent`}
+            tabIndex={0}
+          >
+            {flag.type.charAt(0).toUpperCase() + flag.type.slice(1)}
+          </span>
+        );
+      })}
+    </section>
   );
 }
