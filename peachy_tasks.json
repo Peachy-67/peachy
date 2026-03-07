@@ -1,5 +1,10 @@
 {
-  "queue": [],
+  "queue": [
+    "Develop the result visualization component showing clear verdicts, flag badges, and confidence scores in a layout optimized for screenshots.",
+    "Add share functionality including a share button and copy result feature to enhance viral potential.",
+    "Build the alert system that triggers and displays immediate notifications for high-risk behaviors during conversation analysis.",
+    "Create the dashboard for real-time conversation monitoring with live updates and an alert stream to improve usability and system responsiveness."
+  ],
   "completed": [
     "Create conversation input UI component",
     "Create analyze button component",
@@ -16,6 +21,7 @@
     "Develop the result visualization components including verdict display, flag badges, and confidence score visualization.",
     "Create a shareable results feature with screenshot-friendly layouts, share buttons, and copy-to-clipboard functionality.",
     "Build alert system to notify users immediately upon detection of high-risk behaviors in conversations.",
-    "Develop the dashboard for real-time conversation monitoring with live updates and an alert stream."
+    "Develop the dashboard for real-time conversation monitoring with live updates and an alert stream.",
+    "Implement the AI conversation analyzer to detect insults, manipulation, gaslighting, discard behavior, and control patterns with high accuracy."
   ]
 }
