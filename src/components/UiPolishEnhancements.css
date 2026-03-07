@@ -1,0 +1,217 @@
+/* UI Polish enhancements for the core UI elements of FLAGGED web app */
+
+:root {
+  --peachy-primary: #ff8566;
+  --peachy-secondary: #ffc2b3;
+  --peachy-dark: #cc6650;
+  --peachy-light: #fff5f0;
+  --text-dark: #333333;
+  --text-light: #fafafa;
+  --border-radius: 8px;
+  --shadow-subtle: 0 2px 6px rgba(0,0,0,0.07);
+  --shadow-medium: 0 4px 10px rgba(0,0,0,0.1);
+  --spacing-base: 12px;
+  --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--peachy-light);
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 var(--spacing-base);
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-medium);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+textarea.conversation-input {
+  width: 100%;
+  min-height: 140px;
+  border: 2px solid var(--peachy-primary);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  font-size: 1rem;
+  resize: vertical;
+  color: var(--text-dark);
+  background-color: #fff;
+  box-shadow: var(--shadow-subtle);
+  transition: border-color 0.3s ease;
+}
+
+textarea.conversation-input:focus {
+  outline: none;
+  border-color: var(--peachy-dark);
+  box-shadow: 0 0 4px var(--peachy-dark);
+}
+
+button.analyze-btn {
+  background-color: var(--peachy-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0.8rem 1.6rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-subtle);
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+  user-select: none;
+  width: 160px;
+  align-self: flex-start;
+}
+
+button.analyze-btn:hover:not(:disabled) {
+  background-color: var(--peachy-dark);
+  box-shadow: var(--shadow-medium);
+}
+
+button.analyze-btn:disabled {
+  background-color: #f1b9aa;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.verdict-container {
+  border: 2px solid transparent;
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 700;
+  text-align: center;
+  font-size: 1.2rem;
+  user-select: none;
+  min-width: 100px;
+  box-shadow: var(--shadow-subtle);
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+.verdict-safe {
+  border-color: #39913a;
+  color: #2a662b;
+  background-color: #e4f0e5;
+}
+
+.verdict-caution {
+  border-color: #d68e2d;
+  color: #a36911;
+  background-color: #fdf6e2;
+}
+
+.verdict-flagged {
+  border-color: #cc3b3b;
+  color: #7a1d1d;
+  background-color: #fae6e6;
+}
+
+/* Badge polish */
+.badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.badge {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.3em 0.75em;
+  border-radius: 16px;
+  color: white;
+  min-width: 90px;
+  text-align: center;
+  box-shadow: var(--shadow-subtle);
+  user-select: none;
+  cursor: default;
+  transition: filter 0.25s ease;
+}
+
+.badge:hover {
+  filter: brightness(1.15);
+}
+
+.badge-insult {
+  background-color: #d9534f;
+  box-shadow: 0 0 6px #d9534faa;
+}
+
+.badge-manipulation {
+  background-color: #f0ad4e;
+  box-shadow: 0 0 6px #f0ad4eaa;
+}
+
+.badge-gaslighting {
+  background-color: #5bc0de;
+  box-shadow: 0 0 6px #5bc0deaa;
+}
+
+.badge-discard {
+  background-color: #337ab7;
+  box-shadow: 0 0 6px #337ab7aa;
+}
+
+.badge-control {
+  background-color: #5cb85c;
+  box-shadow: 0 0 6px #5cb85caa;
+}
+
+/* Share button polish */
+.share-button {
+  background-color: var(--peachy-secondary);
+  border: 2px solid var(--peachy-primary);
+  color: var(--peachy-dark);
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: var(--shadow-subtle);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+  width: fit-content;
+}
+
+.share-button:hover {
+  background-color: var(--peachy-primary);
+  border-color: var(--peachy-dark);
+  color: white;
+  box-shadow: var(--shadow-medium);
+}
+
+/* Alert banner polish */
+.alert-banner {
+  background-color: #cc3b3b;
+  color: white;
+  padding: 0.75rem 1.2rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  text-align: center;
+  box-shadow: var(--shadow-medium);
+  user-select: none;
+  margin-bottom: 1rem;
+}
+
+/* Responsive refinements */
+@media (max-width: 480px) {
+  .container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  .badge {
+    min-width: 75px;
+    font-size: 0.85rem;
+    padding: 0.3em 0.5em;
+  }
+  button.analyze-btn {
+    width: 100%;
+  }
+}
