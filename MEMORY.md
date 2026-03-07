@@ -11,7 +11,8 @@ Curated, durable facts learned over time.
 - _No entries yet._
 
 ## Decisions (important project decisions)
-- _No entries yet._
+- For risky or irreversible changes, require explicit user approval before execution. *(source: learning/eval-decisions-001.md + learning/decision-principles-002.md; signal: repeated observation across multiple files; confidence: confirmed)*
+- Keep active work-in-progress capped at three concurrent tasks. *(source: learning/eval-decisions-001.md; signal: explicit project decision; confidence: medium)*
 
 ## Patterns (things that repeatedly work)
 - Break work into small verifiable/testable steps and verify each step before continuing. *(source: learning/agent-building-principles.md + learning/decision-principles-002.md; signal: repeated observation across multiple files; confidence: confirmed)*
