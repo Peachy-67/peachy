@@ -22,3 +22,252 @@ Peachy ran at 2026-03-04T09:11:02.600Z
 2026-03-07T13:51:44.735Z - Added a comprehensive new set of polished UI components including a styled conversation input area, analyze button, and a refined flagged result display with verdict and badges, all using a shared UI enhancements CSS for consistent spacing, colors, shadows, and interactivity. Combined them in a new ConversationAnalyzerPolish component with loading/error state handling and accessible attributes to improve product usability, visual clarity, and screenshot friendliness for launch readiness.
 2026-03-07T14:53:07.772Z - Added enhanced UI polish including a refined flagged results display with distinct, accessible, color-coded verdict and badge components featuring confidence scores, improved spacing, and smooth hover effects for screenshot and sharing friendliness. Updated the share button for consistent polished styling and created an improved ConversationAnalyzer component integrating the new polished UI for conversation input, error handling, result display, and sharing, boosting overall usability, clarity, and viral sharing appeal.
 2026-03-07T15:46:41.985Z - Implemented core AI conversation analyzer module using GPT-4 prompt engineering to detect insults, manipulation, gaslighting, discard behavior, and control patterns. Returns a concise JSON with verdict, flags, confidence scores, and examples optimized for shareable and screenshot-friendly output. Includes a helper to call OpenAI GPT-4 API with error handling and sanitization.
+2026-03-07T16:54:44.663Z - 'No red flags detected',
+  },
+  Caution: {
+    color: '#d17e00',
+    borderColor: '#d17e00',
+    label: 'Caution',
+    description: 'Potential concerns found',
+  },
+  Flagged: {
+    color: '#cc2f2f',
+    borderColor: '#cc2f2f',
+    label: 'Flagged',
+    description: 'Red flags detected',
+  },
+};
+
+const VerdictDisplay = ({ verdict }) => {
+  const style = verdictStyles[verdict] || verdictStyles.Safe;
+
+  return (
+    <div
+      className="verdict-display"
+      role="region"
+      aria-live="polite"
+      aria-label={`Conversation verdict: ${style.label}`}
+      style={{ borderColor: style.borderColor, color: style.color }}
+    >
+      <span className="verdict-label">{style.label}</span>
+      <small className="verdict-description">{style.description}</small>
+    </div>
+  );
+};
+
+VerdictDisplay.propTypes = {
+  verdict: PropTypes.oneOf(['Safe', 'Caution', 'Flagged']).isRequired,
+};
+
+export default VerdictDisplay;
+---END---
+
+filename: src/components/FlagBadge.js
+
+---CODE---
+import React from 'react';
+import PropTypes from 'prop-types';
+import './FlagBadge.css';
+
+const flagColors = {
+  insult: '#d9534f',
+  manipulation: '#f0ad4e',
+  gaslighting: '#d9534f',
+  discard: '#5bc0de',
+  control: '#5cb85c',
+};
+
+const FlagBadge = ({ type, label, confidence }) => {
+  const color = flagColors[type.toLowerCase()] || '#777';
+
+  const confidencePercent = Math.round(Math.min(Math.max(confidence, 0), 1) * 100);
+
+  return (
+    <div 
+      className="flag-badge" 
+      style={{backgroundColor: color}} 
+      aria-label={`${label} flag with confidence ${confidencePercent} percent`}
+      role="listitem"
+    >
+      <span className="flag-label">{label}</span>
+      <span className="confidence-score">({confidencePercent}%)</span>
+    </div>
+  );
+};
+
+FlagBadge.propTypes = {
+  type: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  confidence: PropTypes.number.isRequired,
+};
+
+export default FlagBadge;
+---END---
+
+filename: src/components/FlaggedResultVisualization.js
+
+---CODE---
+import React from 'react';
+import PropTypes from 'prop-types';
+import VerdictDisplay from './VerdictDisplay';
+import FlagBadge from './FlagBadge';
+import ConfidenceScore from './ConfidenceScore';
+import './FlaggedResultVisualization.css';
+
+const FlaggedResultVisualization = ({ verdict, flaggedBehaviors, overallConfidence }) => {
+  // flaggedBehaviors is an array of objects: {type, label, confidence}
+
+  return (
+    <section 
+      className="flagged-result-container" 
+      aria-live="polite" 
+      aria-label="Flagged conversation result"
+      role="region"
+    >
+      <VerdictDisplay verdict={verdict} />
+      <div className="flagged-badges" role="list" aria-label="Detected red flags">
+        {flaggedBehaviors.length === 0 && <p className="no-flags">No red flags detected.</p>}
+        {flaggedBehaviors.map((flag) => (
+          <FlagBadge key={flag.type} type={flag.type} label={flag.label} confidence={flag.confidence} />
+        ))}
+      </div>
+      <ConfidenceScore score={overallConfidence} />
+    </section>
+  );
+};
+
+FlaggedResultVisualization.propTypes = {
+  verdict: PropTypes.oneOf(['Safe', 'Caution', 'Flagged']).isRequired,
+  flaggedBehaviors: PropTypes.arrayOf(
+    PropTypes.shape({
+      type: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      confidence: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  overallConfidence: PropTypes.number.isRequired,
+};
+
+export default FlaggedResultVisualization;
+---END---
+
+filename: src/styles/FlaggedResultVisualization.css
+
+---CODE---
+.flagged-result-container {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 400px;
+  background-color: #fff8f2;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+}
+
+.flagged-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  min-height: 30px;
+}
+
+.no-flags {
+  font-style: italic;
+  color: #999;
+}
+
+/* VerdictDisplay.css */
+
+.verdict-display {
+  border: 2px solid;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 1.25rem;
+  display: inline-block;
+  user-select: none;
+}
+
+.verdict-label {
+  display: block;
+  font-size: 1.4rem;
+}
+
+.verdict-description {
+  font-weight: normal;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  display: block;
+  margin-top: 2px;
+}
+
+/* FlagBadge.css */
+.flag-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: white;
+  min-width: 100px;
+  display: flex;
+  justify-content: space-between;
+  user-select: text;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: filter 0.3s ease;
+  cursor: default;
+}
+
+.flag-badge:hover,
+.flag-badge:focus {
+  filter: brightness(1.15);
+}
+
+.flag-label {
+  flex-shrink: 0;
+  margin-right: 6px;
+}
+
+.confidence-score {
+  font-weight: 400;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* ConfidenceScore.css */
+.confidence-score {
+  position: relative;
+  height: 20px;
+  border-radius: 10px;
+  background: #e0e0e0;
+  overflow: hidden;
+  margin-top: 8px;
+  user-select: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+  width: 100%;
+}
+
+.confidence-bar {
+  height: 100%;
+  border-radius: 10px 0 0 10px;
+  transition: width 0.5s ease, background-color 0.5s ease;
+}
+
+.confidence-text {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  line-height: 20px;
+  pointer-events: none;
+  user-select: none;
+  font-weight: 700;
+  color: #222;
+}
+---END---
+
+description: Added a complete visualization module that displays the final verdict with distinct colors, colored badges for each detected red flag behavior with confidence percentages, and a colored confidence bar showing overall confidence. The components are accessible, screenshot-friendly, and visually polished for usability and viral sharing.
