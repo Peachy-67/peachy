@@ -1,0 +1,155 @@
+/* Additional UI polish improvements for core UI components */
+
+/* Container for flagged results and share area */
+.flagged-result-container {
+  background: #fff8f3; /* very light peach background */
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 3px 8px rgba(255, 165, 130, 0.2);
+  max-width: 500px;
+  margin: 20px auto;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  user-select: text;
+}
+
+/* Improved spacing and border for verdict inside container */
+.flagged-verdict {
+  margin-bottom: 12px;
+  padding: 8px 14px;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 1.15rem;
+  box-shadow: 0 0 4px rgb(255 165 130 / 0.6);
+}
+
+/* Verdict color themes */
+.verdict-safe {
+  color: #2e7d32;
+  border: 2px solid #60ad5e;
+  background-color: #dff0d8;
+}
+
+.verdict-caution {
+  color: #ef6c00;
+  border: 2px solid #f59c1a;
+  background-color: #fff4d0;
+}
+
+.verdict-flagged {
+  color: #b00020;
+  border: 2px solid #f44336;
+  background-color: #ffe6e3;
+}
+
+/* Flex container for badges with spacing and wrap */
+.flagged-badges-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: start;
+}
+
+/* Enhanced badge styles */
+.flagged-badge {
+  min-width: 110px;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.06);
+  text-align: center;
+  user-select: none;
+  cursor: default;
+  transition: filter 0.15s ease;
+  white-space: nowrap;
+}
+
+/* Hover brightness boost for badges */
+.flagged-badge:hover {
+  filter: brightness(1.1);
+}
+
+/* Distinct badge colors for red flags */
+.badge-insult {
+  background-color: #d32f2f; /* red */
+  box-shadow: 0 0 7px #d32f2faa;
+}
+
+.badge-manipulation {
+  background-color: #f57c00; /* orange */
+  box-shadow: 0 0 7px #f57c00aa;
+}
+
+.badge-gaslighting {
+  background-color: #1976d2; /* blue */
+  box-shadow: 0 0 7px #1976d2aa;
+}
+
+.badge-discard {
+  background-color: #7b1fa2; /* purple */
+  box-shadow: 0 0 7px #7b1fa2aa;
+}
+
+.badge-control {
+  background-color: #0288d1; /* teal */
+  box-shadow: 0 0 7px #0288d1aa;
+}
+
+/* Additional subtler badge for confidence scores */
+.badge-confidence {
+  background-color: #555555cc;
+  box-shadow: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  user-select: text;
+  cursor: default;
+}
+
+/* Share button improvements - slightly bigger and spacing */
+.share-result-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffa07a;
+  color: #5d2300;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 22px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 9px #ffa07a99;
+  transition: background-color 0.25s, box-shadow 0.25s;
+  user-select: none;
+  font-size: 1rem;
+  margin: 18px auto 0;
+  max-width: 250px;
+}
+
+.share-result-button:hover:not(:disabled) {
+  background-color: #ff7b49;
+  box-shadow: 0 6px 12px #ff7b4988;
+}
+
+.share-result-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Responsive: smaller container on narrow screens */
+@media (max-width: 480px) {
+  .flagged-result-container {
+    margin: 12px;
+    max-width: 100%;
+    padding: 14px;
+  }
+  .flagged-badge {
+    min-width: 90px;
+    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
+  .flagged-verdict {
+    font-size: 1rem;
+  }
+}
