@@ -1,0 +1,93 @@
+/* Core UI polish improvements for Flagged app */
+
+/* Container for flagged badges and verdict */
+.flagged-result-container {
+  margin: 1rem 0;
+  padding: 1rem 1.5rem;
+  background: #fff7f0;
+  border: 2px solid #ffb07c;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(255, 123, 0, 0.2);
+}
+
+/* Header style for section labels */
+.ui-section-header {
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #ff6f3c;
+  text-shadow: 0 1px 2px rgba(255, 111, 60, 0.5);
+}
+
+/* Button styles for consistent branding and polish */
+.peachy-button {
+  background-color: #ff7433;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 3px 7px rgba(255, 116, 51, 0.5);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
+}
+.peachy-button:hover:not(:disabled) {
+  background-color: #ff6112;
+  box-shadow: 0 5px 15px rgba(255, 97, 18, 0.7);
+}
+.peachy-button:active:not(:disabled) {
+  background-color: #e65500;
+  box-shadow: 0 2px 6px rgba(230, 85, 0, 0.6);
+}
+.peachy-button:disabled {
+  background-color: #f0c6b0;
+  cursor: not-allowed;
+}
+
+/* Textarea improved styling and focus */
+.peachy-textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #ffbb85;
+  box-shadow: inset 0 3px 7px rgba(255, 131, 48, 0.15);
+  resize: vertical;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.peachy-textarea:focus {
+  outline: none;
+  border-color: #ff8330;
+  box-shadow: 0 0 10px rgba(255, 131, 48, 0.7);
+  background: #fff9f3;
+}
+
+/* Alert message banner style */
+.alert-banner {
+  margin: 1rem 0;
+  padding: 1rem 1.5rem;
+  background-color: #fce3d2;
+  border-left: 5px solid #ff6833;
+  color: #9f3e00;
+  font-weight: 600;
+  border-radius: 6px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(255, 104, 51, 0.2);
+}
+
+/* Consistent margin and padding for primary containers */
+.main-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+  background: #fffaf5;
+  border-radius: 12px;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-smooth {
+  transition: all 0.3s ease-in-out;
+}
