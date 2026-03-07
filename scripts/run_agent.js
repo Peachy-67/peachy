@@ -48,6 +48,21 @@ ${content}
   console.log("📂 Repo analyzed")
 
   // -----------------------------
+  // Detect missing core app files
+  // -----------------------------
+
+  const coreFiles = [
+    "src/App.js",
+    "src/index.js"
+  ]
+
+  const missingCore = coreFiles.filter(file => !fs.existsSync(file))
+
+  if (missingCore.length > 0) {
+    console.log("🧠 Missing core files:", missingCore)
+  }
+
+  // -----------------------------
   // Load architecture
   // -----------------------------
 
@@ -118,6 +133,25 @@ ${content}
   }
 
   // -----------------------------
+  // Force core build if app files missing
+  // -----------------------------
+
+  if (missingCore.length > 0) {
+
+    const coreBuildTask =
+      "Create the main React application entry point and assemble existing UI components into a working app"
+
+    if (!taskData.queue.includes(coreBuildTask)) {
+      taskData.queue.unshift(coreBuildTask)
+
+      fs.writeFileSync(
+        "./peachy_tasks.json",
+        JSON.stringify(taskData, null, 2)
+      )
+    }
+  }
+
+  // -----------------------------
   // Generate tasks if empty
   // -----------------------------
 
@@ -135,6 +169,15 @@ Goal:
 ${goal}
 
 Generate 5 development tasks that move the product closer to completing the roadmap.
+
+Prioritize:
+
+1. Creating missing application files
+2. Connecting UI components together
+3. Connecting frontend to backend APIs
+4. Building working product features
+
+Avoid repeating tasks like UI polish or styling improvements unless the app is already functional.
 
 Return JSON:
 
@@ -163,7 +206,24 @@ Return JSON:
 
   }
 
-  const task = taskData.queue[0] || "Improve UI polish"
+  // -----------------------------
+  // Select current task
+  // -----------------------------
+
+  let task = taskData.queue[0] || "Build core application files"
+
+  // Prevent Peachy from getting stuck in UI polish loops
+  const recent = memory.completed.slice(-5).join(" ").toLowerCase()
+
+  if (
+    recent.includes("ui polish") ||
+    recent.includes("css") ||
+    recent.includes("styling")
+  ) {
+    console.log("⚠️ UI loop detected — forcing product build")
+
+    task = "Create the main React application entry point and connect existing UI components together"
+  }
 
   console.log("🧩 Current task:", task)
 
@@ -200,6 +260,7 @@ Rules:
 - Prefer creating new files
 - Implement ONLY the current task
 - Prefer placing UI code in src/components/
+- Prefer implementing full working features over UI improvements
 
 You may generate MULTIPLE files if needed.
 
