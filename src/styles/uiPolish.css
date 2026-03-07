@@ -1,0 +1,211 @@
+/* UI Polish improvements for overall app components */
+:root {
+  --peachy-color: #ff6f61;
+  --peachy-color-focus: #ff8470;
+  --flagged-color: #d14242;
+  --caution-color: #d1a242;
+  --safe-color: #42b447;
+  --badge-shadow: rgba(0, 0, 0, 0.1);
+  --border-radius: 6px;
+  --font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --transition-duration: 0.3s;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: #fefefe;
+  margin: 0;
+  padding: 0;
+  color: #222;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+textarea, input, button {
+  font-family: var(--font-family);
+  font-size: 1rem;
+  outline-offset: 2px;
+}
+
+textarea:focus, input:focus, button:focus {
+  outline-color: var(--peachy-color);
+  outline-style: solid;
+  outline-width: 2px;
+}
+
+header, main {
+  max-width: 660px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem 1.25rem;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.3rem;
+  color: #333;
+}
+
+label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #444;
+}
+
+button.analyze-button {
+  background-color: var(--peachy-color);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 6px var(--badge-shadow);
+  transition:
+    background-color var(--transition-duration),
+    box-shadow var(--transition-duration);
+  user-select: none;
+  margin-top: 1rem;
+}
+
+button.analyze-button:hover:not(:disabled) {
+  background-color: var(--peachy-color-focus);
+  box-shadow: 0 4px 8px var(--badge-shadow);
+}
+
+button.analyze-button:disabled {
+  cursor: not-allowed;
+  background-color: #ffcabe;
+  box-shadow: none;
+  color: #a75a50;
+}
+
+.flagged-output-container {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-start;
+  align-items: center;
+  user-select: text;
+}
+
+.badge {
+  min-width: 4.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.7rem;
+  color: #fff;
+  border-radius: var(--border-radius);
+  box-shadow: 0 1px 4px var(--badge-shadow);
+  transition: filter var(--transition-duration);
+  user-select: none;
+  cursor: default;
+  display: inline-block;
+}
+
+.badge:hover {
+  filter: brightness(110%);
+}
+
+.badge-insult {
+  background-color: #d14242; /* red */
+}
+
+.badge-manipulation {
+  background-color: #d16842; /* deep orange */
+}
+
+.badge-gaslighting {
+  background-color: #b9426f; /* deep pink */
+}
+
+.badge-discard {
+  background-color: #663fcf; /* purple */
+}
+
+.badge-control {
+  background-color: #4277d1; /* blue */
+}
+
+.verdict {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  border: 2px solid transparent;
+  user-select: none;
+  display: inline-block;
+  min-width: 6rem;
+  text-align: center;
+  margin-top: 0.8rem;
+}
+
+.verdict-safe {
+  color: var(--safe-color);
+  border-color: var(--safe-color);
+  background-color: #e6f3e7;
+}
+
+.verdict-caution {
+  color: var(--caution-color);
+  border-color: var(--caution-color);
+  background-color: #faf4e1;
+}
+
+.verdict-flagged {
+  color: var(--flagged-color);
+  border-color: var(--flagged-color);
+  background-color: #fde6e6;
+}
+
+.share-button {
+  background-color: var(--peachy-color);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  box-shadow: 0 2px 7px var(--badge-shadow);
+  transition: background-color var(--transition-duration);
+  user-select: none;
+  margin-left: 0.7rem;
+}
+
+.share-button:hover {
+  background-color: var(--peachy-color-focus);
+}
+
+.alert-banner {
+  background-color: #ffdad6;
+  color: var(--flagged-color);
+  border-left: 5px solid var(--flagged-color);
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+  font-weight: 700;
+  border-radius: var(--border-radius);
+}
+
+.status-message {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 0.8rem;
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .flagged-output-container {
+    justify-content: center;
+  }
+  button.analyze-button {
+    width: 100%;
+  }
+  .share-button {
+    margin-left: 0.5rem;
+    padding: 0.5rem;
+  }
+}
