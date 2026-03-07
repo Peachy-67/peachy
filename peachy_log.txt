@@ -271,3 +271,4 @@ filename: src/styles/FlaggedResultVisualization.css
 ---END---
 
 description: Added a complete visualization module that displays the final verdict with distinct colors, colored badges for each detected red flag behavior with confidence percentages, and a colored confidence bar showing overall confidence. The components are accessible, screenshot-friendly, and visually polished for usability and viral sharing.
+2026-03-07T17:47:49.923Z - Added a new React component ShareableResult that wraps the flagged result visualization with snapshot-friendly styling, and includes a Share Result button supporting native web share API or clipboard fallback, plus a Copy to Clipboard button. The share text includes a concise summary and a conversation excerpt to boost viral sharing and usability. The UI uses consistent polished peachy brand styling optimized for screenshot-friendliness and accessibility.

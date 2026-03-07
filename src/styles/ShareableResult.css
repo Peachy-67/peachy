@@ -1,0 +1,75 @@
+.shareable-result-container {
+  background-color: #fff9f2;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 480px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+}
+
+.share-buttons-container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.primary-share-btn,
+.copy-clipboard-btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  outline-offset: 3px;
+}
+
+.primary-share-btn {
+  background-color: #e07a5f;
+  color: white;
+}
+
+.primary-share-btn:hover,
+.primary-share-btn:focus {
+  background-color: #c55a3f;
+}
+
+.copy-clipboard-btn {
+  background-color: #f6bd60;
+  color: #4a3c31;
+}
+
+.copy-clipboard-btn:hover,
+.copy-clipboard-btn:focus {
+  background-color: #d6a34b;
+}
+
+.copy-feedback {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  color: #4a4a4a;
+  user-select: text;
+  min-height: 1.2em;
+}
+
+@media (max-width: 500px) {
+  .shareable-result-container {
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  .share-buttons-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primary-share-btn,
+  .copy-clipboard-btn {
+    width: 100%;
+  }
+}
