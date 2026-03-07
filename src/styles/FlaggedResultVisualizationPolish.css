@@ -1,0 +1,105 @@
+.flagged-result-polish-container {
+  border: 2px solid #f5bca9;
+  border-radius: 12px;
+  padding: 20px 24px;
+  max-width: 440px;
+  background: linear-gradient(135deg, #fff3eb, #ffe7dc);
+  box-shadow: 0 4px 10px rgba(255, 131, 102, 0.24);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #362a26;
+  transition: box-shadow 0.3s ease;
+  user-select: none;
+}
+
+.flagged-result-polish-container:hover {
+  box-shadow: 0 6px 14px rgba(255, 131, 102, 0.38);
+}
+
+.flagged-badges-polish {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  min-height: 34px;
+  justify-content: center;
+}
+
+.no-flags-polish {
+  font-style: italic;
+  color: #b3a092;
+  text-align: center;
+  font-size: 1rem;
+  margin: 12px 0;
+}
+
+/* Override FlagBadge styles for polish */
+.flag-badge {
+  border: 2px solid rgba(255 255 255 / 0.35);
+  min-width: 110px;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  transition: filter 0.25s ease, transform 0.2s ease;
+  cursor: default;
+  user-select: text;
+}
+
+.flag-badge:hover,
+.flag-badge:focus {
+  filter: brightness(1.25);
+  transform: scale(1.05);
+  outline: none;
+}
+
+.flag-label {
+  margin-right: 8px;
+  font-size: 1.05rem;
+}
+
+.confidence-score {
+  font-weight: 500;
+  opacity: 0.9;
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+/* ConfidenceScore override polish */
+.confidence-score {
+  margin-top: 10px;
+  height: 22px;
+  border-radius: 12px;
+  background: #ffd6c3;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #683931;
+  position: relative;
+  user-select: none;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgb(255 255 255 / 0.45);
+}
+
+.confidence-bar {
+  height: 100%;
+  border-radius: 12px 0 0 12px;
+  background-color: #f96138; /* stronger saturated peach */
+  transition: width 0.7s ease, background-color 0.7s ease;
+}
+
+.confidence-text {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  line-height: 22px;
+  pointer-events: none;
+  user-select: none;
+  font-weight: 800;
+  color: #3a1c0b;
+  text-shadow:
+    0 0 2px rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+}
