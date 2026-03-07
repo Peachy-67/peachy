@@ -60,6 +60,18 @@ ${content}
   } catch {}
 
   // -----------------------------
+  // Load roadmap (NEW)
+  // -----------------------------
+
+  let roadmap = ""
+
+  try {
+    roadmap = fs.readFileSync("./ROADMAP.md", "utf8")
+  } catch {
+    roadmap = "No roadmap defined yet."
+  }
+
+  // -----------------------------
   // Goal
   // -----------------------------
 
@@ -116,9 +128,13 @@ ${content}
     const planningPrompt = `
 You are planning development tasks for the product FLAGGED.
 
-The product analyzes conversations and detects behavioral red flags.
+Product roadmap:
+${roadmap}
 
-Generate 5 development tasks to improve the product.
+Goal:
+${goal}
+
+Generate 5 development tasks that move the product closer to completing the roadmap.
 
 Return JSON:
 
@@ -162,6 +178,9 @@ You are Peachy, an autonomous AI software engineer building the product FLAGGED.
 
 Current task:
 ${task}
+
+Product roadmap:
+${roadmap}
 
 Goal:
 ${goal}
