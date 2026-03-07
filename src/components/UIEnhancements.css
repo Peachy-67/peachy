@@ -1,198 +1,119 @@
-/* UI Enhancements for overall app polish */
+/* UI Enhancements for polish, spacing, readability, and screenshot friendliness */
 
-/* Container base */
 .ui-container {
-  max-width: 800px;
+  max-width: 720px;
   margin: 1rem auto;
-  padding: 1rem 1.5rem;
-  background: #fff8f0;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(255, 174, 140, 0.25);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #4a2c20;
-}
-
-/* Heading styles */
-.ui-container h1, .ui-container h2 {
-  color: #e88065;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.03em;
-}
-
-/* Textarea enhancements */
-.ui-textarea {
-  width: 100%;
-  min-height: 140px;
-  padding: 0.75rem 1rem;
-  border: 2px solid #f4b190;
-  border-radius: 6px;
-  font-size: 1rem;
-  line-height: 1.4;
-  resize: vertical;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  background-color: #fff3e6;
-  color: #5c3a20;
-}
-
-.ui-textarea:focus {
-  border-color: #ff8c47;
-  box-shadow: 0 0 6px rgba(255,140,71,0.6);
-  outline: none;
-}
-
-/* Button base */
-.ui-button {
-  background-color: #ffa56e;
-  color: #4a2c20;
-  border: none;
-  padding: 0.5rem 1.25rem;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(255, 165, 110, 0.5);
-  transition: background-color 0.25s ease, box-shadow 0.25s ease;
-  user-select: none;
-}
-
-.ui-button:hover:not(:disabled) {
-  background-color: #ff8f3f;
-  box-shadow: 0 4px 10px rgba(255, 143, 63, 0.75);
-}
-
-.ui-button:disabled,
-.ui-button[aria-disabled="true"] {
-  background-color: #f7b89c;
-  cursor: not-allowed;
-  box-shadow: none;
-  color: #b07a61;
-}
-
-/* Result container */
-.result-container {
-  margin-top: 1rem;
-  padding: 1rem 1.25rem;
-  border-radius: 8px;
-  background: #fff4e6;
-  box-shadow: 0 1px 4px rgba(255, 165, 110, 0.3);
-  color: #5c3a20;
-  font-size: 1.05rem;
+  padding: 1.2rem 1.6rem;
+  background-color: #fff9f7;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(255, 182, 193, 0.3);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #512026;
   line-height: 1.5;
 }
 
-/* Alert banner */
-.alert-banner {
-  background-color: #ffb4a2;
-  border-left: solid 6px #e86449;
-  color: #572d24;
+.ui-header {
   font-weight: 700;
-  padding: 0.75rem 1rem;
-  margin-top: 1rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(232, 100, 73, 0.25);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.alert-banner button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-weight: 900;
-  font-size: 1.1rem;
-  line-height: 1;
-  color: #572d24;
-  padding: 0 0.5rem;
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+  color: #e07070;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
   user-select: none;
 }
 
-.alert-banner button:hover {
-  color: #e86449;
+.ui-subheader {
+  font-weight: 500;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  color: #9e6b6b;
+  text-align: center;
+  user-select: none;
 }
 
-/* Share button enhancements */
-.share-button {
+.ui-textarea {
+  width: 100%;
+  min-height: 140px;
+  font-size: 1rem;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 2px solid #f1c0c0;
+  background-color: #fff3f1;
+  color: #512026;
+  resize: vertical;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  outline-offset: 2px;
+  outline-color: #e07070;
+}
+
+.ui-textarea:focus {
+  border-color: #e07070;
+  box-shadow: 0 0 8px #f49797cc;
+  background-color: #fff6f5;
+}
+
+.ui-button {
+  background-color: #ec6f6f;
+  color: #fff9f7;
+  border: none;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(236, 111, 111, 0.6);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
   margin-top: 1rem;
   display: inline-block;
-  padding: 0.5rem 1rem;
-  background-color: #ffc8a2;
-  color: #5c3a20;
-  border: none;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(255, 200, 160, 0.5);
+  width: 100%;
+  max-width: 280px;
+}
+
+.ui-button:disabled {
+  background-color: #f4c4c4;
+  color: #8b5a5a;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.ui-button:not(:disabled):hover {
+  background-color: #d45e5e;
+  box-shadow: 0 5px 18px rgba(212, 94, 94, 0.85);
+}
+
+/* Smooth focus ring */
+.ui-button:focus-visible {
+  outline: 3px solid #f8d0d0;
+  outline-offset: 3px;
+}
+
+/* Alerts */
+.ui-alert {
+  margin-top: 1rem;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  user-select: none;
-}
-
-.share-button:hover {
-  background-color: #ffb070;
-}
-
-/* Verdict style refinement */
-.verdict-label {
-  padding: 0.3rem 0.8rem;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1rem;
   text-align: center;
-  min-width: 90px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #6a1a1a;
+  background-color: #fcdede;
+  border: 1.5px solid #e07070;
+  box-shadow: 0 0 6px #f5bcbc;
   user-select: none;
-  box-shadow: 0 1px 4px rgba(255,165,110,0.3);
-  transition: background-color 0.25s ease;
 }
 
-.verdict-safe {
-  color: #246a41;
-  background-color: #d0f0d8;
-  border: 1.5px solid #3ba054;
-}
-
-.verdict-caution {
-  color: #9a6a21;
-  background-color: #ffebc0;
-  border: 1.5px solid #d2971b;
-}
-
-.verdict-flagged {
-  color: #8b2c28;
-  background-color: #ffd4d1;
-  border: 1.5px solid #c6453a;
-}
-
-/* Subtle text improvement for results */
-.result-text {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #5c3a20;
-  margin-bottom: 0.4rem;
-}
-
-/* Input label refinement */
-.input-label {
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-  color: #b9603a;
-}
-
-/* Responsive tweaks */
-@media screen and (max-width: 480px) {
+@media (max-width: 480px) {
   .ui-container {
-    margin: 0.5rem 0.5rem 1rem;
-    padding: 0.75rem 1rem;
+    padding: 1rem 1rem;
+    margin: 1rem 0.6rem;
   }
-
   .ui-button {
     width: 100%;
-    font-size: 1rem;
-  }
-
-  .verdict-label {
-    min-width: auto;
-    padding: 0.3rem 0.5rem;
-    font-size: 0.9rem;
+    max-width: 100%;
   }
 }
