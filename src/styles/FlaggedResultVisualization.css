@@ -62,11 +62,13 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   transition: filter 0.3s ease;
   cursor: default;
+  outline-offset: 2px;
 }
 
 .flag-badge:hover,
 .flag-badge:focus {
   filter: brightness(1.15);
+  outline: 2px solid #333333;
 }
 
 .flag-label {

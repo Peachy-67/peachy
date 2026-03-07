@@ -6,12 +6,12 @@ import ConfidenceScore from './ConfidenceScore';
 import './FlaggedResultVisualization.css';
 
 const FlaggedResultVisualization = ({ verdict, flaggedBehaviors, overallConfidence }) => {
-  // flaggedBehaviors is an array of objects: {type, label, confidence}
+  // flaggedBehaviors: array of {type, label, confidence}
 
   return (
-    <section 
-      className="flagged-result-container" 
-      aria-live="polite" 
+    <section
+      className="flagged-result-container"
+      aria-live="polite"
       aria-label="Flagged conversation result"
       role="region"
     >

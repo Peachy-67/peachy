@@ -16,11 +16,12 @@ const FlagBadge = ({ type, label, confidence }) => {
   const confidencePercent = Math.round(Math.min(Math.max(confidence, 0), 1) * 100);
 
   return (
-    <div 
-      className="flag-badge" 
-      style={{backgroundColor: color}} 
+    <div
+      className="flag-badge"
+      style={{ backgroundColor: color }}
       aria-label={`${label} flag with confidence ${confidencePercent} percent`}
       role="listitem"
+      tabIndex={0}
     >
       <span className="flag-label">{label}</span>
       <span className="confidence-score">({confidencePercent}%)</span>
