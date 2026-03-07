@@ -1,0 +1,22 @@
+.polished-container {
+  max-width: 720px;
+  margin: 20px auto;
+  padding: 24px 32px;
+  background: #fff7f0;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 8px rgba(255, 183, 77, 0.2),
+    0 0 20px rgba(255, 183, 77, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #3a2a18;
+  border: 1.5px solid #ffb94c;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  user-select: text;
+}
+
+.polished-container:focus-within {
+  outline: none;
+  box-shadow:
+    0 0 10px 4px #ffb94c;
+  border-color: #ff952c;
+}

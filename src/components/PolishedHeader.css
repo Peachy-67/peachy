@@ -1,0 +1,19 @@
+.polished-header h1 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: #d77900;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 183, 77, 0.6);
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
+.polished-header .subtitle {
+  font-weight: 400;
+  font-size: 1rem;
+  color: #6b4a00;
+  margin-top: 4px;
+  text-align: center;
+  user-select: none;
+}
