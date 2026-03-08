@@ -1,17 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import MainApp from './components/MainApp';
-import './styles/ui-polish.css';
+import './styles/FlaggedResultVisualization.css';
+import './styles/MainApp.css';
 
 const rootElement = document.getElementById('root');
 
-if (rootElement) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <React.StrictMode>
-      <MainApp />
-    </React.StrictMode>
-  );
-} else {
-  console.error('Root element not found');
+if (!rootElement) {
+  throw new Error('Root element with id "root" not found');
 }
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(<MainApp />);

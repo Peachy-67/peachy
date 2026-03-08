@@ -23,6 +23,7 @@
     "Develop the dashboard for real-time conversation monitoring with live updates and an alert stream.",
     "Implement the AI conversation analyzer to detect insults, manipulation, gaslighting, discard behavior, and control patterns with high accuracy.",
     "Develop the result visualization component showing clear verdicts, flag badges, and confidence scores in a layout optimized for screenshots.",
+    "Create the main React application entry point and assemble existing UI components into a working app",
     "Create the main React application entry point and assemble existing UI components into a working app"
   ]
 }
