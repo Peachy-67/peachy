@@ -142,6 +142,7 @@ ${content}
       "Create the main React application entry point and assemble existing UI components into a working app"
 
     if (!taskData.queue.includes(coreBuildTask)) {
+
       taskData.queue.unshift(coreBuildTask)
 
       fs.writeFileSync(
@@ -177,7 +178,7 @@ Prioritize:
 3. Connecting frontend to backend APIs
 4. Building working product features
 
-Avoid repeating tasks like UI polish or styling improvements unless the app is already functional.
+Avoid repeating tasks like UI polish, CSS improvements, or styling tweaks unless the application is already functional.
 
 Return JSON:
 
@@ -212,17 +213,18 @@ Return JSON:
 
   let task = taskData.queue[0] || "Build core application files"
 
-  // Prevent Peachy from getting stuck in UI polish loops
-  const recent = memory.completed.slice(-5).join(" ").toLowerCase()
+  const recent = memory.completed.slice(-6).join(" ").toLowerCase()
 
   if (
-    recent.includes("ui polish") ||
+    recent.includes("ui") ||
     recent.includes("css") ||
-    recent.includes("styling")
+    recent.includes("style") ||
+    recent.includes("polish")
   ) {
-    console.log("⚠️ UI loop detected — forcing product build")
 
-    task = "Create the main React application entry point and connect existing UI components together"
+    console.log("⚠️ UI loop detected — forcing real product work")
+
+    task = "Create the main React application entry point and connect all existing UI components into a working product interface"
   }
 
   console.log("🧩 Current task:", task)
@@ -278,16 +280,7 @@ filename: path/to/file2.js
 code
 ---END---
 
-filename: path/to/file3.js
-
----CODE---
-code
----END---
-
-description: short explanation of the feature implemented
-
-You may generate up to 5 files if needed to complete the task.
-Prefer building complete working features rather than small fragments.
+description: short explanation
 `
 
   const response = await client.responses.create({
@@ -300,7 +293,7 @@ Prefer building complete working features rather than small fragments.
   console.log("🧠 Raw Peachy response:\n", text)
 
   // -----------------------------
-  // Extract generated files
+  // Extract files
   // -----------------------------
 
   const fileMatches = [...text.matchAll(/filename:\s*(.*)/g)]
@@ -318,7 +311,6 @@ Prefer building complete working features rather than small fragments.
     )
 
     return
-
   }
 
   // -----------------------------
@@ -326,10 +318,16 @@ Prefer building complete working features rather than small fragments.
   // -----------------------------
 
   const PROTECTED_FILES = [
+
     "src/server.js",
     "scripts/run_agent.js",
     "package.json",
-    "package-lock.json"
+    "package-lock.json",
+
+    // Prevent CSS loop
+    "src/styles/UiPolish.css",
+    "src/styles/UiPolishImprovements.css",
+    "src/components/UIPolishEnhancements.css"
   ]
 
   const PROTECTED_DIRECTORIES = [
@@ -354,7 +352,8 @@ Prefer building complete working features rather than small fragments.
       PROTECTED_FILES.includes(normalized) ||
       PROTECTED_DIRECTORIES.some(dir => normalized.startsWith(dir))
     ) {
-      console.log("🚫 Peachy blocked from modifying protected path:", filename)
+
+      console.log("🚫 Peachy blocked from modifying:", filename)
       continue
     }
 
@@ -394,7 +393,7 @@ Prefer building complete working features rather than small fragments.
   )
 
   // -----------------------------
-  // Log activity
+  // Log
   // -----------------------------
 
   fs.appendFileSync(
