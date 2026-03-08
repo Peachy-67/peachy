@@ -1,5 +1,6 @@
 {
   "queue": [
+    "Create src/App.js and connect the best existing UI components into a working app",
     "Add share functionality including a share button and copy result feature to enhance viral potential.",
     "Build the alert system that triggers and displays immediate notifications for high-risk behaviors during conversation analysis.",
     "Create the dashboard for real-time conversation monitoring with live updates and an alert stream to improve usability and system responsiveness."
@@ -24,6 +25,7 @@
     "Implement the AI conversation analyzer to detect insults, manipulation, gaslighting, discard behavior, and control patterns with high accuracy.",
     "Develop the result visualization component showing clear verdicts, flag badges, and confidence scores in a layout optimized for screenshots.",
     "Create the main React application entry point and assemble existing UI components into a working app",
-    "Create the main React application entry point and assemble existing UI components into a working app"
+    "Create the main React application entry point and assemble existing UI components into a working app",
+    "Clean repository clutter by selecting canonical components, updating imports, and deleting unused duplicate variants safely"
   ]
 }
