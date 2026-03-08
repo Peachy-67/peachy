@@ -26,6 +26,7 @@
     "Develop the result visualization component showing clear verdicts, flag badges, and confidence scores in a layout optimized for screenshots.",
     "Create the main React application entry point and assemble existing UI components into a working app",
     "Create the main React application entry point and assemble existing UI components into a working app",
+    "Clean repository clutter by selecting canonical components, updating imports, and deleting unused duplicate variants safely",
     "Clean repository clutter by selecting canonical components, updating imports, and deleting unused duplicate variants safely"
   ]
 }
