@@ -27,6 +27,7 @@
     "Create the main React application entry point and assemble existing UI components into a working app",
     "Create the main React application entry point and assemble existing UI components into a working app",
     "Clean repository clutter by selecting canonical components, updating imports, and deleting unused duplicate variants safely",
+    "Clean repository clutter by selecting canonical components, updating imports, and deleting unused duplicate variants safely",
     "Clean repository clutter by selecting canonical components, updating imports, and deleting unused duplicate variants safely"
   ]
 }
