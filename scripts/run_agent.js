@@ -441,7 +441,6 @@ description: short explanation
     "package.json",
     "package-lock.json",
     "src/index.js",
-    "src/App.js",
 
     // Prevent CSS loop
     "src/styles/UiPolish.css",
