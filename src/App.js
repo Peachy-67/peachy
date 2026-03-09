@@ -1,91 +1,92 @@
-import React, { useState, useEffect, useCallback } from "react";
-
+import React, { useState, useEffect } from "react";
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
 import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
-
-import "./styles/UiPolish.css";
-
-const HIGH_RISK_FLAGS = new Set([
-  "insult",
-  "gaslighting",
-  "threat",
-  "ultimatum",
-  "discard",
-]);
-
-function hasHighRiskFlags(flags) {
-  return flags.some((flag) => HIGH_RISK_FLAGS.has(flag.type.toLowerCase()));
-}
+import "./styles/uiPolish.css";
 
 const App = () => {
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [alertsVisible, setAlertsVisible] = useState(true);
-  const [realTimeView, setRealTimeView] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null); // Stores the analysis result with verdict, flags, confidence etc.
+  const [alertFlags, setAlertFlags] = useState([]); // Holds high-risk flags for immediate alert
+  const [showDashboard, setShowDashboard] = useState(false); // Toggle real-time dashboard view
 
-  // Handler when conversation analysis completes/updates
-  const handleAnalysisUpdate = useCallback((result) => {
-    setAnalysisResult(result);
-    // Re-show alert banner when new high risk flags appear
-    if (result && hasHighRiskFlags(result.flaggedBehaviors)) {
-      setAlertsVisible(true);
+  // Update alert flags whenever analysisResult changes
+  useEffect(() => {
+    if (!analysisResult || !analysisResult.signals) {
+      setAlertFlags([]);
+      return;
     }
-  }, []);
+    // High-risk signals for ImmediateAlert
+    const highRiskFlags = ["insult", "gaslighting", "threat", "discard", "manipulation", "control", "ultimatum"];
+    const flagged = analysisResult.signals.filter((flag) => highRiskFlags.includes(flag));
+    setAlertFlags(flagged);
+  }, [analysisResult]);
 
-  // Handler to dismiss alert banner
-  const dismissAlert = useCallback(() => {
-    setAlertsVisible(false);
-  }, []);
+  // Handler when conversation analysis completes
+  const onAnalysisComplete = (result) => {
+    setAnalysisResult(result);
+  };
 
-  // Toggle between real-time monitoring dashboard and analyzer view
-  const toggleRealTimeView = useCallback(() => {
-    setRealTimeView((v) => !v);
-  }, []);
+  // Toggle dashboard view handler
+  const toggleDashboard = () => {
+    setShowDashboard((prev) => !prev);
+  };
 
   return (
-    <main className="ui-container" aria-label="FLAGGED conversation analyzer app">
-      <header>
-        <h1>FLAGGED: Conversation Red Flag Detector</h1>
-      </header>
+    <main className="ui-container" aria-label="FLAGGED conversation red flag analyzer">
+      <h1 style={{ textAlign: "center", color: "#cc2f2f", userSelect: "none" }}>FLAGGED Conversation Analyzer</h1>
 
-      {alertsVisible && analysisResult && hasHighRiskFlags(analysisResult.flaggedBehaviors) && (
-        <ImmediateAlert
-          flaggedBehaviors={analysisResult.flaggedBehaviors}
-          onDismiss={dismissAlert}
-        />
-      )}
+      {/* Immediate alert triggered by high-risk flags */}
+      <ImmediateAlert flaggedBehaviors={alertFlags} />
 
-      <section aria-label="Conversation analyzer section" style={{ marginBottom: "2rem" }}>
-        <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
-      </section>
-
-      {analysisResult && (
-        <section aria-label="Analysis result visualization with sharing">
-          <FlaggedResultVisualization
-            verdict={analysisResult.verdictLabel}
-            flaggedBehaviors={analysisResult.flaggedBehaviors}
-            overallConfidence={analysisResult.confidence}
-          />
-          <ShareableResult result={analysisResult} />
-        </section>
-      )}
-
-      <hr aria-hidden="true" style={{ margin: "2rem 0" }} />
-
-      <section aria-label="Real-time conversation monitoring dashboard">
+      {/* Real-time monitoring dashboard toggle */}
+      <div style={{ textAlign: "center", margin: "20px 0" }}>
         <button
-          type="button"
-          onClick={toggleRealTimeView}
-          aria-pressed={realTimeView}
+          onClick={toggleDashboard}
+          aria-pressed={showDashboard}
+          aria-label={showDashboard ? "Hide real-time dashboard" : "Show real-time dashboard"}
           className="peachy-button"
-          style={{ marginBottom: "1rem" }}
         >
-          {realTimeView ? "Hide Real-Time Dashboard" : "Show Real-Time Dashboard"}
+          {showDashboard ? "Hide Real-Time Dashboard" : "Show Real-Time Dashboard"}
         </button>
-        {realTimeView && <RealTimeDashboard />}
-      </section>
+      </div>
+
+      {/* Show dashboard or conversation analyzer + result */}
+      {showDashboard ? (
+        <RealTimeDashboard onAnalysisComplete={onAnalysisComplete} />
+      ) : (
+        <>
+          {/* Conversation analyzer input and analysis */}
+          <ConversationAnalyzerPolish onAnalysisComplete={onAnalysisComplete} />
+          {/* Result visualization and share UI, shown only if analyzed */}
+          {analysisResult && (
+            <>
+              <FlaggedResultVisualization
+                verdict={analysisResult.verdict.label}
+                flaggedBehaviors={analysisResult.signals.map((sig) => ({
+                  type: sig,
+                  label: sig.charAt(0).toUpperCase() + sig.slice(1),
+                  confidence: 1, // Confidence per behavior not broken out in v1, use 1 as placeholder
+                }))}
+                overallConfidence={analysisResult.confidence}
+              />
+              <ShareableResult
+                verdict={analysisResult.verdict.label}
+                flaggedBehaviors={analysisResult.signals.map((sig) => ({
+                  type: sig,
+                  label: sig.charAt(0).toUpperCase() + sig.slice(1),
+                  confidence: 1,
+                }))}
+                overallConfidence={analysisResult.confidence}
+                conversationExcerpt={
+                  analysisResult?.meta?.excerpt || "" // Use excerpt from meta if any
+                }
+              />
+            </>
+          )}
+        </>
+      )}
     </main>
   );
 };
