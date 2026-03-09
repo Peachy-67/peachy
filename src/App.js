@@ -1,141 +1,127 @@
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useCallback } from "react";
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
 import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
 
-import "./styles/UiPolish.css";
+import "./styles/uiPolish.css";
 
-const HIGH_RISK_FLAGS = new Set([
-  "insult",
-  "discard",
-  "threat",
-  "gaslighting",
-  "manipulation",
-  "control",
-]);
+/**
+ * Main App component integrating:
+ * - Conversation analyzer with polished UI
+ * - Immediate alert on high-risk flagged behaviors
+ * - Polished flagged result visualization with share options
+ * - Toggleable real-time dashboard for live monitoring
+ */
+const App = () => {
+  // Analysis result state, initially null (no analysis done)
+  const [analysis, setAnalysis] = useState(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [dashboardActive, setDashboardActive] = useState(false);
 
-const deriveVerdictLabel = (verdictObj) => {
-  if (!verdictObj || !verdictObj.band) return "Safe";
-  switch (verdictObj.band) {
-    case "green":
-      return "Safe";
-    case "yellow":
-      return "Caution";
-    case "red":
-      return "Flagged";
-    default:
-      return "Safe";
-  }
-};
+  // Handle new analysis result from analyzer
+  const handleAnalysisUpdate = useCallback(
+    (newAnalysis) => {
+      setAnalysis(newAnalysis);
+      // Detect any high risk flags to trigger alert
+      if (newAnalysis && newAnalysis.signals) {
+        const highRiskFlags = newAnalysis.signals.some((flag) =>
+          ["insult", "manipulation", "gaslighting", "discard", "control"].includes(flag.toLowerCase())
+        );
+        setAlertVisible(highRiskFlags);
+      } else {
+        setAlertVisible(false);
+      }
+    },
+    [setAnalysis, setAlertVisible]
+  );
 
-export default function App() {
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [alertFlags, setAlertFlags] = useState([]);
-  const [realTimeMode, setRealTimeMode] = useState(false);
-
-  // Effect to trigger immediate alert when high risk flags detected
-  useEffect(() => {
-    if (!analysisResult || !analysisResult.signals) {
-      setAlertFlags([]);
-      return;
-    }
-    const highRiskDetected = analysisResult.signals.filter((flag) =>
-      HIGH_RISK_FLAGS.has(flag)
-    );
-    setAlertFlags(highRiskDetected);
-  }, [analysisResult]);
-
-  const handleAnalysisUpdate = (result) => {
-    setAnalysisResult(result);
+  // Dismiss alert banner manually
+  const dismissAlert = () => {
+    setAlertVisible(false);
   };
 
-  // Prepare flaggedBehaviors array for visualization based on signals
-  // Map signals to label and confidence; confidence not given in result signals array, so assume 1 for now
-  const flaggedBehaviors =
-    analysisResult?.signals?.map((signal) => {
-      // Map known signals to labels
-      const labelMap = {
-        insult: "Insult",
-        manipulation: "Manipulation",
-        gaslighting: "Gaslighting",
-        discard: "Discard",
-        control: "Control",
-        ultimatum: "Ultimatum",
-        threat: "Threat",
-        guilt: "Guilt",
-        boundary_push: "Boundary Push",
-        inconsistency: "Inconsistency",
-      };
-      return {
-        type: signal,
-        label: labelMap[signal] || signal,
-        confidence: 1, // No explicit confidence; default to 1
-      };
-    }) || [];
+  // Toggle dashboard visibility
+  const toggleDashboard = () => {
+    setDashboardActive((active) => !active);
+  };
 
-  // OverallConfidence fallback (use analysisResult.confidence or 0)
-  const overallConfidence = analysisResult?.confidence || 0;
+  // Prepare props for visualization and sharing
+  const verdictLabel =
+    analysis && analysis.verdict && analysis.verdict.label
+      ? analysis.verdict.label
+      : "Safe";
 
-  const verdictLabel = deriveVerdictLabel(analysisResult?.verdict);
+  // Map flagged behaviors to label and confidence for badges
+  const flaggedBehaviors = (analysis?.signals || []).map((flag) => {
+    // Map signals to labels (capitalize first letter, replace _ with space)
+    const label =
+      flag.charAt(0).toUpperCase() +
+      flag.slice(1).replace(/_/g, " ");
+    // Use confidence from analysis or default 0.7 for visual clarity
+    const confidence =
+      typeof analysis?.confidence === "number" ? analysis.confidence : 0.7;
+
+    return {
+      type: flag.toLowerCase(),
+      label,
+      confidence,
+    };
+  });
+
+  const overallConfidence =
+    typeof analysis?.confidence === "number" ? analysis.confidence : 0;
 
   return (
-    <main className="ui-container" aria-label="FLAGGED conversation analyzer">
-      <h1 style={{ textAlign: "center", color: "#ff6f61", userSelect: "none" }}>
-        FLAGGED - Conversation Red Flag Detector
+    <main className="ui-container" role="main" aria-label="FLAGGED Red Flag Conversation Detector">
+      <h1 style={{ textAlign: "center", color: "#cc2f2f", userSelect: "none" }}>
+        FLAGGED - Red Flag Conversation Detector
       </h1>
 
-      {/* Conversation Analyzer Input */}
-      {!realTimeMode && (
-        <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
+      <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
+
+      {alertVisible && (
+        <ImmediateAlert
+          flaggedBehaviors={flaggedBehaviors}
+          onDismiss={dismissAlert}
+        />
       )}
 
-      {/* Immediate alert for high-risk flags */}
-      <ImmediateAlert flaggedBehaviors={alertFlags} />
-
-      {/* Show results visualization and share if analysis present and not in real time mode */}
-      {!realTimeMode && analysisResult && (
-        <section
-          aria-label="Analysis results and sharing"
-          style={{ marginTop: 20 }}
-        >
+      {analysis && (
+        <section aria-label="Analysis results and sharing" style={{ marginTop: "1.25rem", textAlign: "center" }}>
           <FlaggedResultVisualization
             verdict={verdictLabel}
             flaggedBehaviors={flaggedBehaviors}
             overallConfidence={overallConfidence}
           />
-
           <ShareableResult
             verdict={verdictLabel}
             flaggedBehaviors={flaggedBehaviors}
             overallConfidence={overallConfidence}
-            conversationText={analysisResult.inputText || ""}
+            conversation={analysis?.usage?.lastInput || ""}
           />
         </section>
       )}
 
-      {/* Real-time dashboard toggle and view */}
-      <section style={{ marginTop: 30, textAlign: "center" }}>
+      <section style={{ marginTop: "2rem", textAlign: "center" }}>
         <button
-          type="button"
           className="peachy-button"
-          aria-pressed={realTimeMode}
-          aria-label={
-            realTimeMode
-              ? "Disable real-time dashboard"
-              : "Enable real-time dashboard"
-          }
-          onClick={() => setRealTimeMode((mode) => !mode)}
+          onClick={toggleDashboard}
+          aria-pressed={dashboardActive}
+          aria-label={dashboardActive ? "Hide Real-Time Dashboard" : "Show Real-Time Dashboard"}
         >
-          {realTimeMode ? "Exit Real-Time Dashboard" : "Open Real-Time Dashboard"}
+          {dashboardActive ? "Hide Real-Time Dashboard" : "Show Real-Time Dashboard"}
         </button>
       </section>
 
-      {realTimeMode && (
-        <RealTimeDashboard onAnalysis={handleAnalysisUpdate} />
+      {dashboardActive && (
+        <section aria-label="Real-time dashboard section" style={{ marginTop: "2rem" }}>
+          <RealTimeDashboard onAnalysis={handleAnalysisUpdate} />
+        </section>
       )}
     </main>
   );
-}
+};
+
+export default App;
