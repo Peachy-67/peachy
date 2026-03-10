@@ -86,11 +86,13 @@
     "Created src/App.js integrating best existing components ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a cohesive main app interface managing analysis state, alerts on high-risk flags, polished results with confidence and sharing options, and toggling real-time dashboard view as per product roadmap without duplicating UI polish components.",
     "Created src/App.js integrating the existing best components ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a cohesive main app interface managing analysis state, immediate alerts on high-risk flags, polished result visualization with share options, and toggling a real-time dashboard as per product roadmap, without duplicating UI polish components.",
     "Created src/App.js integrating best existing components ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a cohesive main app interface managing analysis updates, immediate alerts on high-risk flags, results display with sharing, and toggling real-time dashboard, using existing CSS polish and meeting product roadmap with no duplicates.",
-    "Created src/App.js that integrates the best existing ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard components into a cohesive main product interface managing analysis state, alerts on high-risk flags, polished results with confidence and sharing options, and toggling real-time monitoring dashboard per product roadmap without duplicating UI polish components."
+    "Created src/App.js that integrates the best existing ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard components into a cohesive main product interface managing analysis state, alerts on high-risk flags, polished results with confidence and sharing options, and toggling real-time monitoring dashboard per product roadmap without duplicating UI polish components.",
+    "No description"
   ],
   "failed": [
     "Invalid response",
     "Invalid response",
+    "Build check: No build script found",
     "Build check: No build script found",
     "Build check: No build script found",
     "Build check: No build script found",
