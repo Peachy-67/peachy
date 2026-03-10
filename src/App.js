@@ -6,103 +6,123 @@ import FlaggedResultVisualization from "./components/FlaggedResultVisualization"
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
 
-import "./styles/uiPolish.css";
+import "./styles/UiPolish.css";
 
-const App = () => {
+const highRiskFlags = new Set([
+  "insult",
+  "gaslighting",
+  "threat",
+  "ultimatum",
+  "control",
+  "discard",
+]);
+
+/**
+ * Main App component integrating:
+ * - ConversationAnalyzerPolish for input and analysis
+ * - ImmediateAlert for alerting high risk flags immediately
+ * - FlaggedResultVisualization for showing verdict and flag badges
+ * - ShareableResult for sharing flagged conversation results
+ * - RealTimeDashboard for optionally monitoring real-time conversations
+ */
+function App() {
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [showDashboard, setShowDashboard] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [alertFlags, setAlertFlags] = useState([]);
+  const [showDashboard, setShowDashboard] = useState(false);
 
-  // Determine high-risk flags for alert triggering
-  const highRiskFlags = ["insult", "gaslighting", "threat", "ultimatum", "control"];
-
-  // Monitor analysisResult for high risk flags to show alert
+  // When analysisResult changes, determine if alert needed
   useEffect(() => {
-    if (
-      analysisResult &&
-      Array.isArray(analysisResult.signals) &&
-      analysisResult.signals.some((signal) => highRiskFlags.includes(signal))
-    ) {
-      setAlertFlags(
-        analysisResult.signals.filter((signal) => highRiskFlags.includes(signal))
-      );
-      setAlertVisible(true);
-    } else {
-      setAlertVisible(false);
+    if (!analysisResult) {
+      setShowAlert(false);
       setAlertFlags([]);
+      return;
+    }
+
+    const flaggedBehaviorTypes = analysisResult.signals || [];
+
+    // Check if any high risk flags present
+    const detectedHighRiskFlags = flaggedBehaviorTypes.filter((flag) =>
+      highRiskFlags.has(flag)
+    );
+
+    if (detectedHighRiskFlags.length > 0) {
+      setAlertFlags(detectedHighRiskFlags);
+      setShowAlert(true);
+    } else {
+      setAlertFlags([]);
+      setShowAlert(false);
     }
   }, [analysisResult]);
 
-  // Handler to receive new analysis results from conversation analyzer or dashboard
-  const handleAnalysisUpdate = (result) => {
-    setAnalysisResult(result);
-  };
-
-  // Dismiss alert handler
-  const dismissAlert = () => {
-    setAlertVisible(false);
-  };
-
-  // Toggle to show/hide the RealTimeDashboard view
+  // Helper to toggle real-time dashboard view
   const toggleDashboard = () => {
     setShowDashboard((prev) => !prev);
   };
 
   return (
-    <main className="container" role="main" aria-label="FLAGGED conversation red flag detector">
-      <h1 style={{ textAlign: "center", color: "#ff6f61", userSelect: "none", marginBottom: "1rem" }}>
-        FLAGGED
-      </h1>
-
-      {alertVisible && <ImmediateAlert flaggedBehaviors={alertFlags} onDismiss={dismissAlert} />}
-
-      <section aria-label="Conversation analyzer and results" style={{ marginBottom: "2rem" }}>
-        <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
-      </section>
-
-      {analysisResult && (
-        <section aria-label="Analysis result visualization" style={{ marginBottom: "2rem" }}>
-          <FlaggedResultVisualization
-            verdict={convertBandToLabel(analysisResult.verdict.band)}
-            flaggedBehaviors={mapSignalsToLabels(analysisResult.signals)}
-            overallConfidence={analysisResult.confidence}
-          />
-          <ShareableResult analysis={analysisResult} />
-        </section>
-      )}
-
-      <section aria-label="Real-time conversation monitoring dashboard" style={{ marginBottom: "3rem" }}>
+    <main className="ui-container" aria-label="FLAGGED conversation analyzer app">
+      <header style={{ textAlign: "center", marginBottom: "1rem" }}>
+        <h1 style={{ color: "#ff7043", userSelect: "none" }}>FLAGGED.RUN</h1>
         <button
           type="button"
+          className="peachy-button"
           onClick={toggleDashboard}
           aria-pressed={showDashboard}
-          aria-label={showDashboard ? "Hide real-time dashboard" : "Show real-time dashboard"}
-          style={{
-            marginBottom: "1rem",
-            padding: "0.5rem 1.1rem",
-            fontWeight: "700",
-            fontSize: "1rem",
-            borderRadius: "8px",
-            border: "2px solid #ff6f61",
-            backgroundColor: showDashboard ? "#ff6f61" : "transparent",
-            color: showDashboard ? "white" : "#ff6f61",
-            cursor: "pointer",
-            userSelect: "none",
-            transition: "all 0.3s ease",
-          }}
+          aria-label={
+            showDashboard
+              ? "Hide real-time dashboard"
+              : "Show real-time dashboard for live conversation monitoring"
+          }
         >
-          {showDashboard ? "Hide Real-time Dashboard" : "Show Real-time Dashboard"}
+          {showDashboard ? "Hide Real-Time Dashboard" : "Show Real-Time Dashboard"}
         </button>
-        {showDashboard && <RealTimeDashboard onAnalysis={handleAnalysisUpdate} highRiskFlags={highRiskFlags} />}
-      </section>
+      </header>
+
+      {showDashboard ? (
+        <RealTimeDashboard
+          analysisResult={analysisResult}
+          onAnalysisUpdate={setAnalysisResult}
+        />
+      ) : (
+        <>
+          <ConversationAnalyzerPolish onAnalysis={setAnalysisResult} />
+
+          {showAlert && alertFlags.length > 0 && (
+            <ImmediateAlert
+              flaggedBehaviors={alertFlags}
+              onDismiss={() => setShowAlert(false)}
+            />
+          )}
+
+          {analysisResult && (
+            <>
+              <FlaggedResultVisualization
+                verdict={mapVerdictLabel(analysisResult.verdict)}
+                flaggedBehaviors={mapFlagsForVisualization(
+                  analysisResult.signals,
+                  analysisResult.confidence
+                )}
+                overallConfidence={analysisResult.confidence}
+              />
+              <ShareableResult analysisResult={analysisResult} />
+            </>
+          )}
+        </>
+      )}
     </main>
   );
-};
+}
 
-// Helper to convert backend band to verdict label expected by visualization
-function convertBandToLabel(band) {
-  switch (band) {
+/**
+ * The backend verdict format is an object, we map it to string labels expected by VerdictDisplay
+ */
+function mapVerdictLabel(verdictObj) {
+  if (!verdictObj || typeof verdictObj !== "object") {
+    return "Safe";
+  }
+  // Map bands to verdict label strings expected by VerdictDisplay
+  switch (verdictObj.band) {
     case "green":
       return "Safe";
     case "yellow":
@@ -114,27 +134,51 @@ function convertBandToLabel(band) {
   }
 }
 
-// Helper to map signals array to flagged behaviors array with labels & confidences for visualization
-// Confidence defaults to 1 because actual per-flag confidences aren't returned by current API.
-function mapSignalsToLabels(signals) {
-  if (!Array.isArray(signals)) return [];
-  
-  const signalMap = {
-    insult: { label: "Insult", confidence: 1 },
-    manipulation: { label: "Manipulation", confidence: 1 },
-    gaslighting: { label: "Gaslighting", confidence: 1 },
-    discard: { label: "Discard", confidence: 1 },
-    control: { label: "Control", confidence: 1 },
-    ultimatum: { label: "Ultimatum", confidence: 1 },
-    threat: { label: "Threat", confidence: 1 },
-    guilt: { label: "Guilt", confidence: 1 },
-    boundary_push: { label: "Boundary Push", confidence: 1 },
-    inconsistency: { label: "Inconsistency", confidence: 1 },
+/**
+ * Map raw flagged behavior types from backend to visualization format:
+ * Each item: { type, label, confidence }
+ * Use backend confidence as confidence score for all.
+ */
+function mapFlagsForVisualization(flags, confidence) {
+  if (!Array.isArray(flags) || flags.length === 0) {
+    return [];
+  }
+
+  // Label mappings for known flags
+  const labelMap = {
+    insult: "Insult",
+    manipulation: "Manipulation",
+    gaslighting: "Gaslighting",
+    discard: "Discard",
+    control: "Control",
+    ultimatum: "Ultimatum",
+    threat: "Threat",
+    guilt: "Guilt",
+    boundary_push: "Boundary Push",
+    inconsistency: "Inconsistency",
   };
 
-  return signals
-    .filter((signal) => Object.hasOwn(signalMap, signal))
-    .map((signal) => ({ type: signal, ...signalMap[signal] }));
+  // Only pass known flags that FlagBadge expects (per roadmap and existing)
+  const acceptedFlags = [
+    "insult",
+    "manipulation",
+    "gaslighting",
+    "discard",
+    "control",
+    "ultimatum",
+    "threat",
+    "guilt",
+    "boundary_push",
+    "inconsistency",
+  ];
+
+  return flags
+    .filter((f) => acceptedFlags.includes(f))
+    .map((type) => ({
+      type,
+      label: labelMap[type] || type,
+      confidence: confidence || 0,
+    }));
 }
 
 export default App;
