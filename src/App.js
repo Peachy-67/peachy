@@ -1,118 +1,87 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
 import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
 
-import "./styles/UiPolish.css";
+import "./styles/uiPolish.css";
 
-const highRiskFlags = new Set([
-  "insult",
-  "gaslighting",
-  "threat",
-  "ultimatum",
-  "discard",
-]);
+const HIGH_RISK_FLAGS = new Set(["insult", "gaslighting", "threat", "ultimatum"]);
 
 const App = () => {
-  // State for analysis data from conversation input or real-time dashboard
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [alertFlags, setAlertFlags] = useState([]);
+  const [showDashboard, setShowDashboard] = useState(false);
 
-  // State for visibility of ImmediateAlert dismissal
-  const [alertDismissed, setAlertDismissed] = useState(false);
-
-  // State for toggling real-time dashboard view
-  const [showRealTimeDashboard, setShowRealTimeDashboard] = useState(false);
-
-  // Determine if any high-risk flags are present to trigger alert
-  const hasHighRiskFlags =
-    analysisResult?.flaggedBehaviors?.some((flag) => highRiskFlags.has(flag.type.toLowerCase())) ?? false;
-
-  // Handler when new analysis data is received (from analyzer or dashboard)
-  const handleAnalysisUpdate = useCallback((result) => {
-    setAnalysisResult(result);
-    // Reset alert dismissal when new result comes in with high-risk flags
-    const hasRisks =
-      result?.flaggedBehaviors?.some((flag) => highRiskFlags.has(flag.type.toLowerCase())) ?? false;
-    if (hasRisks) {
-      setAlertDismissed(false);
+  // Trigger immediate alert if any high-risk flags appear
+  useEffect(() => {
+    if (analysisResult && Array.isArray(analysisResult.signals)) {
+      const foundFlags = analysisResult.signals.filter((flag) => HIGH_RISK_FLAGS.has(flag));
+      if (foundFlags.length) {
+        setAlertFlags(foundFlags);
+        // Native alert for immediate attention
+        alert(`⚠️ High-risk behavior detected: ${foundFlags.join(", ")}`);
+      } else {
+        setAlertFlags([]);
+      }
+    } else {
+      setAlertFlags([]);
     }
-  }, []);
+  }, [analysisResult]);
 
-  const handleDismissAlert = useCallback(() => {
-    setAlertDismissed(true);
-  }, []);
-
-  // Compose the shareable text for sharing button components
-  const buildShareText = () => {
-    if (!analysisResult) return "";
-
-    const verdictLine = `Verdict: ${analysisResult.verdict}`;
-    const flagsLines =
-      analysisResult.flaggedBehaviors.length > 0
-        ? analysisResult.flaggedBehaviors
-            .map((flag) => `- ${flag.label} (${Math.round(flag.confidence * 100)}%)`)
-            .join("\n")
-        : "No red flags detected.";
-
-    const excerpt = analysisResult.originalText
-      ? `\n\nConversation excerpt:\n` +
-        (analysisResult.originalText.length > 200
-          ? analysisResult.originalText.slice(0, 200) + "..."
-          : analysisResult.originalText)
-      : "";
-
-    return `${verdictLine}\n${flagsLines}${excerpt}\n\nAnalyzed with FLAGGED.RUN - detect manipulation and unhealthy behavior in conversations.`;
+  // Handler for analysis updates from ConversationAnalyzerPolish or RealTimeDashboard
+  const handleAnalysisUpdate = (result) => {
+    setAnalysisResult(result);
   };
 
   return (
-    <main className="ui-container" aria-label="Flagged conversation analyzer application">
+    <main className="container" aria-label="FLAGGED application main interface">
       <header>
-        <h1 style={{ color: "#ff6f61", userSelect: "none", textAlign: "center" }}>FLAGGED Conversation Detector</h1>
+        <h1 style={{ textAlign: "center", color: "#cc2f2f", userSelect: "none" }}>FLAGGED</h1>
+        <p style={{ textAlign: "center", maxWidth: 450, margin: "0 auto 1rem" }}>
+          Detect red flags in conversations and protect yourself from manipulation and harmful behavior.
+        </p>
       </header>
 
-      <section aria-label="Conversation analysis input and results">
-        <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
-
-        {/* Immediate alert banner for high-risk flags */}
-        {hasHighRiskFlags && !alertDismissed && (
-          <ImmediateAlert flaggedBehaviors={analysisResult.flaggedBehaviors} onDismiss={handleDismissAlert} />
+      <section aria-label="Conversation analysis section">
+        {!showDashboard && (
+          <ConversationAnalyzerPolish onAnalyze={handleAnalysisUpdate} key="conv-analyzer" />
         )}
-
-        {/* Show flagged result visualization for latest analysis */}
-        {analysisResult && (
+        {analysisResult && !showDashboard && (
           <FlaggedResultVisualization
-            verdict={analysisResult.verdict}
-            flaggedBehaviors={analysisResult.flaggedBehaviors}
+            verdict={analysisResult.verdict.label}
+            flaggedBehaviors={analysisResult.signals.map((type) => ({
+              type,
+              label: type.charAt(0).toUpperCase() + type.slice(1),
+              confidence: 1, // Confidence not passed so default 100%, can extend when needed
+            }))}
             overallConfidence={analysisResult.confidence}
           />
         )}
-
-        {/* Shareable result area */}
-        {analysisResult && (
-          <ShareableResult shareText={buildShareText()} disabled={!analysisResult}>
-            {/* Children are optional, this component handles UI internally */}
-          </ShareableResult>
+        {analysisResult && !showDashboard && (
+          <ShareableResult analysis={analysisResult} />
         )}
       </section>
 
-      <hr style={{ margin: "2rem 0" }} />
+      <ImmediateAlert flags={alertFlags} />
 
-      <section aria-label="Real-time dashboard for monitoring conversations">
+      <section aria-label="Real-time monitoring dashboard toggle" style={{ textAlign: "center", marginTop: 30 }}>
         <button
           type="button"
+          onClick={() => setShowDashboard(!showDashboard)}
+          aria-pressed={showDashboard}
           className="peachy-button"
-          onClick={() => setShowRealTimeDashboard((show) => !show)}
-          aria-pressed={showRealTimeDashboard}
-          aria-label="Toggle real-time conversation monitoring dashboard"
-          style={{ marginBottom: "1rem", display: "block", width: "100%" }}
         >
-          {showRealTimeDashboard ? "Hide Real-Time Dashboard" : "Show Real-Time Dashboard"}
+          {showDashboard ? "Hide Real-Time Dashboard" : "Show Real-Time Dashboard"}
         </button>
-
-        {showRealTimeDashboard && <RealTimeDashboard onAnalysis={handleAnalysisUpdate} />}
       </section>
+
+      {showDashboard && (
+        <section aria-label="Real-time conversation monitoring dashboard">
+          <RealTimeDashboard onAnalyze={handleAnalysisUpdate} key="rt-dashboard" />
+        </section>
+      )}
     </main>
   );
 };
