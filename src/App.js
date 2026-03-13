@@ -8,167 +8,107 @@ import RealTimeDashboard from "./components/RealTimeDashboard";
 
 import "./styles/UiPolish.css";
 
-/**
- * Main application component integrating:
- * - ConversationAnalyzerPolish for user input and analysis
- * - ImmediateAlert for high-risk flag notifications
- * - FlaggedResultVisualization to show verdict and flags with confidence
- * - ShareableResult to enable sharing results easily
- * - RealTimeDashboard for live conversation monitoring toggling
- */
 const App = () => {
+  // State to hold the latest analyzed result from conversation analyzer
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [showRealTimeDashboard, setShowRealTimeDashboard] = useState(false);
-  const [alertFlags, setAlertFlags] = useState([]);
 
-  // Parse flagged behaviors from analysisResult signals and enrich with labels and confidence
-  const flaggedBehaviors =
-    analysisResult && analysisResult.signals
-      ? analysisResult.signals.map((signal) => {
-          // Map signals to label and confidence
-          // Use existing labels consistent with FlagBadge expectations
-          // Confidence fallback to overall confidence for now
-          const labelMap = {
-            insult: "Insult",
-            manipulation: "Manipulation",
-            gaslighting: "Gaslighting",
-            discard: "Discard",
-            control: "Control",
-            ultimatum: "Ultimatum",
-            threat: "Threat",
-            guilt: "Guilt",
-            boundary_push: "Boundary Push",
-            inconsistency: "Inconsistency",
-          };
+  // State to toggle between main analyzer view and real-time dashboard view
+  const [showDashboard, setShowDashboard] = useState(false);
 
-          return {
-            type: signal,
-            label: labelMap[signal] || signal,
-            confidence: analysisResult.confidence || 0,
-          };
-        })
-      : [];
-
-  // Determine verdict label from the backend data
-  // Using "Safe" / "Caution" / "Flagged" mapping from bands
-  const verdictMapping = {
-    green: "Safe",
-    yellow: "Caution",
-    red: "Flagged",
-  };
-
-  const verdict = analysisResult && analysisResult.verdict
-    ? verdictMapping[analysisResult.verdict.band] || "Safe"
-    : "Safe";
-
-  // Extract overall confidence number
-  const overallConfidence = analysisResult ? analysisResult.confidence : 0;
-
-  // Detect which flags are high risk for alerting (red flags)
-  // High risk set is: insult, gaslighting, threat, ultimatum, discard, control
-  const highRiskFlagTypes = new Set([
-    "insult",
-    "gaslighting",
-    "threat",
-    "ultimatum",
-    "discard",
-    "control",
-  ]);
-
-  useEffect(() => {
-    if (!analysisResult) {
-      setAlertFlags([]);
-      return;
-    }
-    const highRiskDetected = flaggedBehaviors.filter(
-      (flag) => highRiskFlagTypes.has(flag.type.toLowerCase())
-    );
-    setAlertFlags(highRiskDetected);
+  // Extract flagged behaviors with full info from analysisResult.signals
+  // Here we map signals to objects with type, label, and confidence (approximate)
+  // For simplified purposes, label = type capitalized, confidence is from analysisResult.confidence
+  const flaggedBehaviors = React.useMemo(() => {
+    if (!analysisResult || !Array.isArray(analysisResult.signals)) return [];
+    return analysisResult.signals.map((signal) => ({
+      type: signal,
+      label: signal.charAt(0).toUpperCase() + signal.slice(1),
+      confidence: analysisResult.confidence ?? 0,
+    }));
   }, [analysisResult]);
 
+  // Derive verdict label string from analysisResult.verdict.band
+  // Map backend bands (green/yellow/red) to frontend verdict labels Safe/Caution/Flagged
+  const verdict = React.useMemo(() => {
+    if (!analysisResult || !analysisResult.verdict) return "Safe";
+    switch (analysisResult.verdict.band) {
+      case "green":
+        return "Safe";
+      case "yellow":
+        return "Caution";
+      case "red":
+        return "Flagged";
+      default:
+        return "Safe";
+    }
+  }, [analysisResult]);
+
+  // ImmediateAlert consumes flagged behaviors to notify if any high-risk flags exist (red flags)
+  // We consider any flagged behavior as high-risk for alerting purposes
+  // The ImmediateAlert component can filter inside if needed
+
+  // Handler passed to ConversationAnalyzerPolish to receive analysis results on submit
+  const handleAnalysisUpdate = (result) => {
+    setAnalysisResult(result);
+  };
+
+  // Also allow toggling between main analyzer and real-time dashboard
+  const toggleDashboard = () => {
+    setShowDashboard((show) => !show);
+  };
+
   return (
-    <main className="ui-container" role="main" aria-label="Flagged conversation red flag detector application">
-      <h1 style={{ textAlign: "center", color: "#d94f4f", userSelect: "none", marginBottom: "1rem" }}>
-        FLAGGED: Conversation Red Flag Detector
+    <main className="ui-container" aria-label="FLAGGED conversation analyzer application">
+      <h1 style={{ textAlign: "center", color: "#cc2f2f", userSelect: "none" }}>
+        FLAGGED - Conversation Red Flag Detector
       </h1>
 
-      {/* Immediate alert banner and native alert dialog */}
-      <ImmediateAlert flaggedBehaviors={alertFlags} />
+      {/* Immediate alert banner for high-risk flags */}
+      <ImmediateAlert flaggedBehaviors={flaggedBehaviors} />
 
-      {/* Show the main conversation analyzer or real-time dashboard toggle */}
-      {!showRealTimeDashboard && (
-        <>
-          <ConversationAnalyzerPolish
-            onAnalysis={(result, error) => {
-              if (error) {
-                setErrorMessage(error);
-                setAnalysisResult(null);
-              } else {
-                setErrorMessage(null);
-                setAnalysisResult(result);
-              }
-            }}
-          />
-
-          {errorMessage && (
-            <div
-              className="alert-banner"
-              role="alert"
-              aria-live="assertive"
-              style={{ marginTop: "1rem" }}
-            >
-              {errorMessage}
-            </div>
-          )}
-
-          {/* Display flagged result visualization if available */}
-          {analysisResult && (
-            <FlaggedResultVisualization
-              verdict={verdict}
-              flaggedBehaviors={flaggedBehaviors}
-              overallConfidence={overallConfidence}
-            />
-          )}
-
-          {/* Shareable result interface for viral sharing */}
-          {analysisResult && (
-            <ShareableResult
-              verdict={verdict}
-              flaggedBehaviors={flaggedBehaviors}
-              overallConfidence={overallConfidence}
-              conversationExcerpt={
-                analysisResult.meta?.conversationExcerpt || ""
-              }
-            />
-          )}
-        </>
-      )}
-
-      {/* Toggle button for real-time dashboard */}
-      <div style={{ marginTop: "24px", textAlign: "center" }}>
+      {/* Toggle button to switch views */}
+      <div style={{ margin: "1rem 0", textAlign: "center" }}>
         <button
           type="button"
+          onClick={toggleDashboard}
+          aria-pressed={showDashboard}
+          aria-label={showDashboard ? "Switch to Conversation Analyzer" : "Switch to Real-Time Dashboard"}
           className="peachy-button"
-          onClick={() => setShowRealTimeDashboard(!showRealTimeDashboard)}
-          aria-pressed={showRealTimeDashboard}
-          aria-label={
-            showRealTimeDashboard
-              ? "Hide real-time dashboard"
-              : "Show real-time dashboard"
-          }
         >
-          {showRealTimeDashboard ? "Return to Analyzer" : "Open Real-Time Dashboard"}
+          {showDashboard ? "Show Conversation Analyzer" : "Show Real-Time Dashboard"}
         </button>
       </div>
 
-      {/* Real-time dashboard view toggled */}
-      {showRealTimeDashboard && (
-        <RealTimeDashboard
-          onAnalysis={(result) => {
-            setAnalysisResult(result);
-          }}
-        />
+      {showDashboard ? (
+        // Real-time conversation monitoring dashboard
+        <RealTimeDashboard onAnalysisUpdate={handleAnalysisUpdate} />
+      ) : (
+        // Main conversation analyzer interface
+        <>
+          <ConversationAnalyzerPolish onAnalysisUpdate={handleAnalysisUpdate} />
+
+          {analysisResult && (
+            <>
+              {/* Visualize flagged results */}
+              <FlaggedResultVisualization
+                verdict={verdict}
+                flaggedBehaviors={flaggedBehaviors}
+                overallConfidence={analysisResult.confidence ?? 0}
+              />
+              {/* Share results */}
+              <ShareableResult
+                verdict={verdict}
+                flaggedBehaviors={flaggedBehaviors}
+                overallConfidence={analysisResult.confidence ?? 0}
+                conversationExcerpt={
+                  analysisResult.why && analysisResult.why.length > 0
+                    ? analysisResult.why.slice(0, 3).join(" ")
+                    : ""
+                }
+              />
+            </>
+          )}
+        </>
       )}
     </main>
   );
