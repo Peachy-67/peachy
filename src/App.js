@@ -1,103 +1,142 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
-import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
-import ImmediateAlert from "./components/ImmediateAlert";
-import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
-import ShareableResult from "./components/ShareableResult";
-import RealTimeDashboard from "./components/RealTimeDashboard";
+import ConversationAnalyzerPolish from './components/ConversationAnalyzerPolish';
+import ImmediateAlert from './components/ImmediateAlert';
+import FlaggedResultVisualization from './components/FlaggedResultVisualization';
+import ShareableResult from './components/ShareableResult';
+import RealTimeDashboard from './components/RealTimeDashboard';
 
-import "./styles/uiPolish.css";
+import './styles/uiPolish.css';
 
-const HIGH_RISK_FLAGS = ["insult", "threat", "gaslighting", "discard", "control", "ultimatum"];
+const HIGH_RISK_FLAGS = [
+  'insult',
+  'manipulation',
+  'gaslighting',
+  'discard',
+  'control',
+  'ultimatum',
+  'threat',
+  'guilt',
+  'boundary_push',
+  'inconsistency',
+];
 
-function App() {
+// The main app component combining analyzer, results visualization,
+// immediate alert on high-risk flags, sharing capabilities,
+// and a toggleable real-time dashboard per product roadmap.
+const App = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [alertFlags, setAlertFlags] = useState([]);
+  const [highRiskFlagsDetected, setHighRiskFlagsDetected] = useState([]);
   const [showDashboard, setShowDashboard] = useState(false);
 
-  // Update alert flags on new analysis results containing high-risk signals
+  // Update high-risk alert flags when analysisResult changes
   useEffect(() => {
     if (!analysisResult || !Array.isArray(analysisResult.signals)) {
-      setAlertFlags([]);
+      setHighRiskFlagsDetected([]);
       return;
     }
-    const highRiskDetected = analysisResult.signals.filter((sig) =>
-      HIGH_RISK_FLAGS.includes(sig.toLowerCase())
+    const detectedFlags = analysisResult.signals.filter((flag) =>
+      HIGH_RISK_FLAGS.includes(flag.toLowerCase())
     );
-    setAlertFlags(highRiskDetected);
+
+    setHighRiskFlagsDetected(detectedFlags);
   }, [analysisResult]);
 
-  // Handler when conversation analyzed from ConversationAnalyzerPolish or RealTimeDashboard
+  // Handler passed to ConversationAnalyzerPolish and RealTimeDashboard
+  // Called when new analysis is available
   const handleAnalysisUpdate = (result) => {
     setAnalysisResult(result);
   };
 
-  // Toggle between analyzer + result view and real-time dashboard
-  const toggleDashboard = () => {
-    setShowDashboard((show) => !show);
-    // Clear current results and alerts when switching mode
-    setAnalysisResult(null);
-    setAlertFlags([]);
-  };
-
   return (
-    <main className="container" aria-label="FLAGGED conversation analyzer app">
-      <header style={{ textAlign: "center", marginBottom: "1rem", userSelect: "none" }}>
-        <h1>FLAGGED</h1>
-        <p style={{ color: "#cc2f2f", fontWeight: "600" }}>Detect red flags in conversations</p>
-        <button
-          type="button"
-          onClick={toggleDashboard}
-          aria-pressed={showDashboard}
-          style={{
-            marginTop: "12px",
-            backgroundColor: "#ff6f61",
-            border: "none",
-            borderRadius: "6px",
-            padding: "0.55rem 1.3rem",
-            color: "white",
-            cursor: "pointer",
-            boxShadow: "0 3px 7px rgba(255,111,97,0.7)",
-            fontWeight: "600",
-            fontSize: "1rem",
-            userSelect: "none",
-            transition: "background-color 0.25s ease",
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#e65b50")}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#ff6f61")}
-        >
-          {showDashboard ? "Back to Analyzer" : "Go to Real-Time Dashboard"}
-        </button>
+    <main className="container" role="main" aria-label="FLAGGED conversation analysis application">
+      <header>
+        <h1 tabIndex={-1} style={{ userSelect: 'none', textAlign: 'center', color: '#cc2f2f' }}>
+          FLAGGED
+        </h1>
       </header>
 
-      <ImmediateAlert flaggedBehaviors={alertFlags} />
+      <section aria-labelledby="analyzer-label" style={{ marginBottom: '2rem' }}>
+        <h2 id="analyzer-label" className="ui-section-header">
+          Conversation Analyzer
+        </h2>
+        <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
+      </section>
 
-      {!showDashboard && (
-        <>
-          <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
+      <ImmediateAlert flaggedBehaviors={highRiskFlagsDetected} />
 
-          {analysisResult && (
-            <>
-              <FlaggedResultVisualization
-                verdict={analysisResult.verdict.label}
-                flaggedBehaviors={analysisResult.signals.map((flag) => ({
-                  type: flag,
-                  label: flag.charAt(0).toUpperCase() + flag.slice(1),
-                  confidence: 1,
-                }))}
-                overallConfidence={analysisResult.confidence}
-              />
-              <ShareableResult analysisResult={analysisResult} />
-            </>
-          )}
-        </>
+      {analysisResult && (
+        <section aria-labelledby="results-label" style={{ marginBottom: '2rem' }}>
+          <h2 id="results-label" className="ui-section-header">
+            Analysis Results
+          </h2>
+          {/* Show polished flagged result visualization */}
+          <FlaggedResultVisualization
+            verdict={mapVerdictLabel(analysisResult.verdict)}
+            flaggedBehaviors={mapFlags(analysisResult.signals, analysisResult.confidence)}
+            overallConfidence={analysisResult.confidence}
+          />
+          {/* Include shareable UI */}
+          <ShareableResult analysis={analysisResult} />
+        </section>
       )}
 
+      <section aria-label="Toggle real-time dashboard" style={{ marginBottom: '2rem', textAlign: 'center' }}>
+        <button
+          type="button"
+          onClick={() => setShowDashboard((v) => !v)}
+          className="peachy-button"
+          aria-pressed={showDashboard}
+          aria-label={showDashboard ? 'Hide real-time dashboard' : 'Show real-time dashboard'}
+        >
+          {showDashboard ? 'Hide Real-Time Dashboard' : 'Show Real-Time Dashboard'}
+        </button>
+      </section>
+
       {showDashboard && (
-        <RealTimeDashboard onAnalysis={handleAnalysisUpdate} flaggedBehaviors={alertFlags} />
+        <section aria-labelledby="dashboard-label">
+          <h2 id="dashboard-label" className="ui-section-header">
+            Real-Time Conversation Dashboard
+          </h2>
+          <RealTimeDashboard onAnalysis={handleAnalysisUpdate} />
+        </section>
       )}
     </main>
   );
+};
+
+// Helper to map verdict object properties to verdict string expected by FlaggedResultVisualization
+function mapVerdictLabel(verdictObj) {
+  if (!verdictObj || typeof verdictObj !== 'object') return 'Safe';
+  // Map backend verdict band to frontend verdict string:
+  // backend bands: green, yellow, red
+  // frontend verdicts: Safe, Caution, Flagged
+  switch ((verdictObj.band || '').toLowerCase()) {
+    case 'green':
+      return 'Safe';
+    case 'yellow':
+      return 'Caution';
+    case 'red':
+      return 'Flagged';
+    default:
+      return 'Safe';
+  }
+}
+
+// Map signals into flaggedBehaviors array shape expected by visualization: {type, label, confidence}
+function mapFlags(signalsArray, confidence) {
+  if (!Array.isArray(signalsArray) || signalsArray.length === 0) return [];
+  // Use confidence from analysis for all flags as proxy
+  return signalsArray.map((flagType) => ({
+    type: flagType.toLowerCase(),
+    label: capitalize(flagType),
+    confidence: confidence || 0,
+  }));
+}
+
+function capitalize(str) {
+  if (!str || typeof str !== 'string') return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export default App;
