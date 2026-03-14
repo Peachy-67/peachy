@@ -8,123 +8,83 @@ import RealTimeDashboard from "./components/RealTimeDashboard";
 
 import "./styles/UiPolish.css";
 
+const HIGH_RISK_FLAGS = new Set([
+  "insult",
+  "gaslighting",
+  "threat",
+  "ultimatum",
+]);
+
 const App = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [alerts, setAlerts] = useState([]);
+  const [alertFlags, setAlertFlags] = useState([]);
   const [showDashboard, setShowDashboard] = useState(false);
-  const [currentText, setCurrentText] = useState("");
 
-  // Update alerts when detected flagged behaviors change
+  // Handle immediate alert flags from analysis results
   useEffect(() => {
     if (!analysisResult) {
-      setAlerts([]);
+      setAlertFlags([]);
       return;
     }
-    // high-risk flags for alerting can be insult, gaslighting, threat, discard, control
-    const highRiskFlags = ["insult", "gaslighting", "threat", "discard", "control"];
-    const detectedFlags = analysisResult.signals || [];
-    const activeAlerts = detectedFlags.filter((flag) => highRiskFlags.includes(flag));
-    setAlerts(activeAlerts);
+    const highRiskDetected = analysisResult.signals.filter((flag) =>
+      HIGH_RISK_FLAGS.has(flag)
+    );
+    setAlertFlags(highRiskDetected);
   }, [analysisResult]);
 
-  // Handler for analysis updates from analyzer or dashboard
+  // Handler for analysis updates from ConversationAnalyzerPolish and RealTimeDashboard
   const handleAnalysisUpdate = (result) => {
     setAnalysisResult(result);
   };
 
-  // Map signals to badge data for visualization (type, label, confidence)
-  // Using existing flags for labels and confidence from backend
-  const flaggedBadges = React.useMemo(() => {
-    if (!analysisResult || !Array.isArray(analysisResult.signals)) return [];
-    // We do not have detailed confidence per flag from backend;
-    // Assign equal confidence from overall confidence.
-    const confidence = analysisResult.confidence || 0;
-    const labels = {
-      insult: "Insult",
-      manipulation: "Manipulation",
-      gaslighting: "Gaslighting",
-      discard: "Discard",
-      control: "Control",
-      ultimatum: "Ultimatum",
-      threat: "Threat",
-      guilt: "Guilt",
-      boundary_push: "Boundary Push",
-      inconsistency: "Inconsistency",
-    };
-    return analysisResult.signals.map((sig) => ({
-      type: sig,
-      label: labels[sig] || sig,
-      confidence,
-    }));
-  }, [analysisResult]);
-
-  // Derive verdict label and band for visualization from analysis results
-  // The analysisResult may have verdict object or fallback
-  const verdict =
-    analysisResult && analysisResult.verdict && analysisResult.verdict.band
-      ? // legacy: verdict label as Safe/Caution/Flagged based on band
-        analysisResult.verdict.band === "green"
-          ? "Safe"
-          : analysisResult.verdict.band === "yellow"
-          ? "Caution"
-          : "Flagged"
-      : "Safe";
-
-  // Overall confidence for visualization
-  const overallConfidence = analysisResult ? analysisResult.confidence || 0 : 0;
+  // Toggle dashboard visibility
+  const toggleDashboard = () => {
+    setShowDashboard((prev) => !prev);
+  };
 
   return (
-    <main className="ui-container" role="main" aria-label="FLAGGED conversation analyzer app">
-      <h1 tabIndex={-1} style={{ textAlign: "center", userSelect: "none", marginBottom: "1.5rem", color: "#ff4d6d" }}>
-        FLAGGED Conversation Red Flag Detector
+    <main className="ui-container" role="main" aria-label="FLAGGED conversation analysis app">
+      <h1 style={{ textAlign: "center", color: "#ff6f61", userSelect: "none" }}>
+        FLAGGED
       </h1>
 
       <button
         type="button"
-        className="peachy-button"
-        onClick={() => setShowDashboard((v) => !v)}
+        onClick={toggleDashboard}
         aria-pressed={showDashboard}
-        aria-label={`${showDashboard ? "Hide" : "Show"} real-time dashboard`}
-        style={{ marginBottom: "1.5rem", display: "block", width: "100%" }}
+        aria-label={showDashboard ? "Hide real-time monitoring dashboard" : "Show real-time monitoring dashboard"}
+        className="peachy-button"
+        style={{ marginBottom: "1rem", width: "100%" }}
       >
-        {showDashboard ? "Hide Real-Time Dashboard" : "Show Real-Time Dashboard"}
+        {showDashboard ? "Hide Real-Time Monitoring Dashboard" : "Show Real-Time Monitoring Dashboard"}
       </button>
 
       {showDashboard ? (
-        <RealTimeDashboard
-          onAnalysis={handleAnalysisUpdate}
-          initialText={currentText}
-          onTextChange={setCurrentText}
-        />
+        <RealTimeDashboard onAnalysisUpdate={handleAnalysisUpdate} />
       ) : (
         <>
-          <ConversationAnalyzerPolish
-            onAnalysis={handleAnalysisUpdate}
-            initialText={currentText}
-            onTextChange={setCurrentText}
-          />
+          <ConversationAnalyzerPolish onAnalysisComplete={handleAnalysisUpdate} />
 
           {analysisResult && (
-            <section aria-label="Analysis results" tabIndex={-1}>
+            <>
               <FlaggedResultVisualization
-                verdict={verdict}
-                flaggedBehaviors={flaggedBadges}
-                overallConfidence={overallConfidence}
+                verdict={analysisResult.verdict.label}
+                flaggedBehaviors={analysisResult.signals.map((type) => ({
+                  type,
+                  label:
+                    type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, " "),
+                  confidence: 0,
+                }))}
+                overallConfidence={analysisResult.confidence}
               />
-              <ShareableResult
-                analysis={analysisResult}
-                flaggedBadges={flaggedBadges}
-                verdict={verdict}
-              />
-            </section>
+
+              <ShareableResult analysisResult={analysisResult} />
+            </>
           )}
         </>
       )}
 
-      <ImmediateAlert
-        flaggedBehaviors={alerts}
-        onDismiss={() => setAlerts([])}
-      />
+      <ImmediateAlert flaggedBehaviors={alertFlags} />
     </main>
   );
 };
