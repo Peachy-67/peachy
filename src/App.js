@@ -1,110 +1,124 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from "react";
 
-import ConversationAnalyzerPolish from './components/ConversationAnalyzerPolish';
-import ImmediateAlert from './components/ImmediateAlert';
-import FlaggedResultVisualization from './components/FlaggedResultVisualization';
-import ShareableResult from './components/ShareableResult';
-import RealTimeDashboard from './components/RealTimeDashboard';
+import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
+import ImmediateAlert from "./components/ImmediateAlert";
+import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
+import ShareableResult from "./components/ShareableResult";
+import RealTimeDashboard from "./components/RealTimeDashboard";
 
-import './styles/UiPolish.css';
-import './styles/UiPolishImprovements.css';
+import "./styles/UiPolish.css";
 
-const HIGH_RISK_FLAGS = ['insult', 'gaslighting', 'threat', 'ultimatum'];
+const highRiskFlags = new Set(["insult", "gaslighting", "threat", "ultimatum"]);
 
 const App = () => {
-  // State for current analyzed result
   const [analysisResult, setAnalysisResult] = useState(null); 
-  // Chat input mode: "paste" or "realtime"
-  const [activeMode, setActiveMode] = useState('paste');
-  // Alert banner visibility
-  const [showAlert, setShowAlert] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [alertFlags, setAlertFlags] = useState([]);
+  const [lastAnalyzedText, setLastAnalyzedText] = useState("");
 
-  // Callback when new analysis result arrives (from ConversationAnalyzer or dashboard)
-  const onNewAnalysis = useCallback((result) => {
-    setAnalysisResult(result);
-
-    // Check for high risk flag
-    if (
-      result?.flaggedBehaviors &&
-      result.flaggedBehaviors.some((f) => HIGH_RISK_FLAGS.includes(f.type.toLowerCase()))
-    ) {
-      const highRiskDetected = result.flaggedBehaviors.filter((f) =>
-        HIGH_RISK_FLAGS.includes(f.type.toLowerCase())
-      );
-      setAlertFlags(highRiskDetected);
-      setShowAlert(true);
-      // Also use native alert for immediate attention
-      if (highRiskDetected.length > 0) {
-        alert(
-          `Warning: High-risk behaviors detected: ${highRiskDetected
-            .map((f) => f.label)
-            .join(', ')}`
-        );
-      }
-    } else {
-      setShowAlert(false);
+  // Effect to detect high-risk flags for ImmediateAlert
+  useEffect(() => {
+    if (!analysisResult || !analysisResult.signals) {
       setAlertFlags([]);
+      return;
     }
-  }, []);
+    const risky = analysisResult.signals.filter((f) => highRiskFlags.has(f));
+    setAlertFlags(risky);
+  }, [analysisResult]);
 
-  // Handler to dismiss alert banner
-  const onDismissAlert = () => {
-    setShowAlert(false);
+  // Handler for when conversation is analyzed via the paste UI
+  const handleAnalysisUpdate = (result, inputText) => {
+    setAnalysisResult(result);
+    setLastAnalyzedText(inputText);
   };
 
-  // Mode toggle for user choice
-  const toggleMode = () => {
-    setActiveMode((prev) => (prev === 'paste' ? 'realtime' : 'paste'));
-    setAnalysisResult(null);
-    setShowAlert(false);
-    setAlertFlags([]);
+  // Handler for analysis update from RealTimeDashboard (live monitoring)
+  const handleDashboardAnalysisUpdate = (result) => {
+    setAnalysisResult(result);
+    // For live dashboard maybe no last text update needed
+    // But we keep it for sharing summary, so omit update here
   };
 
   return (
-    <main className="ui-container" aria-label="FLAGGED application main interface">
-      <header>
-        <h1 style={{ textAlign: 'center', color: '#ff6f61', userSelect: 'none' }}>
-          FLAGGED: Conversation Red Flags Detector
-        </h1>
+    <main className="ui-container" aria-label="Flagged conversation analysis app">
+      <h1 style={{ textAlign: "center", color: "#ff6f61", userSelect: "none" }}>
+        FLAGGED Conversation Analyzer
+      </h1>
+
+      {/* Toggle between Paste Conversation Analyzer and RealTime Dashboard */}
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
         <button
-          onClick={toggleMode}
-          aria-pressed={activeMode === 'realtime'}
+          aria-pressed={!showDashboard}
           className="peachy-button"
-          style={{ marginBottom: '1.5rem', display: 'block', marginLeft: 'auto', marginRight: 'auto', maxWidth: '300px' }}
-          title={`Switch to ${activeMode === 'paste' ? 'Real-Time Dashboard' : 'Paste Analyzer'} mode`}
+          style={{ marginRight: "8px" }}
+          onClick={() => setShowDashboard(false)}
+          type="button"
         >
-          Switch to {activeMode === 'paste' ? 'Real-Time Dashboard' : 'Paste Analyzer'}
+          Paste Analyzer
         </button>
-      </header>
+        <button
+          aria-pressed={showDashboard}
+          className="peachy-button"
+          onClick={() => setShowDashboard(true)}
+          type="button"
+        >
+          Real-Time Dashboard
+        </button>
+      </div>
 
-      {showAlert && alertFlags.length > 0 && (
-        <ImmediateAlert flaggedBehaviors={alertFlags} onDismiss={onDismissAlert} />
-      )}
+      <ImmediateAlert flaggedBehaviors={alertFlags} />
 
-      {activeMode === 'paste' && (
+      {!showDashboard && (
         <>
-          <ConversationAnalyzerPolish onAnalysisComplete={onNewAnalysis} />
+          {/* Paste input analyzer */}
+          <ConversationAnalyzerPolish onResult={handleAnalysisUpdate} />
 
+          {/* Display flagged result with verdict and badges */}
           {analysisResult && (
-            <section
-              aria-live="polite"
-              aria-label="Analysis results and sharing options"
-              style={{ marginTop: '1.5rem', textAlign: 'center' }}
-            >
-              <FlaggedResultVisualization
-                verdict={analysisResult.verdict.label}
-                flaggedBehaviors={analysisResult.flaggedBehaviors}
-                overallConfidence={analysisResult.confidence}
-              />
-              <ShareableResult result={analysisResult} />
-            </section>
+            <FlaggedResultVisualization
+              verdict={analysisResult.verdict.label}
+              flaggedBehaviors={analysisResult.signals.map((signal) => {
+                // Map signals to label and confidence for badges
+                // Use known labels and make confidence from reaction confidence if available
+                // We'll set dummy confidence here because original signals are strings
+                // But we should check if analysisResult has confidence for each signal
+                // We do not have individual confidences in current data, so default 0.75
+                const signalLabelMap = {
+                  insult: "Insult",
+                  manipulation: "Manipulation",
+                  gaslighting: "Gaslighting",
+                  discard: "Discard",
+                  control: "Control",
+                  ultimatum: "Ultimatum",
+                  threat: "Threat",
+                  guilt: "Guilt",
+                  boundary_push: "Boundary Push",
+                  inconsistency: "Inconsistency",
+                };
+                return {
+                  type: signal,
+                  label: signalLabelMap[signal] || signal,
+                  confidence: 0.75,
+                };
+              })}
+              overallConfidence={analysisResult.confidence || 0}
+            />
+          )}
+
+          {/* Shareable result component with sharing/copy features */}
+          {analysisResult && (
+            <ShareableResult
+              verdict={analysisResult.verdict.label}
+              flaggedBehaviors={analysisResult.signals}
+              confidence={analysisResult.confidence}
+              conversationExcerpt={lastAnalyzedText}
+            />
           )}
         </>
       )}
 
-      {activeMode === 'realtime' && (
-        <RealTimeDashboard onAnalysis={onNewAnalysis} />
+      {showDashboard && (
+        <RealTimeDashboard onAnalysisUpdate={handleDashboardAnalysisUpdate} />
       )}
     </main>
   );
