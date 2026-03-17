@@ -163,11 +163,13 @@
     "No description",
     "Created src/App.js integrating best existing ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard components into a cohesive main app interface managing analysis state, alerts on high-risk flags, results visualization with confidence and sharing, and real-time monitoring toggle as per product roadmap, without duplicating UI polish components.",
     "Created src/App.js integrating existing best components ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a cohesive main app managing analysis state, alerts on high-risk flags, polished results with sharing options, and real-time dashboard toggle per product roadmap with no UI polish duplication.",
-    "Created src/App.js integrating ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a unified main app interface managing analysis state, alerts, results display, sharing, and real-time dashboard toggle. Uses existing polish CSS and accessibility, fulfilling product roadmap without UI duplication."
+    "Created src/App.js integrating ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a unified main app interface managing analysis state, alerts, results display, sharing, and real-time dashboard toggle. Uses existing polish CSS and accessibility, fulfilling product roadmap without UI duplication.",
+    "Created src/App.js integrating best existing components ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a cohesive main app interface managing analysis state, immediate alerts on high-risk flags, polished flagged result visualization with confidence and share options, and supporting toggling a real-time dashboard per product roadmap without duplicating UI polish components."
   ],
   "failed": [
     "Invalid response",
     "Invalid response",
+    "Build check: No build script found",
     "Build check: No build script found",
     "Build check: No build script found",
     "Build check: No build script found",
