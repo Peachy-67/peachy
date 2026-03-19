@@ -6,7 +6,7 @@ import FlaggedResultVisualization from "./components/FlaggedResultVisualization"
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
 
-import "./styles/UiPolish.css";
+import "./styles/uiPolish.css";
 import "./styles/FlaggedResultVisualization.css";
 import "./styles/ImmediateAlert.css";
 import "./styles/ShareableResult.css";
@@ -14,108 +14,90 @@ import "./styles/RealTimeDashboard.css";
 
 const HIGH_RISK_FLAGS = new Set([
   "insult",
-  "threat",
-  "discard",
   "gaslighting",
+  "discard",
+  "threat",
   "ultimatum",
   "control",
-  "boundary_push",
+  "guilt",
 ]);
-
-const verdictLabelMap = {
-  green: "Safe",
-  yellow: "Caution",
-  red: "Flagged",
-};
 
 function App() {
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [highRiskFlagsDetected, setHighRiskFlagsDetected] = useState([]);
-  const [dashboardEnabled, setDashboardEnabled] = useState(false);
+  const [alertFlags, setAlertFlags] = useState([]);
+  const [showDashboard, setShowDashboard] = useState(false);
 
-  // Update high risk flags for alert system
+  // Whenever analysisResult updates, update alertFlags if high-risk flags present
   useEffect(() => {
-    if (!analysisResult || !analysisResult.signals) {
-      setHighRiskFlagsDetected([]);
-      return;
+    if (analysisResult?.signals && Array.isArray(analysisResult.signals)) {
+      const detectedHighRisk = analysisResult.signals.filter((sig) =>
+        HIGH_RISK_FLAGS.has(sig)
+      );
+      setAlertFlags(detectedHighRisk);
+    } else {
+      setAlertFlags([]);
     }
-
-    const foundHighRisk = analysisResult.signals.filter((flag) =>
-      HIGH_RISK_FLAGS.has(flag)
-    );
-
-    setHighRiskFlagsDetected(foundHighRisk);
   }, [analysisResult]);
 
-  // Handler to receive conversation analysis updates from ConversationAnalyzerPolish or RealTimeDashboard
+  // Handler for when ConversationAnalyzerPolish completes analysis
   const handleAnalysisUpdate = (result) => {
     setAnalysisResult(result);
   };
 
-  // Prepare flagged behaviors array for visualization and sharing
-  const flaggedBehaviors = (analysisResult?.signals || []).map((signal) => {
-    // Map signal to label (some signals are direct labels, others can be more descriptive)
-    const label = signal.charAt(0).toUpperCase() + signal.slice(1).replace(/_/g, " ");
-    // Use a default confidence if we don't have one, fallback 0.8
-    const confidence = analysisResult?.confidence ?? 0.8;
-    return { type: signal, label, confidence };
-  });
-
-  // Map verdict band to display label
-  const verdict = analysisResult
-    ? verdictLabelMap[analysisResult.verdict.band] || "Safe"
-    : "Safe";
+  // Dashboard toggle handler
+  const toggleDashboard = () => {
+    setShowDashboard((prev) => !prev);
+  };
 
   return (
-    <main className="ui-container" role="main" aria-label="FLAGGED conversation analysis app">
-      <h1 style={{ textAlign: "center", color: "#cc2f2f", userSelect: "none" }}>
-        FLAGGED.RUN
+    <main className="ui-container" role="main" aria-label="FLAGGED conversation analyzer app">
+      <h1 style={{ textAlign: "center", userSelect: "none", color: "#ff6f61" }}>
+        FLAGGED
       </h1>
 
-      {/* Toggle dashboard view */}
       <button
         type="button"
+        aria-pressed={showDashboard}
+        onClick={toggleDashboard}
         className="peachy-button"
-        onClick={() => setDashboardEnabled((enabled) => !enabled)}
-        aria-pressed={dashboardEnabled}
-        aria-label={
-          dashboardEnabled
-            ? "Switch to paste analyzer"
-            : "Switch to real-time dashboard"
-        }
-        style={{ marginBottom: "1rem" }}
+        style={{ marginBottom: "1.5rem", display: "block", marginLeft: "auto", marginRight: "auto" }}
       >
-        {dashboardEnabled ? "Use Paste Analyzer" : "Use Real-time Dashboard"}
+        {showDashboard ? "Hide Real-time Dashboard" : "Show Real-time Dashboard"}
       </button>
 
-      {!dashboardEnabled && (
-        <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
-      )}
-
-      {dashboardEnabled && (
+      {showDashboard ? (
         <RealTimeDashboard onAnalysis={handleAnalysisUpdate} />
-      )}
+      ) : (
+        <>
+          <ConversationAnalyzerPolish onAnalyze={handleAnalysisUpdate} />
 
-      {/* Show immediate alerts if high risk flags detected */}
-      <ImmediateAlert flaggedBehaviors={highRiskFlagsDetected} />
+          {alertFlags.length > 0 && (
+            <ImmediateAlert flaggedBehaviors={alertFlags} />
+          )}
 
-      {/* Show flagged result visualization only if we have analysis */}
-      {analysisResult && (
-        <FlaggedResultVisualization
-          verdict={verdict}
-          flaggedBehaviors={flaggedBehaviors}
-          overallConfidence={analysisResult.confidence}
-        />
-      )}
-
-      {/* Shareable result with sharing buttons */}
-      {analysisResult && (
-        <ShareableResult
-          verdict={verdict}
-          flaggedBehaviors={flaggedBehaviors}
-          overallConfidence={analysisResult.confidence}
-          conversation={analysisResult.meta?.excerpt || ""}
-        />
+          {analysisResult && (
+            <>
+              <FlaggedResultVisualization
+                verdict={analysisResult.verdict?.label || "Safe"}
+                flaggedBehaviors={analysisResult.signals.map((flag) => ({
+                  type: flag,
+                  label: flag.charAt(0).toUpperCase() + flag.slice(1),
+                  confidence: analysisResult.confidence || 0,
+                }))}
+                overallConfidence={analysisResult.confidence || 0}
+              />
+              <ShareableResult
+                verdict={analysisResult.verdict?.label || "Safe"}
+                flaggedBehaviors={analysisResult.signals.map((flag) => ({
+                  type: flag,
+                  label: flag.charAt(0).toUpperCase() + flag.slice(1),
+                  confidence: analysisResult.confidence || 0,
+                }))}
+                overallConfidence={analysisResult.confidence || 0}
+              />
+            </>
+          )}
+        </>
       )}
     </main>
   );
