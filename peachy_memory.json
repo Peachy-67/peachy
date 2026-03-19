@@ -176,11 +176,13 @@
     "Created src/App.js integrating ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard components into a cohesive main app interface managing state, alerts, result display, sharing, and real-time monitoring toggle per product roadmap without duplicating UI polish components.",
     "Created src/App.js that integrates existing ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard components into a cohesive main app interface managing analysis state, triggering alerts on high-risk flags, displaying polished results with sharing options, and supporting toggling a real-time dashboard. The app uses existing polish CSS, accessibility attributes, and connects components per product roadmap without duplicating UI polish components.",
     "Created src/App.js connecting best existing components ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into cohesive main product interface. Manages analysis state, error handling, immediate alerts for high-risk flags, result visualization with sharing, and toggling between paste analyzer and real-time dashboard per product roadmap without duplicating UI polish components.",
-    "Created src/App.js integrating existing ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a cohesive main app interface managing analysis, immediate alerts, results visual display with sharing options, and toggle for real-time monitoring per product roadmap without duplicating UI polish components."
+    "Created src/App.js integrating existing ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard into a cohesive main app interface managing analysis, immediate alerts, results visual display with sharing options, and toggle for real-time monitoring per product roadmap without duplicating UI polish components.",
+    "Created src/App.js connecting best existing ConversationAnalyzerPolish, ImmediateAlert, FlaggedResultVisualization, ShareableResult, and RealTimeDashboard components into a cohesive main app interface managing analysis state, alerts on high-risk flags, results display with sharing options, and real-time dashboard toggle per product roadmap without duplicating UI polish components."
   ],
   "failed": [
     "Invalid response",
     "Invalid response",
+    "Build check: No build script found",
     "Build check: No build script found",
     "Build check: No build script found",
     "Build check: No build script found",
