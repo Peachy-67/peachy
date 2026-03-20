@@ -8,114 +8,82 @@ import RealTimeDashboard from "./components/RealTimeDashboard";
 
 import "./styles/UiPolish.css";
 
-/**
- * Main app component integrating all core features:
- * - Conversation input/analyzer with polished UI
- * - Immediate alert system on high-risk flags
- * - Flagged result visualization with confidence and badges
- * - Result sharing UI
- * - Real-time dashboard toggle for live monitoring
- */
-export default function App() {
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [alertFlags, setAlertFlags] = useState([]);
+const highRiskFlags = ["insult", "threat", "gaslighting", "ultimatum"];
+
+// App main component integrates conversation analyzer, alert, result visualization, sharing, and real-time dashboard toggle.
+const App = () => {
+  // store the latest analysis result from conversation analyzer or real-time dashboard
+  const [analysis, setAnalysis] = useState(null);
+
+  // show if a high risk alert banner should be visible
+  const [alertVisible, setAlertVisible] = useState(false);
+
+  // toggle for showing real-time live dashboard or paste analyzer UI
   const [showDashboard, setShowDashboard] = useState(false);
-  const [error, setError] = useState(null);
 
-  /**
-   * Handles new analysis updates.
-   * Trigger alerts if high-risk flags present.
-   */
-  function handleAnalysisUpdate(result) {
-    setAnalysisResult(result);
-    setError(null);
+  // Handler to receive new analysis results from child components
+  function handleAnalysisUpdate(newAnalysis) {
+    setAnalysis(newAnalysis);
 
-    if (!result || !Array.isArray(result.signals)) {
-      setAlertFlags([]);
-      return;
-    }
-
-    // Define high-risk flags that trigger immediate alerts
-    const highRiskFlags = ["insult", "gaslighting", "threat", "discard", "manipulation", "control"];
-    const triggeredAlerts = result.signals.filter((flag) => highRiskFlags.includes(flag.toLowerCase()));
-    setAlertFlags(triggeredAlerts);
+    // check for any high-risk flags detected
+    const flaggedTypes = (newAnalysis?.signals || []).map((s) => s.toLowerCase());
+    const hasHighRisk = highRiskFlags.some((flag) => flaggedTypes.includes(flag));
+    setAlertVisible(hasHighRisk);
   }
 
-  /**
-   * Handle errors from analyzer component.
-   */
-  function handleError(errMsg) {
-    setError(errMsg);
-    setAnalysisResult(null);
-    setAlertFlags([]);
-  }
-
-  /**
-   * Toggle dashboard mode on/off
-   */
-  function toggleDashboard() {
-    setShowDashboard((prev) => !prev);
-    // Clear analysis and alert on toggle for fresh start
-    setAnalysisResult(null);
-    setAlertFlags([]);
-    setError(null);
+  // Dismiss alert banner handler
+  function dismissAlert() {
+    setAlertVisible(false);
   }
 
   return (
-    <main className="ui-container" role="main" aria-label="FLAGGED Conversation Analyzer Application">
-      <header>
-        <h1>FLAGGED Conversation Analyzer</h1>
+    <main className="ui-container" role="main" aria-label="FLAGGED conversation red flag detection app">
+      <h1 style={{ textAlign: "center", userSelect: "none", marginBottom: "1rem", color: "#ff6f3c" }}>FLAGGED</h1>
+
+      <section aria-label="Toggle conversation monitoring mode" style={{ textAlign: "center", marginBottom: "1rem" }}>
         <button
           type="button"
-          className="peachy-button"
+          onClick={() => setShowDashboard((prev) => !prev)}
           aria-pressed={showDashboard}
-          onClick={toggleDashboard}
-          style={{ marginBottom: "1.5rem" }}
+          className="peachy-button"
+          title={showDashboard ? "Switch to paste conversation analyzer" : "Switch to real-time monitoring dashboard"}
         >
-          {showDashboard ? "Back to Paste Analyzer" : "Open Real-Time Dashboard"}
+          {showDashboard ? "Use Paste Conversation Analyzer" : "Use Real-Time Monitoring Dashboard"}
         </button>
-      </header>
+      </section>
 
-      {showDashboard ? (
-        <RealTimeDashboard
-          onAnalysis={handleAnalysisUpdate}
-          onError={handleError}
-          initialData={analysisResult}
-        />
-      ) : (
+      {alertVisible && (
+        <ImmediateAlert flaggedBehaviors={(analysis?.signals || []).filter((s) => highRiskFlags.includes(s.toLowerCase()))} onDismiss={dismissAlert} />
+      )}
+
+      {!showDashboard && (
         <>
-          <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} onError={handleError} />
+          <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
 
-          {error && (
-            <div className="alert-banner" role="alert" aria-live="assertive">
-              {error}
-            </div>
-          )}
-
-          {analysisResult && !error && (
-            <>
+          {analysis && (
+            <section aria-label="Flagged conversation result visualization and sharing">
               <FlaggedResultVisualization
-                verdict={analysisResult.verdict?.label || "Safe"}
-                flaggedBehaviors={analysisResult.signals.map((type) => {
-                  // Map flag type to a descriptive label and confidence
-                  // We assume signals are lowercase strings; confidence fallback 0.75
-                  let label = type.charAt(0).toUpperCase() + type.slice(1);
-                  let confidence = 0.75;
-                  // Attempt to get confidence from signals with details if available
-                  if (Array.isArray(analysisResult.why) && analysisResult.why.length > 0) {
-                    // Nothing to map directly here, so use fallback
-                  }
-                  return { type, label, confidence };
-                })}
-                overallConfidence={analysisResult.confidence || 0}
+                verdict={analysis.verdict?.label || "Safe"}
+                flaggedBehaviors={(analysis.signals || []).map((type) => ({
+                  type,
+                  label: type.charAt(0).toUpperCase() + type.slice(1),
+                  confidence: 1, // No separate per-flag confidence from main analysis, assume 1 for visualization
+                }))}
+                overallConfidence={typeof analysis.confidence === "number" ? analysis.confidence : 0}
               />
-              <ShareableResult result={analysisResult} />
-            </>
+              <ShareableResult analysis={analysis} />
+            </section>
           )}
         </>
       )}
 
-      <ImmediateAlert flaggedBehaviors={alertFlags} />
+      {showDashboard && <RealTimeDashboard onAnalysis={handleAnalysisUpdate} />}
+
+      <footer style={{ marginTop: "3rem", textAlign: "center", fontSize: "0.85rem", color: "#777" }}>
+        &copy; 2024 FLAGGED by Peachy
+      </footer>
     </main>
   );
-}
+};
+
+export default App;
