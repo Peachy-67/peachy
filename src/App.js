@@ -1,155 +1,115 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
-import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
-import ImmediateAlert from "./components/ImmediateAlert";
-import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
-import ShareableResult from "./components/ShareableResult";
-import RealTimeDashboard from "./components/RealTimeDashboard";
+import ConversationAnalyzerPolish from './components/ConversationAnalyzerPolish';
+import ImmediateAlert from './components/ImmediateAlert';
+import FlaggedResultVisualization from './components/FlaggedResultVisualization';
+import ShareableResult from './components/ShareableResult';
+import RealTimeDashboard from './components/RealTimeDashboard';
 
-import "./styles/UiPolish.css";
-import "./styles/FlaggedResultVisualization.css";
-import "./styles/ImmediateAlert.css";
+import './styles/UiPolish.css';
 
-/**
- * Main application component integrating conversation analyzer,
- * immediate alert notifications, flagged result visualization with share options,
- * and real-time dashboard toggle for live monitoring.
- */
+const HIGH_RISK_FLAGS = ['insult', 'gaslighting', 'threat', 'ultimatum', 'discard'];
+
+// App root component integrating conversation analysis, alerting,
+// result visualization, sharing, and real-time dashboard toggle.
 const App = () => {
-  // Analysis result state to share between components
   const [analysis, setAnalysis] = useState(null);
-  // Tracks if a high-risk flag alert was triggered and dismissed
-  const [alertDismissed, setAlertDismissed] = useState(false);
-  // Toggle between Paste Analyzer mode and Real-Time Dashboard mode
+  const [alertFlags, setAlertFlags] = useState([]);
   const [showDashboard, setShowDashboard] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Derived state for flagged behaviors from analysis signals
-  // We map signals to objects with { type, label, confidence } for visualization
-  const flaggedBehaviors = React.useMemo(() => {
-    if (!analysis || !Array.isArray(analysis.signals)) return [];
-    // Map known signal types to labels and default confidences from analysis.confidence
-    // Adapt labels to match existing badge labels
-    const signalLabelMap = {
-      insult: "Insult",
-      manipulation: "Manipulation",
-      gaslighting: "Gaslighting",
-      discard: "Discard",
-      control: "Control",
-      ultimatum: "Ultimatum",
-      threat: "Threat",
-      guilt: "Guilt",
-      boundary_push: "Boundary Push",
-      inconsistency: "Inconsistency",
-    };
-
-    // We use a default confidence from analysis.confidence or 0.75 for each
-    const defaultConfidence = typeof analysis.confidence === "number" ? analysis.confidence : 0.75;
-
-    // Filter only signals that map to visual badges (important behavior flags)
-    // We pick keys that exist in signalLabelMap for visualization
-    return analysis.signals
-      .filter((stype) => signalLabelMap[stype])
-      .map((stype) => ({
-        type: stype,
-        label: signalLabelMap[stype],
-        confidence: defaultConfidence,
-      }));
-  }, [analysis]);
-
-  // Compute verdict label from analysis.verdict
-  // Map backend bands (green,yellow,red) to VerdictDisplay labels (Safe, Caution, Flagged)
-  const verdictLabel = React.useMemo(() => {
-    if (!analysis || !analysis.verdict || !analysis.verdict.band) return "Safe";
-    const band = analysis.verdict.band.toLowerCase();
-    switch (band) {
-      case "green":
-        return "Safe";
-      case "yellow":
-        return "Caution";
-      case "red":
-        return "Flagged";
-      default:
-        return "Safe";
+  // Update alert flags whenever analysis changes
+  useEffect(() => {
+    if (analysis?.flags && Array.isArray(analysis.flags)) {
+      // Determine if any high risk flags present
+      const highRiskDetected = analysis.flags.filter((flag) =>
+        HIGH_RISK_FLAGS.includes(flag.type.toLowerCase())
+      );
+      setAlertFlags(highRiskDetected);
+    } else {
+      setAlertFlags([]);
     }
   }, [analysis]);
 
-  // Overall confidence from analysis.confidence scaled 0-1, fallback 0
-  const overallConfidence = analysis && typeof analysis.confidence === "number" ? analysis.confidence : 0;
-
-  // Detect if a high-risk flag (red band) is present in flagged behaviors
-  const hasHighRiskFlags = React.useMemo(() => {
-    if (!analysis || !analysis.verdict) return false;
-    return analysis.verdict.band === "red";
-  }, [analysis]);
-
-  // Effect to automatically reset alert dismissal once analysis changes
-  useEffect(() => {
-    setAlertDismissed(false);
-  }, [analysis]);
-
-  // Handler for conversation analysis result updates
-  const handleAnalysisUpdate = (result) => {
+  // Handler to receive analysis results from ConversationAnalyzerPolish and RealTimeDashboard
+  const onAnalysis = (result) => {
+    setError(null);
+    if (!result) {
+      setAnalysis(null);
+      return;
+    }
+    // Result shape expected:
+    // {
+    //   verdict: 'Safe' | 'Caution' | 'Flagged',
+    //   flags: [{ type, label, confidence }],
+    //   confidence: number
+    // }
     setAnalysis(result);
   };
 
-  // Handler for dismissing alert banner
-  const dismissAlert = () => {
-    setAlertDismissed(true);
-  };
-
-  // Handler toggle between modes
-  const toggleDashboard = () => {
-    setShowDashboard((v) => !v);
-    // Clear previous results and alert dismissal on mode change
+  // Handler to capture error from analyzer components
+  const onError = (err) => {
     setAnalysis(null);
-    setAlertDismissed(false);
+    setError(err);
   };
 
   return (
-    <main
-      className="ui-container"
-      aria-label="FLAGGED conversation analyzer application"
-    >
-      <header style={{ textAlign: "center", marginBottom: "12px" }}>
-        <h1 style={{ color: "#ff6f61", userSelect: "none" }}>FLAGGED</h1>
+    <main className="ui-container" aria-label="FLAGGED conversation red flag detection app">
+      <h1 style={{ textAlign: 'center', color: '#ff6f61', userSelect: 'none' }}>
+        FLAGGED Conversation Analyzer
+      </h1>
+
+      <section aria-label="Conversation analysis input area" style={{ marginBottom: '1.25rem' }}>
+        {!showDashboard ? (
+          <ConversationAnalyzerPolish onAnalysis={onAnalysis} onError={onError} />
+        ) : (
+          <RealTimeDashboard onAnalysis={onAnalysis} onError={onError} />
+        )}
+
         <button
           type="button"
-          onClick={toggleDashboard}
-          className="peachy-button"
+          onClick={() => setShowDashboard((v) => !v)}
           aria-pressed={showDashboard}
-          aria-label={`Switch to ${showDashboard ? "Paste Analyzer" : "Real-Time Dashboard"} mode`}
-          style={{ marginBottom: "1rem" }}
+          style={{
+            marginTop: '1rem',
+            width: '100%',
+            backgroundColor: '#ff6f61',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 6,
+            padding: '0.75rem 0',
+            fontWeight: '600',
+            fontSize: '1.1rem',
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(255,111,97,0.6)',
+            transition: 'background-color 0.25s ease, box-shadow 0.25s ease',
+          }}
         >
-          {showDashboard ? "Use Paste Analyzer" : "Use Real-Time Dashboard"}
+          {showDashboard ? 'Use Paste Analyzer Instead' : 'Switch to Real-Time Dashboard'}
         </button>
-      </header>
+      </section>
 
-      {showDashboard ? (
-        <RealTimeDashboard
-          onAnalysis={handleAnalysisUpdate}
-        />
-      ) : (
-        <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
+      {error && (
+        <div
+          className="alert-banner"
+          role="alert"
+          aria-live="assertive"
+          style={{ marginBottom: '1.5rem' }}
+        >
+          {error.message || error.toString()}
+        </div>
       )}
 
-      {/* Show alert only if high risk and not dismissed */}
-      {hasHighRiskFlags && !alertDismissed && (
-        <ImmediateAlert flaggedBehaviors={flaggedBehaviors} onDismiss={dismissAlert} />
-      )}
+      {alertFlags.length > 0 && <ImmediateAlert flaggedBehaviors={alertFlags} />}
 
-      {/* Render flagged result and share features if analysis exists */}
-      {analysis && (
-        <section aria-label="Analyzed conversation results" role="region" tabIndex={-1} style={{ marginTop: "1.2rem" }}>
+      {analysis && !showDashboard && (
+        <section aria-label="Flagged conversation result visualization and sharing" style={{ marginTop: '1rem' }}>
           <FlaggedResultVisualization
-            verdict={verdictLabel}
-            flaggedBehaviors={flaggedBehaviors}
-            overallConfidence={overallConfidence}
+            verdict={analysis.verdict}
+            flaggedBehaviors={analysis.flags}
+            overallConfidence={analysis.confidence}
           />
-          <ShareableResult
-            analysis={analysis}
-            verdictLabel={verdictLabel}
-            flaggedBehaviors={flaggedBehaviors}
-          />
+          <ShareableResult analysis={analysis} />
         </section>
       )}
     </main>
