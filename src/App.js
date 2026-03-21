@@ -8,121 +8,136 @@ import RealTimeDashboard from "./components/RealTimeDashboard";
 
 import "./styles/UiPolish.css";
 
-const HIGH_RISK_FLAGS = ["insult", "gaslighting", "threat", "discard", "control"];
-
-const initialResultState = {
-  verdict: "Safe",
-  flaggedBehaviors: [],
-  overallConfidence: 0,
-  rawData: null,
-};
+const HIGH_RISK_FLAGS = new Set([
+  "insult",
+  "gaslighting",
+  "threat",
+  "ultimatum",
+]);
 
 const App = () => {
-  const [analysisResult, setAnalysisResult] = useState(initialResultState);
-  const [showImmediateAlert, setShowImmediateAlert] = useState(false);
-  const [dashboardMode, setDashboardMode] = useState(false);
+  // State to hold the latest analysis from conversation analyzer (paste input)
+  const [analysis, setAnalysis] = useState(null);
+  // Track errors from analysis
+  const [error, setError] = useState(null);
+  // Flag to toggle real-time dashboard mode
+  const [liveDashboard, setLiveDashboard] = useState(false);
 
-  // When flagged behaviors update, check for high-risk flags and trigger alert
-  useEffect(() => {
-    if (!analysisResult.flaggedBehaviors || !analysisResult.flaggedBehaviors.length) {
-      setShowImmediateAlert(false);
-      return;
-    }
-    const hasHighRisk = analysisResult.flaggedBehaviors.some((flag) =>
-      HIGH_RISK_FLAGS.includes(flag.type.toLowerCase())
-    );
-    setShowImmediateAlert(hasHighRisk);
-  }, [analysisResult.flaggedBehaviors]);
+  // Determine if any high-risk flags exist in current analysis
+  const hasHighRiskFlags =
+    analysis?.signals?.some((flag) => HIGH_RISK_FLAGS.has(flag)) || false;
 
-  // Handler for new analysis results from ConversationAnalyzerPolish or RealTimeDashboard
+  // Handler on analysis update from ConversationAnalyzerPolish or RealTimeDashboard
   const handleAnalysisUpdate = (result) => {
-    // result shape expected:
-    // { verdict: "Safe"|"Caution"|"Flagged", flaggedBehaviors: [{type,label,confidence}], overallConfidence: number, rawData: ... }
-    if (
-      result &&
-      typeof result === "object" &&
-      result.verdict &&
-      Array.isArray(result.flaggedBehaviors)
-    ) {
-      setAnalysisResult(result);
+    if (!result) {
+      setAnalysis(null);
+      setError(null);
+    } else if (result.error) {
+      setAnalysis(null);
+      setError(result.message || "Analysis error");
     } else {
-      setAnalysisResult(initialResultState);
+      // Clear error on successful result
+      setError(null);
+      setAnalysis(result);
     }
   };
 
-  // ImmediateAlert dismissal handler
-  const onDismissAlert = () => {
-    setShowImmediateAlert(false);
-  };
-
-  // Toggle between paste analyzer mode and real-time dashboard mode
-  const toggleDashboardMode = () => {
-    setDashboardMode((prev) => !prev);
-    // Reset results and alert on mode switch for clarity
-    setAnalysisResult(initialResultState);
-    setShowImmediateAlert(false);
-  };
+  // When toggling to dashboard, clear analysis and errors to avoid confusion
+  useEffect(() => {
+    if (liveDashboard) {
+      setAnalysis(null);
+      setError(null);
+    }
+  }, [liveDashboard]);
 
   return (
-    <main className="ui-container" aria-label="Flagged conversation analysis application">
-      <header>
-        <h1 style={{ userSelect: "none", textAlign: "center", color: "#ff6f61" }}>
-          FLAGGED
-        </h1>
+    <main className="ui-container" aria-label="FLAGGED conversation analysis app">
+      <h1 tabIndex={-1} style={{ textAlign: "center", color: "#cc2f2f" }}>
+        FLAGGED: Conversation Red Flag Detector
+      </h1>
+
+      <div
+        style={{
+          marginTop: "1rem",
+          marginBottom: "1.5rem",
+          textAlign: "center",
+        }}
+      >
         <button
           type="button"
-          onClick={toggleDashboardMode}
-          aria-pressed={dashboardMode}
-          style={{
-            display: "block",
-            margin: "0.5rem auto 1rem auto",
-            padding: "0.5rem 1rem",
-            backgroundColor: "#ff6f61",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
+          className="peachy-button"
+          onClick={() => setLiveDashboard(!liveDashboard)}
+          aria-pressed={liveDashboard}
+          aria-label={
+            liveDashboard
+              ? "Switch to conversation paste analyzer"
+              : "Switch to real-time dashboard monitoring"
+          }
         >
-          {dashboardMode ? "Switch to Paste Analyzer" : "Switch to Real-Time Dashboard"}
+          {liveDashboard ? "Paste Conversation Analyzer" : "Real-Time Dashboard"}
         </button>
-      </header>
+      </div>
 
-      {showImmediateAlert && (
-        <ImmediateAlert
-          flaggedBehaviors={analysisResult.flaggedBehaviors}
-          onDismiss={onDismissAlert}
-        />
-      )}
-
-      {!dashboardMode && (
+      {liveDashboard ? (
         <>
-          <ConversationAnalyzerPolish onResult={handleAnalysisUpdate} />
+          <RealTimeDashboard onAnalysisUpdate={handleAnalysisUpdate} />
+          <ImmediateAlert flaggedBehaviors={analysis?.signals || []} />
+        </>
+      ) : (
+        <>
+          <ConversationAnalyzerPolish onAnalysisUpdate={handleAnalysisUpdate} />
+          <ImmediateAlert flaggedBehaviors={analysis?.signals || []} />
 
-          {/* Show flagged results visualization if any result */}
-          {(analysisResult.flaggedBehaviors.length > 0 || analysisResult.verdict !== "Safe") && (
-            <section aria-label="Analysis results" style={{ textAlign: "center" }}>
+          {/* Error message display */}
+          {error && (
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="alert-banner"
+              style={{ marginTop: "1rem" }}
+            >
+              {error}
+            </div>
+          )}
+
+          {/* Show results only if no error and have analysis */}
+          {!error && analysis && (
+            <>
               <FlaggedResultVisualization
-                verdict={analysisResult.verdict}
-                flaggedBehaviors={analysisResult.flaggedBehaviors}
-                overallConfidence={analysisResult.overallConfidence}
+                verdict={
+                  analysis.verdict?.label === "Safe"
+                    ? "Safe"
+                    : analysis.verdict?.label === "Caution"
+                    ? "Caution"
+                    : "Flagged"
+                }
+                flaggedBehaviors={analysis.signals.map((type) => {
+                  // Map some flag type to more readable label (fallback to type)
+                  const labelMap = {
+                    insult: "Insult",
+                    manipulation: "Manipulation",
+                    gaslighting: "Gaslighting",
+                    discard: "Discard",
+                    control: "Control",
+                    ultimatum: "Ultimatum",
+                    threat: "Threat",
+                    guilt: "Guilt",
+                    boundary_push: "Boundary Push",
+                    inconsistency: "Inconsistency",
+                  };
+                  // Confidence not separately provided here, use confidence from overall
+                  return {
+                    type,
+                    label: labelMap[type.toLowerCase()] || type,
+                    confidence: analysis.confidence || 0,
+                  };
+                })}
+                overallConfidence={analysis.confidence || 0}
               />
-              <ShareableResult
-                verdict={analysisResult.verdict}
-                flaggedBehaviors={analysisResult.flaggedBehaviors}
-                overallConfidence={analysisResult.overallConfidence}
-              />
-            </section>
+              <ShareableResult analysis={analysis} />
+            </>
           )}
         </>
-      )}
-
-      {dashboardMode && (
-        <RealTimeDashboard
-          onAnalysisUpdate={handleAnalysisUpdate}
-          initialResult={analysisResult}
-        />
       )}
     </main>
   );
