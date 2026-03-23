@@ -7,90 +7,97 @@ import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
 
 import "./styles/UiPolish.css";
-import "./styles/UiPolishImprovements.css";
 
-const HIGH_RISK_FLAGS = new Set([
-  "insult",
-  "manipulation",
-  "gaslighting",
-  "threat",
-  "ultimatum",
-]);
+const HIGH_RISK_FLAGS = ["insult", "gaslighting", "threat", "ultimatum", "discard"];
 
 const App = () => {
-  // Managing overall current analysis result state
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [alertFlags, setAlertFlags] = useState([]);
-  const [showDashboard, setShowDashboard] = useState(false);
+  const [immediateAlerts, setImmediateAlerts] = useState([]);
+  const [dashboardActive, setDashboardActive] = useState(false);
 
-  // Handler for updates from ConversationAnalyzerPolish or RealTimeDashboard
-  const onAnalysisUpdate = (newResult) => {
-    setAnalysisResult(newResult);
-
-    if (newResult?.flaggedBehaviors?.length > 0) {
-      const highRiskDetected = newResult.flaggedBehaviors.some((flag) =>
-        HIGH_RISK_FLAGS.has(flag.type.toLowerCase())
-      );
-      if (highRiskDetected) {
-        // Collect unique high-risk flags from newResult for alert
-        const highRiskFlags = newResult.flaggedBehaviors.filter((flag) =>
-          HIGH_RISK_FLAGS.has(flag.type.toLowerCase())
-        );
-        setAlertFlags(highRiskFlags);
-      } else {
-        setAlertFlags([]);
-      }
-    } else {
-      setAlertFlags([]);
+  // Trigger immediate alert for high-risk flags in the latest result
+  useEffect(() => {
+    if (!analysisResult) {
+      setImmediateAlerts([]);
+      return;
     }
+
+    const highRiskDetected = analysisResult.signals.filter((signal) =>
+      HIGH_RISK_FLAGS.includes(signal)
+    );
+    setImmediateAlerts(highRiskDetected);
+
+    // Also trigger native alert for immediate notification
+    if (highRiskDetected.length > 0) {
+      const alertMessage = `⚠️ High-risk flags detected: ${highRiskDetected.join(", ")}`;
+      // Use setTimeout to avoid blocking React rendering
+      setTimeout(() => {
+        alert(alertMessage);
+      }, 100);
+    }
+  }, [analysisResult]);
+
+  const handleAnalyze = (result) => {
+    setAnalysisResult(result);
   };
 
-  // Clear alert flags on dismiss
-  const dismissAlert = () => setAlertFlags([]);
-
-  // Toggle between paste analyzer and real-time dashboard
-  const toggleDashboard = () => setShowDashboard((prev) => !prev);
+  const toggleDashboard = () => {
+    setDashboardActive((prev) => !prev);
+  };
 
   return (
-    <main className="ui-container" role="main" aria-label="FLAGGED Conversation Analyzer">
-      <header style={{ textAlign: "center", marginBottom: "1.5rem", userSelect: "none" }}>
-        <h1 style={{ color: "#ff6f61", fontWeight: 900, fontSize: "2rem" }}>FLAGGED</h1>
-        <p style={{ fontStyle: "italic", color: "#666" }}>
-          Detect red flags in conversations to identify manipulation, gaslighting, and harmful behavior.
-        </p>
-      </header>
+    <main className="ui-container" role="main" aria-label="Flagged conversation analyzer app">
+      <h1 style={{ textAlign: "center", color: "#ff6f61", userSelect: "none" }}>
+        FLAGGED Conversation Analyzer
+      </h1>
 
       <button
         type="button"
         onClick={toggleDashboard}
-        aria-pressed={showDashboard}
-        className="peachy-button"
-        style={{ marginBottom: "1rem", display: "block", marginLeft: "auto", marginRight: "auto" }}
+        aria-pressed={dashboardActive}
+        aria-label={dashboardActive ? "Switch to Paste Conversation Analyzer" : "Switch to Real-Time Dashboard"}
+        style={{
+          marginBottom: "1rem",
+          backgroundColor: dashboardActive ? "#ff4d6d" : "#ff6f61",
+          color: "white",
+          padding: "0.5rem 1rem",
+          borderRadius: "8px",
+          border: "none",
+          fontWeight: "700",
+          cursor: "pointer",
+          transition: "background-color 0.3s ease",
+          userSelect: "none",
+          display: "block",
+          marginLeft: "auto",
+          marginRight: "auto",
+          maxWidth: "300px",
+        }}
       >
-        {showDashboard ? "Use Paste Analyzer" : "Real-Time Monitoring Dashboard"}
+        {dashboardActive ? "Switch to Paste Conversation Analyzer" : "Switch to Real-Time Dashboard"}
       </button>
 
-      {showDashboard ? (
-        <RealTimeDashboard onAnalysisUpdate={onAnalysisUpdate} />
+      {dashboardActive ? (
+        <RealTimeDashboard onAnalyze={handleAnalyze} />
       ) : (
-        <ConversationAnalyzerPolish onAnalysisUpdate={onAnalysisUpdate} />
-      )}
-
-      <ImmediateAlert flaggedBehaviors={alertFlags} onDismiss={dismissAlert} />
-
-      {analysisResult ? (
         <>
-          <FlaggedResultVisualization
-            verdict={analysisResult.verdict.label}
-            flaggedBehaviors={analysisResult.flaggedBehaviors}
-            overallConfidence={analysisResult.confidence}
-          />
-          <ShareableResult analysisResult={analysisResult} />
+          <ConversationAnalyzerPolish onAnalyze={handleAnalyze} />
+          {immediateAlerts.length > 0 && <ImmediateAlert flaggedBehaviors={immediateAlerts} />}
+          {analysisResult && (
+            <section aria-label="Analysis results and sharing section" style={{ marginTop: "1rem" }}>
+              <FlaggedResultVisualization
+                verdict={analysisResult.verdict.label}
+                flaggedBehaviors={analysisResult.signals.map((signal) => {
+                  // For labels, capitalize first letter and replace underscores if any
+                  const label = signal.charAt(0).toUpperCase() + signal.slice(1).replace(/_/g, " ");
+                  // Confidence not supplied here, fallback 0.9 for demo
+                  return { type: signal, label, confidence: 0.9 };
+                })}
+                overallConfidence={analysisResult.confidence}
+              />
+              <ShareableResult analysis={analysisResult} />
+            </section>
+          )}
         </>
-      ) : (
-        <p style={{ textAlign: "center", marginTop: "2rem", color: "#999" }}>
-          Paste a conversation or use the real-time dashboard to see red flags here.
-        </p>
       )}
     </main>
   );
