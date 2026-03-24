@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
@@ -6,86 +6,132 @@ import FlaggedResultVisualization from "./components/FlaggedResultVisualization"
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
 
-import "./styles/UiPolishImprovement.css";
-import "./styles/FlaggedResultVisualization.css";
+import "./styles/UiPolish.css";
 
-const highRiskFlags = new Set([
+const highRiskFlags = [
   "insult",
   "gaslighting",
   "threat",
   "ultimatum",
-]);
+  "discard",
+  "control",
+  "guilt",
+  "boundary_push",
+  "inconsistency",
+];
 
-function App() {
+const hasHighRiskFlags = (flags = []) =>
+  flags.some((flag) => highRiskFlags.includes(flag));
+
+const App = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [realTimeMode, setRealTimeMode] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [alertFlags, setAlertFlags] = useState([]);
+  const [realtimeMode, setRealtimeMode] = useState(false);
 
-  // Handle new analysis results
-  const onAnalysisUpdate = useCallback((result) => {
-    setAnalysisResult(result || null);
-
-    // Determine if any high-risk flags are present
-    const flagsDetected = (result?.signals || []).filter((sig) =>
-      highRiskFlags.has(sig)
-    );
-
-    setAlertFlags(flagsDetected);
-  }, []);
-
-  // Reset results/alerts when switching mode
+  // When analysis changes, check for high-risk flags to trigger alert
   useEffect(() => {
+    if (
+      analysisResult &&
+      analysisResult.signals &&
+      hasHighRiskFlags(analysisResult.signals)
+    ) {
+      setAlertFlags(analysisResult.signals.filter((flag) => highRiskFlags.includes(flag)));
+      setShowAlert(true);
+
+      // Show native alert for immediate attention
+      // Compose alert message with flag names capitalized
+      const flagList = alertFlags.length
+        ? alertFlags
+        : analysisResult.signals.filter((flag) => highRiskFlags.includes(flag));
+      if (flagList.length) {
+        const alertMessage = `Warning: High-risk flags detected - ${flagList
+          .map((f) => f.charAt(0).toUpperCase() + f.slice(1))
+          .join(", ")}`;
+        // Use setTimeout to avoid React warning on alert sync call
+        setTimeout(() => {
+          window.alert(alertMessage);
+        }, 100);
+      }
+    } else {
+      // no high risk flags, hide alert
+      setShowAlert(false);
+      setAlertFlags([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analysisResult]);
+
+  // Handler for conversation analysis update from ConversationAnalyzerPolish or RealTimeDashboard
+  const handleAnalysisUpdate = (result) => {
+    setAnalysisResult(result);
+  };
+
+  // Handler to dismiss alert banner
+  const handleDismissAlert = () => {
+    setShowAlert(false);
+  };
+
+  // Toggle between paste analyzer and real-time dashboard mode
+  const toggleRealtimeMode = () => {
+    setRealtimeMode((prev) => !prev);
     setAnalysisResult(null);
+    setShowAlert(false);
     setAlertFlags([]);
-  }, [realTimeMode]);
+  };
 
   return (
-    <main className="ui-container" aria-label="FLAGGED conversation analysis app">
-      <h1 style={{ textAlign: "center", userSelect: "none", color: "#cc2f2f" }}>
+    <main className="ui-container" role="main" aria-label="FLAGGED conversation analysis app">
+      <h1 style={{ textAlign: "center", color: "#ff6847", userSelect: "none" }}>
         FLAGGED
       </h1>
-
-      <div style={{ marginBottom: "1rem", textAlign: "center" }}>
+      <div style={{ marginBottom: 24, textAlign: "center" }}>
         <button
-          onClick={() => setRealTimeMode((mode) => !mode)}
-          aria-pressed={realTimeMode}
-          aria-label={`Toggle ${realTimeMode ? "paste analyzer mode" : "real-time dashboard mode"}`}
-          className="peachy-button"
           type="button"
+          onClick={toggleRealtimeMode}
+          aria-pressed={realtimeMode}
+          aria-label={
+            realtimeMode
+              ? "Switch to paste conversation analyzer"
+              : "Switch to real-time dashboard"
+          }
+          className="peachy-button"
         >
-          {realTimeMode ? "Switch to Paste Analyzer" : "Switch to Real-Time Dashboard"}
+          {realtimeMode ? "Use Paste Analyzer" : "Use Real-Time Dashboard"}
         </button>
       </div>
 
-      {realTimeMode ? (
-        <RealTimeDashboard onAnalysisUpdate={onAnalysisUpdate} />
-      ) : (
+      {showAlert && (
+        <ImmediateAlert flags={alertFlags} onDismiss={handleDismissAlert} />
+      )}
+
+      {!realtimeMode && (
         <>
-          <ConversationAnalyzerPolish onAnalysisUpdate={onAnalysisUpdate} />
+          <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
           {analysisResult && (
             <>
-              <ImmediateAlert flaggedBehaviors={alertFlags} />
               <FlaggedResultVisualization
-                verdict={analysisResult.verdict.label}
-                flaggedBehaviors={(analysisResult.signals || []).map((sig) => ({
+                verdict={analysisResult.verdict?.label || "Safe"}
+                flaggedBehaviors={analysisResult.signals.map((sig) => ({
                   type: sig,
                   label: sig.charAt(0).toUpperCase() + sig.slice(1),
-                  confidence: analysisResult.confidence,
+                  confidence: analysisResult.confidence ?? 0,
                 }))}
-                overallConfidence={analysisResult.confidence}
+                overallConfidence={analysisResult.confidence ?? 0}
               />
-              <ShareableResult
-                result={analysisResult}
-                conversationExcerpt={
-                  analysisResult?.meta?.conversationExcerpt || ""
-                }
-              />
+              <ShareableResult analysis={analysisResult} />
             </>
           )}
         </>
       )}
+
+      {realtimeMode && (
+        <RealTimeDashboard
+          onAnalysis={handleAnalysisUpdate}
+          initialAnalysis={analysisResult}
+        />
+      )}
     </main>
   );
-}
+};
 
 export default App;
