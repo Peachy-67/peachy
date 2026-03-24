@@ -1,129 +1,116 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
 import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
+
 import "./styles/UiPolish.css";
 
-const highRiskFlags = new Set([
+const HIGH_RISK_FLAGS = new Set([
   "insult",
-  "threat",
   "gaslighting",
-  "discard",
+  "threat",
   "ultimatum",
+  "discard",
 ]);
 
 const App = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [showAlert, setShowAlert] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [alertFlags, setAlertFlags] = useState([]);
-  const [viewDashboard, setViewDashboard] = useState(false);
 
-  // Check for any high risk flags in the latest analysis result
-  useEffect(() => {
-    if (!analysisResult || !analysisResult.signals) {
-      setShowAlert(false);
-      setAlertFlags([]);
-      return;
-    }
-    const detectedHighRiskFlags = analysisResult.signals.filter((flag) =>
-      highRiskFlags.has(flag)
-    );
-    if (detectedHighRiskFlags.length > 0) {
-      setAlertFlags(detectedHighRiskFlags);
-      setShowAlert(true);
-    } else {
-      setShowAlert(false);
-      setAlertFlags([]);
-    }
-  }, [analysisResult]);
-
-  const handleAnalyze = (result) => {
+  // Callback to receive new analysis from analyzer or dashboard fallback
+  const handleAnalysisUpdate = useCallback((result) => {
     setAnalysisResult(result);
-  };
 
-  const toggleDashboard = () => {
-    setViewDashboard((prev) => !prev);
+    if (result && result.signals) {
+      const highRiskDetected = result.signals.filter((flag) =>
+        HIGH_RISK_FLAGS.has(flag.toLowerCase())
+      );
+      setAlertFlags(highRiskDetected);
+    } else {
+      setAlertFlags([]);
+    }
+  }, []);
+
+  // Clear alerts when dashboard or input changes or user dismisses alert
+  const dismissAlert = () => {
+    setAlertFlags([]);
   };
 
   return (
-    <main className="ui-container" aria-label="FLAGGED conversation analysis app">
-      <h1 style={{ textAlign: "center", color: "#ff6f61" }}>
-        FLAGGED Conversation Analyzer
-      </h1>
+    <main className="ui-container" aria-label="FLAGGED conversation analyzer application">
+      <header>
+        <h1 style={{ color: "#cc2f2f", userSelect: "none", textAlign: "center" }}>
+          FLAGGED
+        </h1>
+        <p style={{ textAlign: "center", userSelect: "none", marginBottom: "1rem" }}>
+          Detect red flags in conversations to help spot manipulation and harmful behavior.
+        </p>
+        <button
+          type="button"
+          onClick={() => setShowDashboard((v) => !v)}
+          aria-pressed={showDashboard}
+          className="peachy-button"
+          style={{ marginBottom: "1.75rem", display: "block", marginLeft: "auto", marginRight: "auto" }}
+        >
+          {showDashboard ? "Use Paste Analyzer" : "Use Real-Time Dashboard"}
+        </button>
+      </header>
 
-      <button
-        aria-pressed={viewDashboard}
-        onClick={toggleDashboard}
-        className="peachy-button"
-        style={{ marginBottom: "1rem", width: "100%" }}
-        type="button"
-      >
-        {viewDashboard ? "Switch to Paste Analyzer" : "Switch to Real-time Dashboard"}
-      </button>
-
-      {viewDashboard ? (
-        <RealTimeDashboard
-          onAnalysisUpdate={handleAnalyze}
-          aria-label="Real-time conversation monitoring dashboard"
-        />
-      ) : (
-        <ConversationAnalyzerPolish
-          onAnalysisComplete={handleAnalyze}
-          aria-label="Conversation text analyzer"
-        />
+      {alertFlags.length > 0 && (
+        <ImmediateAlert flags={alertFlags} onDismiss={dismissAlert} />
       )}
 
-      {showAlert && alertFlags.length > 0 && (
-        <ImmediateAlert flags={alertFlags} onDismiss={() => setShowAlert(false)} />
-      )}
-
-      {analysisResult && (
+      {!showDashboard && (
         <>
-          <section
-            aria-label="Flagged conversation results"
-            style={{ marginTop: "1.5rem" }}
-          >
-            <FlaggedResultVisualization
-              verdict={capitalizeVerdict(analysisResult.verdict?.label)}
-              flaggedBehaviors={mapFlagsToLabels(analysisResult.signals)}
-              overallConfidence={analysisResult.confidence}
-            />
-          </section>
-
-          <section
-            aria-label="Share flagged conversation results"
-            style={{ marginTop: "1rem" }}
-          >
-            <ShareableResult analysisResult={analysisResult} />
-          </section>
+          <ConversationAnalyzerPolish onAnalysis={handleAnalysisUpdate} />
+          {analysisResult && (
+            <>
+              <FlaggedResultVisualization
+                verdict={mapBandToVerdictLabel(analysisResult.verdict?.band)}
+                flaggedBehaviors={mapSignalsToFlaggedBehaviors(analysisResult.signals)}
+                overallConfidence={analysisResult.confidence || 0}
+              />
+              <ShareableResult
+                result={analysisResult}
+              />
+            </>
+          )}
         </>
+      )}
+
+      {showDashboard && (
+        <RealTimeDashboard
+          onAnalysis={handleAnalysisUpdate}
+          initialResult={analysisResult}
+        />
       )}
     </main>
   );
 };
 
-// Utility to capitalize verdict label to match expected enum
-function capitalizeVerdict(verdict) {
-  if (!verdict) return "Safe";
-  const v = verdict.toLowerCase();
-  if (v === "safe" || v === "green") return "Safe";
-  if (v === "caution" || v === "yellow") return "Caution";
-  if (v === "flagged" || v === "red") return "Flagged";
-  return "Caution";
+// Helper to map verdict band to verdict display label
+function mapBandToVerdictLabel(band) {
+  switch (band) {
+    case "green":
+      return "Safe";
+    case "yellow":
+      return "Caution";
+    case "red":
+      return "Flagged";
+    default:
+      return "Safe";
+  }
 }
 
-/**
- * Map raw signals to objects with type, label, and confidence.
- * Confidence is unknown here so set to 1 by default.
- * Labels capitalize first letter and may refine wording.
- */
-function mapFlagsToLabels(signals) {
-  if (!Array.isArray(signals)) return [];
-
-  // Map of signal to display label
-  const labelMap = {
+// Map raw signals to objects with type, label, and confidence for FlaggedResultVisualization
+function mapSignalsToFlaggedBehaviors(signals = []) {
+  // For MVP, use default confidence 0.75 for all flags
+  // Map known signal types to labels matching FlagBadge component expectations
+  const flagLabelMap = {
     insult: "Insult",
     manipulation: "Manipulation",
     gaslighting: "Gaslighting",
@@ -136,18 +123,14 @@ function mapFlagsToLabels(signals) {
     inconsistency: "Inconsistency",
   };
 
-  // Return unique signals with label and full confidence (1)
-  return Array.from(new Set(signals)).map((type) => ({
-    type,
-    label: labelMap[type] || capitalize(type),
-    confidence: 1,
-  }));
-}
-
-// Capitalize first letter helper
-function capitalize(str) {
-  if (typeof str !== "string" || str.length === 0) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  // Filter only known flags in label map for display
+  return signals
+    .filter((s) => flagLabelMap[s])
+    .map((s) => ({
+      type: s,
+      label: flagLabelMap[s],
+      confidence: 0.75,
+    }));
 }
 
 export default App;
