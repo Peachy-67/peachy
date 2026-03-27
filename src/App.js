@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
@@ -8,130 +8,136 @@ import RealTimeDashboard from "./components/RealTimeDashboard";
 
 import "./styles/UiPolish.css";
 
-const HIGH_RISK_FLAGS = new Set(["insult", "gaslighting", "threat", "ultimatum"]);
+const HIGH_RISK_FLAGS = new Set([
+  "insult",
+  "gaslighting",
+  "threat",
+  "ultimatum",
+  "control",
+  "discard",
+]);
+
+const initialResultState = {
+  verdict: "Safe",
+  flaggedBehaviors: [],
+  overallConfidence: 0,
+  rawResponse: null,
+  conversation: "",
+};
 
 const App = () => {
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [showDashboard, setShowDashboard] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(initialResultState);
+  const [showAlert, setShowAlert] = useState(false);
   const [alertFlags, setAlertFlags] = useState([]);
-  const [alertVisible, setAlertVisible] = useState(false);
+  const [realTimeMode, setRealTimeMode] = useState(false);
 
-  // Extract flagged behaviors with labels and confidence for visualization
-  const flaggedBehaviors = analysisResult?.signals?.map((signal) => {
-    // Map signal to label and type for badges
-    const labelMap = {
-      insult: "Insult",
-      manipulation: "Manipulation",
-      gaslighting: "Gaslighting",
-      discard: "Discard",
-      control: "Control",
-      ultimatum: "Ultimatum",
-      threat: "Threat",
-      guilt: "Guilt",
-      boundary_push: "Boundary Push",
-      inconsistency: "Inconsistency",
+  // Handler when analysis completes
+  const onAnalysisComplete = useCallback((result, conversationText) => {
+    // Prepare flaggedBehaviors array compatible with FlaggedResultVisualization
+    // Map signals from result.signals to label & confidence if available
+    const flags = (result.signals || []).map((signal) => {
+      let label = signal.charAt(0).toUpperCase() + signal.slice(1);
+      // Some labels might need mapping to friendlier names
+      if (signal === "guilt") label = "Manipulation";
+      if (signal === "border_push") label = "Boundary Push";
+      if (signal === "inconsistency") label = "Inconsistency";
+      if (signal === "ultimatum") label = "Ultimatum";
+      if (signal === "threat") label = "Threat";
+
+      // Confidence fallback to result.confidence if no per-flag confidence exists
+      return {
+        type: signal,
+        label,
+        confidence: result.confidence || 0,
+      };
+    });
+
+    // Derive verdict string: map from band to capitalized label
+    const verdictMap = {
+      green: "Safe",
+      yellow: "Caution",
+      red: "Flagged",
     };
-    return {
-      type: signal,
-      label: labelMap[signal] || signal,
-      confidence: analysisResult.confidence ?? 0,
-    };
-  }) || [];
+    const verdictLabel = (result.verdict?.band && verdictMap[result.verdict.band]) || "Safe";
 
-  // Decide overall verdict label for FlaggedResultVisualization
-  const verdictMap = {
-    green: "Safe",
-    yellow: "Caution",
-    red: "Flagged",
-  };
-  const verdictLabel = analysisResult?.verdict?.band ? verdictMap[analysisResult.verdict.band] : "Safe";
+    setAnalysisResult({
+      verdict: verdictLabel,
+      flaggedBehaviors: flags,
+      overallConfidence: result.confidence || 0,
+      rawResponse: result,
+      conversation: conversationText,
+    });
 
-  // Extract confidence score for display
-  const overallConfidence = analysisResult?.confidence || 0;
-
-  // Immediate Alert triggers when any high-risk flags detected
-  useEffect(() => {
-    if (!analysisResult) {
-      setAlertFlags([]);
-      setAlertVisible(false);
-      return;
-    }
-    const detectedHighRisk = analysisResult.signals.filter((sig) => HIGH_RISK_FLAGS.has(sig));
-    if (detectedHighRisk.length > 0) {
-      setAlertFlags(detectedHighRisk);
-      setAlertVisible(true);
-      // Also immediate native alert popup
-      const labels = detectedHighRisk.map(
-        (sig) =>
-          ({
-            insult: "Insult",
-            gaslighting: "Gaslighting",
-            threat: "Threat",
-            ultimatum: "Ultimatum",
-          }[sig] || sig)
-      );
-      alert(`⚠️ High-risk behavior detected: ${labels.join(", ")}`);
+    // Check if any high risk flags exist
+    const highRiskDetected = flags.some((f) => HIGH_RISK_FLAGS.has(f.type.toLowerCase()));
+    if (highRiskDetected) {
+      setAlertFlags(flags.filter((f) => HIGH_RISK_FLAGS.has(f.type.toLowerCase())));
+      setShowAlert(true);
     } else {
-      setAlertFlags([]);
-      setAlertVisible(false);
+      setShowAlert(false);
     }
-  }, [analysisResult]);
+  }, []);
 
-  // Handle analysis from ConversationAnalyzerPolish component
-  const handleAnalysisComplete = (result) => {
-    setAnalysisResult(result);
-    if (showDashboard && result) {
-      // optionally update if dashboard needs
-    }
+  // Close alert manually
+  const onDismissAlert = () => {
+    setShowAlert(false);
   };
 
-  // Toggle between paste analyzer and real-time dashboard
-  const toggleDashboard = () => {
-    setShowDashboard((prev) => !prev);
-    // Clear analysis and alerts when switching modes
-    setAnalysisResult(null);
-    setAlertFlags([]);
-    setAlertVisible(false);
+  // Toggle between paste input analyzer and real-time dashboard
+  const toggleRealTimeMode = () => {
+    setRealTimeMode((prev) => !prev);
+    setShowAlert(false);
+    setAnalysisResult(initialResultState);
   };
 
   return (
-    <main className="ui-container" role="main" aria-label="FLAGGED conversation analysis application">
-      <h1 style={{ textAlign: "center", color: "#ff6f61", userSelect: "none" }}>FLAGGED Conversation Red Flag Detector</h1>
+    <main className="ui-container" aria-label="FLAGGED Conversation Red Flag Detector Application">
+      <header>
+        <h1 style={{ textAlign: "center", userSelect: "none", color: "#ff6f61" }}>FLAGGED Conversation Analyzer</h1>
+        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+          <button
+            type="button"
+            onClick={toggleRealTimeMode}
+            className="peachy-button"
+            aria-pressed={realTimeMode}
+            aria-label={realTimeMode ? "Switch to conversation paste analyzer" : "Switch to real-time dashboard"}
+          >
+            {realTimeMode ? "Paste Analyzer Mode" : "Real-Time Dashboard Mode"}
+          </button>
+        </div>
+      </header>
 
-      <button
-        type="button"
-        onClick={toggleDashboard}
-        aria-pressed={showDashboard}
-        className="peachy-button"
-        style={{marginBottom: "1rem"}}
-      >
-        {showDashboard ? "Switch to Paste Conversation Analyzer" : "Switch to Real-Time Dashboard"}
-      </button>
-
-      {alertVisible && alertFlags.length > 0 && (
-        <ImmediateAlert flaggedBehaviors={alertFlags} onDismiss={() => setAlertVisible(false)} />
+      {showAlert && (
+        <ImmediateAlert flaggedBehaviors={alertFlags} onDismiss={onDismissAlert} />
       )}
 
-      {!showDashboard ? (
+      {!realTimeMode && (
         <>
-          <ConversationAnalyzerPolish onAnalysisComplete={handleAnalysisComplete} />
-          {analysisResult && (
+          <ConversationAnalyzerPolish onAnalysisComplete={onAnalysisComplete} />
+          {analysisResult.rawResponse && (
             <>
               <FlaggedResultVisualization
-                verdict={verdictLabel}
-                flaggedBehaviors={flaggedBehaviors}
-                overallConfidence={overallConfidence}
+                verdict={analysisResult.verdict}
+                flaggedBehaviors={analysisResult.flaggedBehaviors}
+                overallConfidence={analysisResult.overallConfidence}
               />
-              <ShareableResult analysisResult={analysisResult} />
+              <ShareableResult
+                verdict={analysisResult.verdict}
+                flaggedBehaviors={analysisResult.flaggedBehaviors}
+                overallConfidence={analysisResult.overallConfidence}
+                conversation={analysisResult.conversation}
+              />
             </>
           )}
         </>
-      ) : (
+      )}
+
+      {realTimeMode && (
         <RealTimeDashboard
-          onAnalysisUpdate={handleAnalysisComplete}
-          alertFlags={alertFlags}
-          alertVisible={alertVisible}
-          onAlertDismiss={() => setAlertVisible(false)}
+          onAnalysisComplete={onAnalysisComplete}
+          flaggedBehaviors={analysisResult.flaggedBehaviors}
+          verdict={analysisResult.verdict}
+          overallConfidence={analysisResult.overallConfidence}
         />
       )}
     </main>
