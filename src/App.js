@@ -1,88 +1,180 @@
 import React, { useState, useEffect } from "react";
-
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
 import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
-
 import "./styles/UiPolish.css";
-import "./styles/UiPolishImprovements.css";
 
-const HIGH_RISK_FLAGS = new Set([
-  "insult",
-  "threat",
-  "ultimatum",
-  "gaslighting",
-  "discard",
-]);
-
+/**
+ * Main App component integrating conversation analyzer, real-time dashboard, alerts, and sharing.
+ */
 const App = () => {
-  // State for analysis output
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [isRealTimeMode, setIsRealTimeMode] = useState(false);
+  // Analysis state for conversation paste analyzer
+  const [analysis, setAnalysis] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // When analysis result updates, we show immediate alert for high risk flags if any
-  const highRiskFlagsPresent =
-    analysisResult &&
-    analysisResult.signals &&
-    analysisResult.signals.some((signal) => HIGH_RISK_FLAGS.has(signal));
+  // Toggle between Conversation Analyzer (paste input) and RealTimeDashboard (live monitoring)
+  const [showDashboard, setShowDashboard] = useState(false);
 
-  // Handler passed to ConversationAnalyzerPolish and RealTimeDashboard
+  // Immediate Alert state from flagged behaviors if any high-risk flags detected
+  const [alertFlags, setAlertFlags] = useState([]);
+
+  // Handler when analyzer gets a new result
   const handleAnalysisUpdate = (result) => {
-    setAnalysisResult(result || null);
+    setAnalysis(result);
+    setError(null);
+    setLoading(false);
+
+    if (result && result.signals && result.signals.length > 0) {
+      // Determine if any high-risk flags present (red flags)
+      const highRiskFlags = result.signals.filter((flag) =>
+        ["insult", "manipulation", "gaslighting", "discard", "control"].includes(flag)
+      );
+      setAlertFlags(highRiskFlags);
+    } else {
+      setAlertFlags([]);
+    }
   };
 
-  // Toggle between paste analyzer and real-time dashboard
-  const toggleRealTimeMode = () => {
-    setAnalysisResult(null); // Clear analysis when switching mode
-    setIsRealTimeMode((current) => !current);
+  // Handler for errors from analyzer
+  const handleAnalysisError = (err) => {
+    setError(err);
+    setAnalysis(null);
+    setLoading(false);
+    setAlertFlags([]);
   };
+
+  // Handler for loading state from analyzer
+  const handleLoading = (loadingState) => {
+    setLoading(loadingState);
+  };
+
+  // Toggle dashboard mode
+  const toggleDashboard = () => setShowDashboard((v) => !v);
+
+  // Render header with toggle button
+  const renderHeader = () => (
+    <header
+      style={{
+        textAlign: "center",
+        marginBottom: "1rem",
+        userSelect: "none",
+      }}
+    >
+      <h1
+        style={{
+          color: "#ff6f61",
+          fontWeight: "900",
+          fontSize: "2.25rem",
+          marginBottom: "6px",
+          letterSpacing: "0.04em",
+        }}
+      >
+        FLAGGED
+      </h1>
+      <button
+        type="button"
+        onClick={toggleDashboard}
+        aria-pressed={showDashboard}
+        aria-label={
+          showDashboard ? "Switch to paste conversation analyzer" : "Switch to live real-time dashboard"
+        }
+        style={{
+          backgroundColor: "#ff6f61",
+          color: "white",
+          border: "none",
+          padding: "0.5rem 1.25rem",
+          borderRadius: "6px",
+          cursor: "pointer",
+          fontWeight: "700",
+          fontSize: "1rem",
+          boxShadow: "0 3px 7px rgba(255, 111, 97, 0.7)",
+          transition: "background-color 0.25s ease",
+          userSelect: "none",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#e65b50")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#ff6f61")}
+      >
+        {showDashboard ? "Use Paste Analyzer" : "Use Real-time Dashboard"}
+      </button>
+    </header>
+  );
 
   return (
-    <main className="ui-container" role="main" aria-label="Flagged conversation analyzer">
-      <header>
-        <h1 style={{ userSelect: "none", textAlign: "center", color: "#ff735a" }}>
-          FLAGGED Conversation Analyzer
-        </h1>
-      </header>
+    <main className="ui-container" aria-label="FLAGGED Conversation Analyzer Application">
+      {renderHeader()}
 
-      <section aria-label="Mode toggle" style={{ textAlign: "center", marginBottom: "1rem" }}>
-        <button
-          type="button"
-          onClick={toggleRealTimeMode}
-          className="peachy-button"
-          aria-pressed={isRealTimeMode}
-          aria-label={`Switch to ${isRealTimeMode ? "paste input analysis" : "real-time dashboard"} mode`}
-        >
-          {isRealTimeMode ? "Use Paste Input Analyzer" : "Use Real-Time Dashboard"}
-        </button>
-      </section>
+      <ImmediateAlert flaggedBehaviors={alertFlags} />
 
-      {isRealTimeMode ? (
-        <RealTimeDashboard onAnalysisUpdate={handleAnalysisUpdate} />
+      {showDashboard ? (
+        <RealTimeDashboard
+          onAnalysisUpdate={handleAnalysisUpdate}
+          onError={handleAnalysisError}
+          loading={loading}
+          analysis={analysis}
+        />
       ) : (
-        <ConversationAnalyzerPolish onAnalysisUpdate={handleAnalysisUpdate} />
-      )}
-
-      {highRiskFlagsPresent && analysisResult && (
-        <ImmediateAlert flaggedBehaviors={analysisResult.signals} />
-      )}
-
-      {analysisResult && !isRealTimeMode && (
         <>
-          <FlaggedResultVisualization
-            verdict={analysisResult.verdict?.label || "Safe"}
-            flaggedBehaviors={(analysisResult.signals || []).map((flag) => ({
-              type: flag,
-              label: flag.charAt(0).toUpperCase() + flag.slice(1),
-              confidence: analysisResult.confidence || 0,
-            }))}
-            overallConfidence={analysisResult.confidence || 0}
+          <ConversationAnalyzerPolish
+            onAnalysisUpdate={handleAnalysisUpdate}
+            onError={handleAnalysisError}
+            onLoading={handleLoading}
           />
-          <ShareableResult
-            analysisResult={analysisResult}
-          />
+          {error && (
+            <div
+              role="alert"
+              tabIndex={-1}
+              style={{
+                marginTop: "1rem",
+                backgroundColor: "#ffe6eb",
+                border: "1.5px solid #cc2f2f",
+                padding: "12px 18px",
+                borderRadius: "8px",
+                fontWeight: "700",
+                color: "#a63636",
+                maxWidth: "440px",
+                marginLeft: "auto",
+                marginRight: "auto",
+                userSelect: "text",
+              }}
+            >
+              {error}
+            </div>
+          )}
+          {loading && (
+            <p
+              aria-live="polite"
+              style={{
+                marginTop: "1rem",
+                fontWeight: "600",
+                fontStyle: "italic",
+                color: "#ff6f61",
+                textAlign: "center",
+                userSelect: "none",
+              }}
+            >
+              Analyzing conversation...
+            </p>
+          )}
+          {analysis && !loading && !error && (
+            <>
+              <FlaggedResultVisualization
+                verdict={analysis.verdict.label}
+                flaggedBehaviors={analysis.signals.map((sig) => ({
+                  type: sig,
+                  label: sig.charAt(0).toUpperCase() + sig.slice(1),
+                  confidence: analysis.confidence || 0,
+                }))}
+                overallConfidence={analysis.confidence || 0}
+              />
+              <ShareableResult
+                analysis={analysis}
+                conversationText={analysis.rawInputText || ""}
+              />
+            </>
+          )}
         </>
       )}
     </main>
