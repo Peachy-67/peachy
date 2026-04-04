@@ -1,138 +1,132 @@
 import React, { useState, useEffect } from "react";
-
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
 import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
-
 import "./styles/UiPolish.css";
+import "./styles/UiPolishImprovements.css";
+
+const HIGH_RISK_FLAGS = ["insult", "gaslighting", "threat", "ultimatum"];
 
 const App = () => {
-  // Main app state for analysis
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [highRiskFlags, setHighRiskFlags] = useState([]);
+  const [alertDismissed, setAlertDismissed] = useState(false);
+  const [viewDashboard, setViewDashboard] = useState(false);
   const [error, setError] = useState(null);
 
-  // State to toggle between conversation paste analyzer and realtime dashboard
-  const [showDashboard, setShowDashboard] = useState(false);
-
-  // State to track visible immediate alert flags (array of flag types)
-  const [alertFlags, setAlertFlags] = useState([]);
-
-  // When analysisResult changes, detect high-risk flags to alert immediately
+  // Detect high risk flags for alert triggering
   useEffect(() => {
-    if (!analysisResult || !Array.isArray(analysisResult.flags)) {
-      setAlertFlags([]);
-      return;
-    }
-    // Define high-risk flags that trigger immediate alert
-    const highRiskFlags = new Set(["insult", "gaslighting", "threat", "discard", "manipulation", "control", "ultimatum"]);
-    const foundFlags = analysisResult.flags.filter((flag) => highRiskFlags.has(flag.type.toLowerCase()));
-
-    if (foundFlags.length > 0) {
-      setAlertFlags(foundFlags.map((f) => f.label));
-      // Also trigger native alert
-      alert(
-        `Warning: High risk behavior detected: ${foundFlags.map((f) => f.label).join(", ")}. Please review carefully.`
+    if (analysisResult && Array.isArray(analysisResult.signals)) {
+      const detectedHighRisks = analysisResult.signals.filter((flag) =>
+        HIGH_RISK_FLAGS.includes(flag)
       );
+      if (detectedHighRisks.length) {
+        setHighRiskFlags(detectedHighRisks);
+        setAlertDismissed(false);
+      } else {
+        setHighRiskFlags([]);
+        setAlertDismissed(false);
+      }
     } else {
-      setAlertFlags([]);
+      setHighRiskFlags([]);
+      setAlertDismissed(false);
     }
   }, [analysisResult]);
 
-  // Handler for new analysis from conversation analyzer or realtime dashboard
-  const handleNewAnalysis = (result) => {
-    setAnalysisResult(result);
+  // Handles analysis result update from ConversationAnalyzerPolish or RealTimeDashboard
+  const handleAnalysisUpdate = (result) => {
     setError(null);
-    setLoading(false);
+    setAnalysisResult(result);
   };
 
-  // Handler for errors from analyzer components
-  const handleError = (err) => {
-    setError(err);
-    setLoading(false);
+  // Handles errors from analyzer components
+  const handleError = (errMsg) => {
+    setError(errMsg);
+    setAnalysisResult(null);
   };
 
-  // Handler for loading state from analyzer
-  const handleLoading = (isLoading) => {
-    setLoading(isLoading);
+  // Dismiss alert banner
+  const dismissAlert = () => {
+    setAlertDismissed(true);
   };
 
-  // Render UI
+  // Toggle between ConversationAnalyzerPolish and RealTimeDashboard views
+  const toggleDashboardView = () => {
+    setViewDashboard((prev) => !prev);
+    setError(null);
+    setAnalysisResult(null);
+    setHighRiskFlags([]);
+    setAlertDismissed(false);
+  };
+
   return (
-    <main className="ui-container" role="main" aria-label="FLAGGED conversation analyzer application">
-      <header>
-        <h1 style={{ textAlign: "center", color: "#ff6f61", userSelect: "none", marginBottom: "1rem" }}>
-          FLAGGED: Conversation Red Flag Detector
-        </h1>
-      </header>
+    <main className="ui-container" role="main">
+      <h1
+        tabIndex={-1}
+        className="ui-section-header"
+        aria-label="FLAGGED conversation analysis app"
+      >
+        FLAGGED: Detect Red Flags in Conversations
+      </h1>
 
-      <nav style={{ textAlign: "center", marginBottom: "1rem" }}>
+      <section aria-label="Application controls" className="ui-section-controls" style={{textAlign: "center", marginBottom: '1rem'}}>
         <button
+          onClick={toggleDashboardView}
           type="button"
-          aria-pressed={!showDashboard}
-          onClick={() => setShowDashboard(false)}
-          className="peachy-button"
-          style={{ marginRight: 10 }}
-        >
-          Paste Analyzer
-        </button>
-        <button
-          type="button"
-          aria-pressed={showDashboard}
-          onClick={() => setShowDashboard(true)}
+          aria-pressed={viewDashboard}
+          aria-label={viewDashboard ? "Switch to paste conversation analyzer" : "Switch to real-time dashboard"}
           className="peachy-button"
         >
-          Real-Time Dashboard
+          {viewDashboard ? "Use Paste Analyzer" : "Use Real-Time Dashboard"}
         </button>
-      </nav>
+      </section>
 
-      <ImmediateAlert flags={alertFlags} onDismiss={() => setAlertFlags([])} />
-
-      {showDashboard ? (
+      {viewDashboard ? (
         <RealTimeDashboard
-          onAnalysis={handleNewAnalysis}
+          onAnalysisUpdate={handleAnalysisUpdate}
           onError={handleError}
-          onLoading={handleLoading}
-          analysisResult={analysisResult}
-          loading={loading}
-          error={error}
         />
       ) : (
+        <ConversationAnalyzerPolish
+          onAnalysisUpdate={handleAnalysisUpdate}
+          onError={handleError}
+        />
+      )}
+
+      {error && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="alert-banner"
+          style={{ marginTop: "1rem" }}
+        >
+          {error}
+        </div>
+      )}
+
+      {highRiskFlags.length > 0 && !alertDismissed && (
+        <ImmediateAlert
+          flaggedBehaviors={highRiskFlags}
+          onDismiss={dismissAlert}
+        />
+      )}
+
+      {analysisResult && !viewDashboard && (
         <>
-          <ConversationAnalyzerPolish
-            onAnalysis={handleNewAnalysis}
-            onError={handleError}
-            onLoading={handleLoading}
+          <FlaggedResultVisualization
+            verdict={analysisResult.verdict.label || "Safe"}
+            flaggedBehaviors={
+              analysisResult.signals.map((sig) => ({
+                type: sig,
+                label: sig.charAt(0).toUpperCase() + sig.slice(1).replace(/_/g, " "),
+                confidence: 0.8, // placeholder, no confidence in state, could improve later
+              })) || []
+            }
+            overallConfidence={analysisResult.confidence || 0}
           />
-
-          {loading && (
-            <p style={{ marginTop: "1rem", fontWeight: "600", color: "#cc4a4a" }}>Analyzing conversation...</p>
-          )}
-
-          {error && (
-            <p role="alert" style={{ marginTop: "1rem", fontWeight: "700", color: "#c62828" }}>
-              Error: {error}
-            </p>
-          )}
-
-          {analysisResult && !loading && !error && (
-            <section aria-label="Analysis results" style={{ marginTop: "1.5rem", textAlign: "center" }}>
-              <FlaggedResultVisualization
-                verdict={analysisResult.verdict.label}
-                flaggedBehaviors={
-                  analysisResult.flags || analysisResult.signals?.map((s) => ({
-                    type: s,
-                    label: s.charAt(0).toUpperCase() + s.slice(1),
-                    confidence: analysisResult.confidence || 0,
-                  })) || []
-                }
-                overallConfidence={analysisResult.confidence || 0}
-              />
-              <ShareableResult analysis={analysisResult} />
-            </section>
-          )}
+          <ShareableResult analysis={analysisResult} />
         </>
       )}
     </main>
