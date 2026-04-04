@@ -6,108 +6,169 @@ import ShareableResult from './components/ShareableResult';
 import RealTimeDashboard from './components/RealTimeDashboard';
 import './styles/UiPolish.css';
 
+const HIGH_RISK_FLAGS = new Set([
+  'insult',
+  'gaslighting',
+  'threat',
+  'ultimatum',
+  'discard',
+  'control',
+  'guilt',
+  'boundary_push',
+  'inconsistency',
+]);
+
+const extractFlags = (signals) => {
+  // Return unique array of normalized flags
+  return Array.isArray(signals)
+    ? Array.from(new Set(signals.map((s) => String(s).toLowerCase()).filter(Boolean)))
+    : [];
+};
+
+const hasHighRiskFlag = (flags) => {
+  return flags.some((flag) => HIGH_RISK_FLAGS.has(flag));
+};
+
 const App = () => {
+  // State for analysis result from paste/analyze mode
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [highRiskFlags, setHighRiskFlags] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [dashboardMode, setDashboardMode] = useState(false);
 
-  // Callback to receive analysis result from ConversationAnalyzerPolish or RealTimeDashboard
-  const onAnalysis = useCallback((result, err = null) => {
-    setError(err);
-    setAnalysisResult(result);
+  // State for error notification on analysis failure
+  const [analysisError, setAnalysisError] = useState(null);
 
-    if (result && result.signals) {
-      // Detect any high-risk signals: insult, gaslighting, discard, threat, ultimatum, control, guilt
-      const highRisk = result.signals.filter((signal) =>
-        ['insult', 'gaslighting', 'discard', 'threat', 'ultimatum', 'control', 'guilt'].includes(signal)
-      );
-      setHighRiskFlags(highRisk);
-    } else {
-      setHighRiskFlags([]);
+  // State for loading indication
+  const [isLoading, setIsLoading] = useState(false);
+
+  // State for immediate alert visibility/dismiss
+  const [alertFlags, setAlertFlags] = useState([]);
+
+  // State to toggle RealTimeDashboard or ConversationAnalyzerPolish (paste analyze)
+  const [realTimeMode, setRealTimeMode] = useState(false);
+
+  // Handler called by ConversationAnalyzerPolish on new analysis or error
+  const handleAnalysisUpdate = useCallback(({ result, error }) => {
+    if (error) {
+      setAnalysisError(error);
+      setAnalysisResult(null);
+      setIsLoading(false);
+      setAlertFlags([]);
+      return;
+    }
+    if (result) {
+      setAnalysisResult(result);
+      setAnalysisError(null);
+      setIsLoading(false);
+
+      const flags = extractFlags(result.signals);
+      if (hasHighRiskFlag(flags)) {
+        setAlertFlags(flags);
+      } else {
+        setAlertFlags([]);
+      }
     }
   }, []);
 
-  // We can toggle between real-time dashboard and paste analyzer modes using a button.
-  const toggleDashboardMode = () => {
+  // Handler for starting analysis in paste mode (triggered in ConversationAnalyzerPolish)
+  const handleAnalysisStart = useCallback(() => {
+    setIsLoading(true);
+    setAnalysisError(null);
     setAnalysisResult(null);
-    setError(null);
-    setHighRiskFlags([]);
-    setDashboardMode((prev) => !prev);
+    setAlertFlags([]);
+  }, []);
+
+  // Handler to clear immediate alert banner
+  const dismissAlert = useCallback(() => {
+    setAlertFlags([]);
+  }, []);
+
+  // Handler for share action, we'll pass result data to ShareableResult
+  // ShareableResult includes its own share button(s)
+
+  // Toggle between RealTimeDashboard and paste-analyze view
+  const toggleRealTimeMode = () => {
+    // Clear previous analysis and alerts on mode switch
+    setAnalysisResult(null);
+    setAnalysisError(null);
+    setAlertFlags([]);
+    setIsLoading(false);
+    setRealTimeMode((prev) => !prev);
   };
 
+  // Derived verdict for visualization from analysisResult
+  const verdictLabel = analysisResult?.verdict?.label || 'Safe';
+  const flags = extractFlags(analysisResult?.signals);
+  const flaggedBehaviors = flags.map((flag) => ({
+    type: flag,
+    label: flag.charAt(0).toUpperCase() + flag.slice(1),
+    confidence: analysisResult?.confidence ?? 0,
+  }));
+  const overallConfidence = analysisResult?.confidence ?? 0;
+
   return (
-    <main className="ui-container" aria-label="FLAGGED conversation analysis application">
-      <h1 style={{ textAlign: 'center', color: '#d94a49', userSelect: 'none' }}>FLAGGED</h1>
-      <section aria-label="Application mode toggle" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+    <main className="ui-container" role="main" aria-label="FLAGGED conversation analyzer app">
+      <header>
+        <h1 style={{ textAlign: 'center', userSelect: 'none', color: '#ff6f3c' }}>
+          FLAGGED: Conversation Red Flag Detector
+        </h1>
         <button
           type="button"
-          onClick={toggleDashboardMode}
+          aria-pressed={realTimeMode}
+          onClick={toggleRealTimeMode}
           className="peachy-button"
-          aria-pressed={dashboardMode}
-          aria-label={dashboardMode ? 'Switch to paste conversation analyzer' : 'Switch to real-time dashboard'}
+          style={{ marginBottom: '1rem', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
         >
-          {dashboardMode ? 'Use Paste Analyzer' : 'Use Real-Time Dashboard'}
+          {realTimeMode ? 'Switch to Paste Analyzer' : 'Switch to Real-Time Dashboard'}
         </button>
-      </section>
+      </header>
 
-      <ImmediateAlert flaggedBehaviors={highRiskFlags} />
+      <ImmediateAlert flags={alertFlags} onDismiss={dismissAlert} />
 
-      {!dashboardMode ? (
+      {!realTimeMode && (
         <>
           <ConversationAnalyzerPolish
-            onAnalysis={onAnalysis}
-            loading={loading}
-            setLoading={setLoading}
-            error={error}
-            clearError={() => setError(null)}
+            onAnalysisStart={handleAnalysisStart}
+            onAnalysisUpdate={handleAnalysisUpdate}
+            loading={isLoading}
+            error={analysisError}
           />
 
-          {error && (
-            <section
-              className="alert-banner"
-              role="alert"
-              aria-live="polite"
-              tabIndex={-1}
-              style={{ marginTop: '1rem', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}
-            >
-              {error}
+          {analysisResult && !isLoading && !analysisError && (
+            <section aria-live="polite" aria-atomic="true" style={{ marginTop: '1.5rem' }}>
+              <FlaggedResultVisualization
+                verdict={
+                  verdictLabel === 'Safe'
+                    ? 'Safe'
+                    : verdictLabel === 'Caution'
+                    ? 'Caution'
+                    : 'Flagged'
+                }
+                flaggedBehaviors={flaggedBehaviors}
+                overallConfidence={overallConfidence}
+              />
+              <ShareableResult analysis={analysisResult} />
             </section>
           )}
 
-          {analysisResult && !error && (
-            <section aria-label="Analysis results" style={{ marginTop: '2rem' }}>
-              <FlaggedResultVisualization
-                verdict={analysisResult.verdict?.label || 'Safe'}
-                flaggedBehaviors={analysisResult.signals.map((type) => {
-                  // Map signal type to label - consistent with FlagBadge expectations
-                  const labelMap = {
-                    insult: 'Insult',
-                    manipulation: 'Manipulation',
-                    gaslighting: 'Gaslighting',
-                    discard: 'Discard',
-                    control: 'Control',
-                    ultimatum: 'Ultimatum',
-                    threat: 'Threat',
-                    guilt: 'Guilt',
-                    boundary_push: 'Boundary Push',
-                    inconsistency: 'Inconsistency',
-                  };
-                  return {
-                    type,
-                    label: labelMap[type] || type,
-                    confidence: analysisResult.confidence || 0,
-                  };
-                })}
-                overallConfidence={analysisResult.confidence || 0}
-              />
-              <ShareableResult result={analysisResult} />
-            </section>
+          {analysisError && (
+            <div
+              role="alert"
+              className="alert-banner"
+              style={{ marginTop: '1rem', color: '#b71c1c', backgroundColor: '#ffccbc' }}
+            >
+              {analysisError}
+            </div>
           )}
         </>
-      ) : (
-        <RealTimeDashboard onAnalysis={onAnalysis} />
+      )}
+
+      {realTimeMode && (
+        <section style={{ marginTop: '1rem' }}>
+          <RealTimeDashboard
+            onAlert={(flags) => {
+              setAlertFlags(flags);
+            }}
+          />
+        </section>
       )}
     </main>
   );
