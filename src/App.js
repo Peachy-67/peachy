@@ -1,160 +1,158 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
 import FlaggedResultVisualization from "./components/FlaggedResultVisualization";
 import ShareableResult from "./components/ShareableResult";
 import RealTimeDashboard from "./components/RealTimeDashboard";
+
 import "./styles/UiPolish.css";
 
-const HIGH_RISK_FLAGS = new Set([
-  "insult",
-  "gaslighting",
-  "threat",
-  "ultimatum",
-]);
+const HIGH_RISK_FLAGS = new Set(["insult", "manipulation", "gaslighting", "discard", "control", "ultimatum", "threat"]);
 
-const App = () => {
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [showAlert, setShowAlert] = useState(false);
-  const [highRiskFlags, setHighRiskFlags] = useState([]);
-  const [error, setError] = useState("");
+function isHighRisk(flags = []) {
+  return flags.some((flag) => HIGH_RISK_FLAGS.has(flag));
+}
+
+export default function App() {
+  // State for the current conversation analysis result
+  const [analysis, setAnalysis] = useState(null);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [realTimeMode, setRealTimeMode] = useState(false);
 
-  // Check for high-risk flags and trigger alert
-  useEffect(() => {
-    if (analysisResult?.signals?.length) {
-      const highRiskDetected = analysisResult.signals.filter((s) =>
-        HIGH_RISK_FLAGS.has(s.toLowerCase())
-      );
-      if (highRiskDetected.length > 0) {
-        setHighRiskFlags(highRiskDetected);
-        setShowAlert(true);
-      } else {
-        setHighRiskFlags([]);
-        setShowAlert(false);
-      }
-    } else {
-      setHighRiskFlags([]);
-      setShowAlert(false);
-    }
-  }, [analysisResult]);
+  // State for alert dismissal to allow hiding immediate alert banner
+  const [alertDismissed, setAlertDismissed] = useState(false);
 
-  const handleAnalyze = async (inputText) => {
+  // Toggle between "paste analyzer" mode and "real-time dashboard" mode
+  const [dashboardMode, setDashboardMode] = useState(false);
+
+  // Handler for analyzing text conversation, passed to ConversationAnalyzerPolish
+  const handleAnalysis = useCallback(async (text) => {
     setLoading(true);
-    setError("");
-    setAnalysisResult(null);
+    setError(null);
+    setAlertDismissed(false);
     try {
       const response = await fetch("/v1/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText }),
+        body: JSON.stringify({ text }),
       });
 
       if (!response.ok) {
         const errData = await response.json();
-        setError(errData.message || "Analysis failed");
-        setLoading(false);
+        setError(errData.message || "Failed to analyze conversation.");
+        setAnalysis(null);
         return;
       }
 
-      const data = await response.json();
-      setAnalysisResult(data);
-    } catch (err) {
-      setError("Failed to analyze. Please try again.");
+      const result = await response.json();
+
+      setAnalysis({
+        verdict: result.verdict.label,
+        flaggedBehaviors: result.signals.map((signal) => ({
+          type: signal,
+          label: signal.charAt(0).toUpperCase() + signal.slice(1),
+          confidence: result.confidence || 0,
+        })),
+        overallConfidence: result.confidence || 0,
+        raw: result,
+      });
+    } catch (e) {
+      setError("An unexpected error occurred during analysis.");
+      setAnalysis(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const onDismissAlert = () => setShowAlert(false);
+  // Reset alert dismissal if analysis changes
+  useEffect(() => {
+    setAlertDismissed(false);
+  }, [analysis]);
+
+  // Compose share text summary from current analysis for ShareableResult
+  const shareText = React.useMemo(() => {
+    if (!analysis) return "";
+
+    const verdictLine = `Verdict: ${analysis.verdict}`;
+    const flagsLine =
+      analysis.flaggedBehaviors.length > 0
+        ? "Flags: " + analysis.flaggedBehaviors.map((f) => `${f.label} (${Math.round(f.confidence * 100)}%)`).join(", ")
+        : "No red flags detected.";
+    return `${verdictLine}\n${flagsLine}\n\nAnalyze your conversations at FLAGGED.RUN`;
+  }, [analysis]);
+
+  // Compute quick flag types for alert component
+  const flaggedTypes = analysis ? analysis.flaggedBehaviors.map((f) => f.type.toLowerCase()) : [];
+
+  // Show immediate alert only if high risk flags detected and alert not dismissed
+  const showImmediateAlert = !alertDismissed && isHighRisk(flaggedTypes);
 
   return (
-    <main className="ui-container" role="main" aria-label="FLAGGED conversation analysis app">
-      <header>
-        <h1 style={{ textAlign: "center", color: "#ff6f61", userSelect: "none" }}>
-          FLAGGED
-        </h1>
-        <nav style={{ textAlign: "center", marginBottom: "1rem" }}>
-          <button
-            type="button"
-            className="peachy-button"
-            onClick={() => setRealTimeMode(false)}
-            disabled={!realTimeMode}
-            aria-pressed={!realTimeMode}
-            aria-label="Switch to manual conversation analyzer mode"
-            style={{ marginRight: "1rem" }}
-          >
-            Paste Analyzer
-          </button>
-          <button
-            type="button"
-            className="peachy-button"
-            onClick={() => setRealTimeMode(true)}
-            disabled={realTimeMode}
-            aria-pressed={realTimeMode}
-            aria-label="Switch to real-time dashboard mode"
-          >
-            Real-Time Dashboard
-          </button>
-        </nav>
-      </header>
+    <main className="ui-container" aria-label="FLAGGED conversation analysis app">
+      <h1 style={{ userSelect: "none", textAlign: "center", color: "#ff6f61", marginBottom: "1rem" }}>
+        FLAGGED Conversation Analyzer
+      </h1>
 
-      {showAlert && (
+      <button
+        type="button"
+        onClick={() => setDashboardMode((d) => !d)}
+        aria-pressed={dashboardMode}
+        style={{
+          marginBottom: "1rem",
+          backgroundColor: dashboardMode ? "#ff6f61" : "#fff",
+          color: dashboardMode ? "#fff" : "#ff6f61",
+          border: `2px solid #ff6f61`,
+          borderRadius: "6px",
+          padding: "0.5rem 1rem",
+          fontWeight: "600",
+          cursor: "pointer",
+          userSelect: "none",
+          display: "block",
+          marginLeft: "auto",
+          marginRight: "auto",
+          maxWidth: "220px",
+          transition: "background-color 0.3s ease, color 0.3s ease",
+        }}
+      >
+        {dashboardMode ? "Switch to Paste Analyzer" : "Switch to Real-Time Dashboard"}
+      </button>
+
+      {showImmediateAlert && (
         <ImmediateAlert
-          flaggedBehaviors={highRiskFlags}
-          onDismiss={onDismissAlert}
-          ariaLive="assertive"
+          flaggedBehaviors={flaggedTypes}
+          onDismiss={() => setAlertDismissed(true)}
+          key="immediate-alert"
         />
       )}
 
-      {!realTimeMode && (
+      {dashboardMode ? (
+        <RealTimeDashboard onAnalysisChange={setAnalysis} />
+      ) : (
         <>
           <ConversationAnalyzerPolish
-            onAnalyze={handleAnalyze}
+            onAnalyze={handleAnalysis}
             loading={loading}
             error={error}
+            key="conversation-analyzer"
           />
-          {analysisResult && !error && (
+
+          {analysis && (
             <>
               <FlaggedResultVisualization
-                verdict={analysisResult.verdict.label || "Safe"}
-                flaggedBehaviors={analysisResult.signals.map((type) => ({
-                  type,
-                  label: type.charAt(0).toUpperCase() + type.slice(1),
-                  confidence: analysisResult.confidence || 0,
-                }))}
-                overallConfidence={analysisResult.confidence || 0}
+                verdict={analysis.verdict}
+                flaggedBehaviors={analysis.flaggedBehaviors}
+                overallConfidence={analysis.overallConfidence}
+                key="result-visualization"
               />
               <ShareableResult
-                analysis={analysisResult}
-                conversationText={analysisResult?.usage?.originalText || ""}
+                resultText={shareText}
+                key="shareable-result"
               />
             </>
           )}
         </>
       )}
-
-      {realTimeMode && (
-        <RealTimeDashboard
-          onAnalysisUpdate={setAnalysisResult}
-          initialInput=""
-          // Pass highRiskFlags and alert controls to dashboard to sync alert banner if needed
-          highRiskFlags={highRiskFlags}
-          onHighRiskAlert={(flags) => {
-            setHighRiskFlags(flags);
-            setShowAlert(flags.length > 0);
-          }}
-        />
-      )}
-
-      <footer style={{ marginTop: "3rem", textAlign: "center", userSelect: "none" }}>
-        <small style={{ color: "#aa6666" }}>
-          © FLAGGED 2024 — Behavioral AI conversation analyzer
-        </small>
-      </footer>
     </main>
   );
-};
-
-export default App;
+}
