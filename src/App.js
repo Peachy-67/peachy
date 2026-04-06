@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 
 import ConversationAnalyzerPolish from "./components/ConversationAnalyzerPolish";
 import ImmediateAlert from "./components/ImmediateAlert";
@@ -8,124 +8,122 @@ import RealTimeDashboard from "./components/RealTimeDashboard";
 
 import "./styles/UiPolish.css";
 import "./styles/FlaggedResultVisualization.css";
-import "./styles/ImmediateAlert.css";
-import "./styles/ShareableResult.css";
-import "./styles/RealTimeDashboard.css";
 
-const HIGH_RISK_FLAGS = new Set(["insult", "gaslighting", "threat", "ultimatum"]);
+const HIGH_RISK_FLAGS = new Set([
+  "insult",
+  "manipulation",
+  "gaslighting",
+  "threat",
+  "discard",
+  "control",
+]);
 
-function hasHighRiskFlags(flags = []) {
-  return flags.some((flag) => HIGH_RISK_FLAGS.has(flag));
-}
-
-const App = () => {
+function App() {
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [alertFlags, setAlertFlags] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [liveMode, setLiveMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [alertFlags, setAlertFlags] = useState([]);
 
-  const handleAnalyze = useCallback(async (text) => {
-    setLoading(true);
+  // Handle new analysis results: set alert if high-risk flags present
+  useEffect(() => {
+    if (analysisResult?.signals?.length) {
+      const detectedHighRisk = analysisResult.signals.filter((flag) =>
+        HIGH_RISK_FLAGS.has(flag)
+      );
+      setAlertFlags(detectedHighRisk);
+    } else {
+      setAlertFlags([]);
+    }
+  }, [analysisResult]);
+
+  // Handle analysis triggered by paste or manual analyze
+  async function handleAnalyze(conversationText) {
     setError(null);
+    setLoading(true);
     setAnalysisResult(null);
-
     try {
-      const response = await fetch("/v1/analyze", {
+      const res = await fetch("/v1/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text: conversationText }),
       });
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Analysis failed");
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.message || "Analysis failed");
       }
-      const data = await response.json();
+      const data = await res.json();
       setAnalysisResult(data);
-      if (hasHighRiskFlags(data.signals)) {
-        setAlertFlags(data.signals);
-      } else {
-        setAlertFlags([]);
-      }
-    } catch (e) {
-      setError(e.message || "Unknown error");
+    } catch (err) {
+      setError(err.message || "Unexpected error");
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  const handleDismissAlert = () => {
-    setAlertFlags([]);
-  };
-
-  // If liveMode is toggled off, clear results and alerts
-  useEffect(() => {
-    if (liveMode) {
-      // optionally clear prior results to encourage live input
-      setAnalysisResult(null);
-      setAlertFlags([]);
-      setError(null);
-    }
-  }, [liveMode]);
+  }
 
   return (
-    <main className="ui-container" role="main" aria-label="FLAGGED conversation analyzer application">
-      <h1 style={{ textAlign: "center", color: "#ff7043", userSelect: "none" }}>FLAGGED</h1>
+    <main className="ui-container" role="main" aria-label="FLAGGED conversation analyzer">
+      <h1 tabIndex={-1} style={{ userSelect: "none", color: "#cc2f2f", textAlign: "center" }}>
+        FLAGGED Conversation Analyzer
+      </h1>
 
+      {/* Toggle between Dashboard and Analyzer */}
       <div style={{ textAlign: "center", marginBottom: "1rem" }}>
         <button
           type="button"
           className="peachy-button"
-          onClick={() => setLiveMode((lm) => !lm)}
-          aria-pressed={liveMode}
-          aria-label={`Toggle real-time dashboard mode ${liveMode ? "on" : "off"}`}
-          style={{ maxWidth: 220 }}
+          onClick={() => setShowDashboard((v) => !v)}
+          aria-pressed={showDashboard}
+          aria-label={`Switch to ${showDashboard ? "Conversation Analyzer" : "Real-Time Dashboard"}`}
         >
-          {liveMode ? "Switch to Paste Analyzer" : "Switch to Real-Time Dashboard"}
+          {showDashboard ? "Use Conversation Analyzer" : "Use Real-Time Dashboard"}
         </button>
       </div>
 
-      {alertFlags.length > 0 && (
-        <ImmediateAlert flags={alertFlags} onDismiss={handleDismissAlert} />
-      )}
-
-      {!liveMode && (
+      {showDashboard ? (
+        <RealTimeDashboard
+          onAnalyze={handleAnalyze}
+          loading={loading}
+          error={error}
+          analysisResult={analysisResult}
+        />
+      ) : (
         <>
           <ConversationAnalyzerPolish
             onAnalyze={handleAnalyze}
             loading={loading}
             error={error}
+            analysisResult={analysisResult}
           />
 
+          {/* ImmediateAlert watches for high-risk flags */}
+          <ImmediateAlert flaggedBehaviors={alertFlags} />
+
+          {/* Show flagged results and share options when analysis is done */}
           {analysisResult && (
-            <section
-              aria-live="polite"
-              aria-label="Analysis results and flagged behaviors"
-              style={{ marginTop: "1.5rem" }}
-            >
+            <section aria-live="polite" aria-label="Analysis Results" tabIndex={-1}>
               <FlaggedResultVisualization
-                verdict={analysisResult.verdict.label || "Safe"}
-                flaggedBehaviors={
-                  analysisResult.signals.map((flag) => ({
-                    type: flag,
-                    label: flag.charAt(0).toUpperCase() + flag.slice(1),
-                    confidence: analysisResult.confidence || 0,
-                  }))
+                verdict={
+                  analysisResult.verdict?.band === "green"
+                    ? "Safe"
+                    : analysisResult.verdict?.band === "yellow"
+                    ? "Caution"
+                    : "Flagged"
                 }
                 overallConfidence={analysisResult.confidence || 0}
+                flaggedBehaviors={analysisResult.signals.map((signal) => ({
+                  type: signal,
+                  label: signal.charAt(0).toUpperCase() + signal.slice(1),
+                  confidence: analysisResult.confidence || 0,
+                }))}
               />
-
-              <ShareableResult analysis={analysisResult} />
+              <ShareableResult analysisResult={analysisResult} />
             </section>
           )}
         </>
       )}
-
-      {liveMode && (
-        <RealTimeDashboard onAlert={setAlertFlags} />
-      )}
     </main>
   );
-};
+}
 
 export default App;
